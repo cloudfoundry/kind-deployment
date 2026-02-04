@@ -61,7 +61,7 @@ spec:
     spec:
       initContainers:
         - name: init
-          image: "{{ .Values.registry }}/alpine:latest"
+          image: alpine:latest
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c"]
           args:
