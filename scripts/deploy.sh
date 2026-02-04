@@ -56,7 +56,7 @@ helm upgrade --install locket releases/diego/helm --set dbPassword=$DB_PASSWORD 
 helm upgrade --install diego releases/diego/helm --set dbPassword=$DB_PASSWORD --set diegoSSHCredentials=$DIEGO_SSH_CREDENTIALS --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set-file sshProxyHostKey="$CERTS_DIR/ssh_key" --set "auctioneer.enabled=true" --set "bbs.enabled=true" --set "fileserver.enabled=true" --set "sshProxy.enabled=true"
 helm upgrade --install tps-watcher releases/capi/helm --set "tpsWatcher.enabled=true"
 helm upgrade --install route-emitter releases/diego/helm --set "routeEmitter.enabled=true"
-helm upgrade --install k8s-rep oci://ghcr.io/cloudfoundry/helm/k8s-rep:$K8S_REP_VERSION --set-file ca_crt="$CERTS_DIR/ca.crt" --set "stacks.cflinuxfs4=ghcr.io/cloudfoundry/k8s/cflinuxfs4:1.300.0"
+helm upgrade --install k8s-rep oci://ghcr.io/cloudfoundry/helm/k8s-rep:$K8S_REP_VERSION --set-file ca_crt="$CERTS_DIR/ca.crt" --set "stacks.cflinuxfs4=ghcr.io/cloudfoundry/k8s/cflinuxfs4:1.304.0"
 helm upgrade --install api releases/capi/helm --set blobstorePassword=$BLOBSTORE_PASSWORD --set dbPassword=$DB_PASSWORD --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set cloudController.sshProxyKeyFingerprint=$SSH_PROXY_KEY_FINGERPRINT --set "blobstore.enabled=true" --set "cloudController.enabled=true" --wait
 helm upgrade --install cf-networking releases/cf-networking/helm --set policyServer.dbPassword=$DB_PASSWORD --set policyServer.oauthClientsSecret=$OAUTH_CLIENTS_SECRET
 helm upgrade --install policy-agent oci://ghcr.io/cloudfoundry/helm/policy-agent:$POLICY_AGENT_VERSION
