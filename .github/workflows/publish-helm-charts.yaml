@@ -1,0 +1,89 @@
+name: Publish helm chart
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'releases/**/helm'  
+  workflow_dispatch:
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+    env:
+      PR_TITLE: "Release: Bump chart versions"
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+        fetch-tags: true
+        persist-credentials: false
+    - name: Check if release commit
+      id: check_commit
+      run: |
+        if git log -1 --pretty=%B | grep -q "${{ env.PR_TITLE }}"; then
+          echo "This is a release commit. Starting release."
+          echo "skip=false" >> $GITHUB_OUTPUT
+        else
+          echo "This is NOT a release commit. Exiting workflow."
+          echo "skip=true" >> $GITHUB_OUTPUT
+        fi
+    - name: Authenticate to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Publish Helm Chart
+      if: steps.check_commit.outputs.skip != 'true'
+      run: |
+        export REGISTRY_PREFIX="ghcr.io/cloudfoundry/k8s/helm"
+        UPDATED_CHARTS=$(git log -1 --pretty=%B | grep "list-of-updated-charts:" | cut -d':' -f2)
+        
+        # Publish only the updated charts
+        for CHART_NAME in $(echo $UPDATED_CHARTS | tr ',' ' '); do
+          echo "Processing: $CHART_NAME\n"
+          helm package ./releases/$CHART_NAME/helm -d ${{ runner.temp }}
+          helm push ${{ runner.temp }}/$CHART_NAME-*.tgz oci://$REGISTRY_PREFIX/
+        done
+
+        # Create changelog for ALL charts
+        for CHART_DIR in releases/*/; do
+          CHART_NAME=$(basename "$CHART_DIR")
+          CHART_PATH="releases/$CHART_NAME/helm/Chart.yaml"
+          
+          if [ -f "$CHART_PATH" ]; then
+            CHART_VERSION=$(yq eval '.version' "$CHART_PATH")
+            APP_VERSION=$(yq eval '.appVersion' "$CHART_PATH")
+            
+            # Check if this chart was updated
+            if echo "$UPDATED_CHARTS" | tr ',' '\n' | grep -q "^${CHART_NAME}$"; then
+              echo "* $CHART_NAME $CHART_VERSION ($APP_VERSION) **update**" >> changelog.txt
+            else
+              echo "* $CHART_NAME $CHART_VERSION ($APP_VERSION)" >> changelog.txt
+            fi
+          fi
+        done
+    - name: Determine release version
+      if: steps.check_commit.outputs.skip != 'true'
+      run: |
+        OLD_VERSION=$(git describe --tags --abbrev=0)
+        MAJOR=$(echo $OLD_VERSION | cut -d. -f1 | sed 's/v//')
+        MINOR=$(echo $OLD_VERSION | cut -d. -f2)
+        PATCH=$(echo $OLD_VERSION | cut -d. -f3)
+        NEW_VERSION="v${MAJOR}.$((MINOR + 1)).0"
+        echo "OLD_VERSION=$OLD_VERSION" >> $GITHUB_ENV
+        echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      if: steps.check_commit.outputs.skip != 'true'
+      env:
+        NEW_VERSION: ${{ env.NEW_VERSION }}
+      with:
+        tag_name: ${{ env.NEW_VERSION }}
+        body_path: changelog.txt

@@ -1,0 +1,54 @@
+{{ if .Values.cloudController.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cc-worker
+  labels:
+    app.kubernetes.io/name: cc-worker
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cc-worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cc-worker
+    spec:
+      containers:
+        - name: cc-worker
+          image: {{ .Values.cloudController.image.repository }}:{{ default .Chart.AppVersion .Values.cloudController.image.tag }}
+          imagePullPolicy: {{ .Values.cloudController.image.imagePullPolicy }}
+          command: ["bundle", "exec", "rake", "jobs:generic"]
+          envFrom:
+            - secretRef:
+                name: cc-shared
+          env:
+            - name: INDEX
+              value: "1"
+          {{- if .Values.ccWorker.resources }}
+          resources:
+            {{- toYaml .Values.ccWorker.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: cloud-controller
+              mountPath: /etc/ssl/certs/cloud-controller
+            - name: etc-cloud-controller
+              mountPath: /etc/cloud-controller
+            - name: tmpdir
+              mountPath: /tmp
+      nodeSelector:
+        cloudfoundry.org/workload: "false"
+      volumes:
+        - name: cloud-controller
+          secret:
+            secretName: cloud-controller
+        - name: etc-cloud-controller
+          configMap:
+            name: cloud-controller-configmap
+        - name: tmpdir
+          emptyDir: {}
+{{ end }}

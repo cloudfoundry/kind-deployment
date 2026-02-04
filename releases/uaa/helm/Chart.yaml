@@ -1,0 +1,7 @@
+name: uaa
+version: 0.8.0
+description: A Helm chart for UAA
+type: application
+apiVersion: v2
+# renovate: depName=uaa-release image=ghcr.io/cloudfoundry/k8s/uaa
+appVersion: 78.7.0

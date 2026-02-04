@@ -1,0 +1,39 @@
+x-registry-cache: &registry-cache
+  image: registry:3
+  restart: always
+  networks:
+    - kind
+
+services:
+  docker-io:
+    <<: *registry-cache
+    container_name: docker-io
+    environment:
+      REGISTRY_PROXY_REMOTEURL: https://registry-1.docker.io
+    volumes:
+      - docker-io:/var/lib/registry
+
+  ghcr-io:
+    <<: *registry-cache
+    container_name: ghcr-io
+    environment:
+      REGISTRY_PROXY_REMOTEURL: https://ghcr.io
+    volumes:
+      - ghcr-io:/var/lib/registry
+
+  quay-io:
+    <<: *registry-cache
+    container_name: quay-io
+    environment:
+      REGISTRY_PROXY_REMOTEURL: https://quay.io
+    volumes:
+      - quay-io:/var/lib/registry
+
+volumes:
+  docker-io:
+  ghcr-io:
+  quay-io:
+
+networks:
+  kind:
+    external: true

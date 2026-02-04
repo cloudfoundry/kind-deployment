@@ -1,0 +1,148 @@
+{{- if .Values.sshProxy.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ssh-proxy-configmap
+data:
+  ssh-proxy.json: |-
+    {
+      "address": "0.0.0.0:2222",
+      "health_check_address": "0.0.0.0:2223",
+      "disable_health_check_server": true,
+      "host_key": {{ .Values.sshProxyHostKey | quote }},
+      "skip_cert_verify": false,
+      "log_level": "info",
+      "debug_address": "127.0.0.1:17016",
+      "connect_to_instance_address": false,
+      "communication_timeout": "10s",
+      "cc_api_url": "https://cloud-controller.{{ .Release.Namespace }}.svc.cluster.local:9024",
+      "cc_api_ca_cert": "/etc/ssl/certs/ssh-proxy/ca.crt",
+      "idle_connection_timeout": "300s",
+      "bbs_address": "https://bbs.{{ .Release.Namespace }}.svc.cluster.local:8889",
+      "bbs_client_cert": "/etc/ssl/certs/ssh-proxy/tls.crt",
+      "bbs_client_key": "/etc/ssl/certs/ssh-proxy/tls.key",
+      "bbs_ca_cert": "/etc/ssl/certs/ssh-proxy/ca.crt",
+      "enable_diego_auth": true,
+      "diego_credentials": {{ .Values.diegoSSHCredentials | quote }},
+      "enable_cf_auth": true,
+      "uaa_token_url": "https://uaa.{{ .Release.Namespace }}.svc.cluster.local/oauth/token",
+      "uaa_password": {{ .Values.oauthClientsSecret | quote }},
+      "uaa_username": "ssh-proxy",
+      "uaa_ca_cert": "/etc/ssl/certs/ssh-proxy/ca.crt",
+      "time_format": "rfc3339",
+      "loggregator": {
+        "loggregator_use_v2_api": true,
+        "loggregator_api_port": 3458,
+        "loggregator_api_host": "forwarder-agent.{{ .Release.Namespace }}.svc.cluster.local",
+        "loggregator_ca_path": "/etc/ssl/certs/ssh-proxy/ca.crt",
+        "loggregator_cert_path": "/etc/ssl/certs/ssh-proxy/tls.crt",
+        "loggregator_key_path": "/etc/ssl/certs/ssh-proxy/tls.key",
+        "loggregator_job_deployment": "cf",
+        "loggregator_job_name": "scheduler",
+        "loggregator_job_index": "62bcb8b5-ee8a-4dd9-bec0-3788beb13855",
+        "loggregator_job_ip": "62bcb8b5-ee8a-4dd9-bec0-3788beb13855.scheduler.{{ .Release.Namespace }}.cf.bosh",
+        "loggregator_job_origin": "ssh_proxy",
+        "loggregator_source_id": "ssh_proxy",
+        "loggregator_instance_id": "62bcb8b5-ee8a-4dd9-bec0-3788beb13855"
+      },
+      "backends_tls_enabled": true,
+      "backends_tls_ca_certificates": "/etc/ssl/certs/ssh-proxy/ca.crt",
+      "backends_tls_client_certificate": "/etc/ssl/certs/ssh-proxy/tls.crt",
+      "backends_tls_client_private_key": "/etc/ssl/certs/ssh-proxy/tls.key"
+    }
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: ssh-proxy
+  labels:
+    app: ssh-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ssh-proxy
+  template:
+    metadata:
+      labels:
+        app: ssh-proxy
+    spec:
+      containers:
+        - name: ssh-proxy
+          image: {{ .Values.sshProxy.image.repository }}:{{ default .Chart.AppVersion .Values.sshProxy.image.tag }}
+          imagePullPolicy: {{ .Values.sshProxy.image.imagePullPolicy }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 2222
+          {{- if .Values.sshProxy.resources }}
+          resources:
+            {{- toYaml .Values.sshProxy.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: ssh-proxy
+              mountPath: /etc/ssl/certs/ssh-proxy
+            - name: ssh-proxy-config
+              mountPath: /ssh-proxy
+      nodeSelector:
+        cloudfoundry.org/workload: "false"
+      volumes:
+        - name: ssh-proxy
+          secret:
+            secretName: {{ default .Values.sshProxy.certificateSecret "ssh-proxy" }}
+        - name: ssh-proxy-config
+          configMap:
+            name: ssh-proxy-configmap
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: ssh-proxy
+  labels:
+    app: ssh-proxy
+spec:
+  ports:
+    - port: 2222
+      targetPort: 2222
+      protocol: TCP
+  selector:
+    app: ssh-proxy
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: ssh-proxy
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: ssh-proxy
+  rules:
+    - backendRefs:
+      - name: ssh-proxy
+        port: 2222
+---
+{{ if not .Values.sshProxy.certificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ssh-proxy
+spec:
+  secretName: ssh-proxy
+  commonName: client
+  dnsNames:
+    - ssh-proxy
+    - ssh-proxy.{{ .Release.Namespace }}.svc
+    - ssh-proxy.{{ .Release.Namespace }}.svc.cluster.local
+    - "{{ .Values.sshProxy.hostname }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}
+{{- end }}

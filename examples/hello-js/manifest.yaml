@@ -1,0 +1,11 @@
+---
+applications:
+- name: hello-js
+  path: .
+  instances: 1
+  random-route: false
+  memory: 1024M
+  health-check-type: http
+  health-check-http-endpoint: /livez
+  readiness-health-check-type: http
+  readiness-health-check-http-endpoint: /readyz

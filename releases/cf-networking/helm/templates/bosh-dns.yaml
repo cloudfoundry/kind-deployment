@@ -1,0 +1,233 @@
+{{- if .Values.boshDnsAdapter.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bosh-dns-configmap
+data:
+  handlers.json: |-
+    [
+      {
+        "domain": "apps.internal.",
+        "cache": {
+          "enabled": false
+        },
+        "source": {
+          "type": "http",
+          "url": "http://127.0.0.1:8053"
+        }
+      }
+    ]
+  bosh-dns-adapter.json: |-
+    {
+      "address": "0.0.0.0",
+      "port": "8053",
+      "service_discovery_controller_address": "{{ .Values.serviceDiscoveryController.hostname }}",
+      "service_discovery_controller_port": "{{ .Values.serviceDiscoveryController.port }}",
+      "client_cert": "/etc/ssl/certs/bosh-dns-adapter/tls.crt",
+      "client_key": "/etc/ssl/certs/bosh-dns-adapter/tls.key",
+      "ca_cert": "/etc/ssl/certs/bosh-dns-adapter/ca.crt",
+      "metron_port": 3457,
+      "metrics_emit_seconds": 10,
+      "log_level_address": "127.0.0.1",
+      "log_level_port": 8066,
+      "internal_service_mesh_domains": []
+    }
+  bosh-dns.json: |-
+    {
+      "address": "0.0.0.0",
+      "port": 53,
+      "log_level": "INFO",
+      "disable_recursors": false,
+      "configure_systemd_resolved": false,
+      "recursors": [],
+      "excluded_recursors": [],
+      "records_file": "/bosh-dns/records.json",
+      "upcheck_domains": [
+        "upcheck.bosh-dns."
+      ],
+      "recursor_timeout": "2s",
+      "recursor_max_retries": 0,
+      "request_timeout": "5s",
+      "recursor_selection": "smart",
+      "jobs_dir": "/",
+      "api": {
+        "port": 53080,
+        "certificate_file": "/etc/ssl/certs/bosh-dns/tls.crt",
+        "private_key_file": "/etc/ssl/certs/bosh-dns/tls.key",
+        "ca_file": "/etc/ssl/certs/bosh-dns/ca.crt"
+      },
+      "health": {
+        "enabled": true,
+        "port": 8853,
+        "certificate_file": "/etc/ssl/certs/bosh-dns/tls.crt",
+        "private_key_file": "/etc/ssl/certs/bosh-dns/tls.key",
+        "ca_file": "/etc/ssl/certs/bosh-dns/ca.crt",
+        "check_interval": "20s",
+        "max_tracked_queries": 2000,
+        "synchronous_check_timeout": "1s"
+      },
+      "metrics": {
+        "enabled": false,
+        "port": 53088,
+        "address": "127.0.0.1"
+      },
+      "cache": {
+        "enabled": true
+      },
+      "handlers_files_glob": "/bosh-dns/handlers.json",
+      "internal_upcheck_domain": {
+        "enabled": false,
+        "dns_query": "q-i0.diego-cell.*.cf.bosh."
+      },
+      "logging": {
+        "format": {
+          "timestamp": "rfc3339"
+        },
+        "tags": []
+      }
+    }
+  records.json: |-
+    {
+      "records": [],
+      "aliases": {}
+    }
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: bosh-dns
+  labels:
+    app: bosh-dns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bosh-dns
+  template:
+    metadata:
+      labels:
+        app: bosh-dns
+    spec:
+      containers:
+        - name: bosh-dns-adapter
+          image: {{ .Values.boshDnsAdapter.image.repository }}:{{ default .Chart.AppVersion .Values.boshDnsAdapter.image.tag }}
+          imagePullPolicy: {{ .Values.boshDnsAdapter.image.imagePullPolicy }}
+          imagePullPolicy: IfNotPresent
+          {{- if .Values.boshDnsAdapter.resources }}
+          resources:
+            {{- toYaml .Values.boshDnsAdapter.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: bosh-dns-adapter
+              mountPath: /etc/ssl/certs/bosh-dns-adapter
+            - name: bosh-dns-config
+              mountPath: /bosh-dns-adapter/bosh-dns-adapter.json
+              subPath: bosh-dns-adapter.json
+        - name: bosh-dns
+          image: {{ .Values.boshDns.image.repository }}:{{ .Values.boshDns.image.tag }}
+          imagePullPolicy: {{ .Values.boshDns.image.imagePullPolicy }}
+          imagePullPolicy: IfNotPresent
+          {{- if .Values.boshDns.resources }}
+          resources:
+            {{- toYaml .Values.boshDns.resources | nindent 12 }}
+          {{- end }}
+          ports:
+            - containerPort: 53
+              name: tcp
+              protocol: TCP
+            - containerPort: 53
+              name: udp
+              protocol: UDP
+          volumeMounts:
+            - name: bosh-dns
+              mountPath: /etc/ssl/certs/bosh-dns
+            - name: bosh-dns-config
+              mountPath: /bosh-dns/bosh-dns.json
+              subPath: bosh-dns.json
+            - name: bosh-dns-config
+              mountPath: /bosh-dns/handlers.json
+              subPath: handlers.json
+            - name: bosh-dns-config
+              mountPath: /bosh-dns/records.json
+              subPath: records.json
+      nodeSelector:
+        cloudfoundry.org/workload: "false"
+      volumes:
+        - name: bosh-dns-adapter
+          secret:
+            secretName: {{ default .Values.boshDnsAdapter.certificateSecret "bosh-dns-adapter" }}
+        - name: bosh-dns
+          secret:
+            secretName: {{ default .Values.boshDns.certificateSecret "bosh-dns" }}
+        - name: bosh-dns-config
+          configMap:
+            name: bosh-dns-configmap
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: bosh-dns
+  labels:
+    app: bosh-dns
+spec:
+  ports:
+    - port: 53
+      targetPort: 53
+      name: tcp
+      protocol: TCP
+    - port: 53
+      targetPort: 53
+      name: udp
+      protocol: UDP
+  selector:
+    app: bosh-dns
+{{ if not .Values.boshDnsAdapter.certificateSecret }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bosh-dns-adapter
+spec:
+  secretName: bosh-dns-adapter
+  commonName: bosh-dns-adapter
+  dnsNames:
+    - bosh-dns-adapter
+    - bosh-dns-adapter.{{ .Release.Namespace }}.svc
+    - bosh-dns-adapter.{{ .Release.Namespace }}.svc.cluster.local
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}
+{{- if not .Values.boshDns.certificateSecret }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bosh-dns
+spec:
+  secretName: bosh-dns
+  commonName: bosh-dns
+  dnsNames:
+    - bosh-dns
+    - bosh-dns.{{ .Release.Namespace }}.svc
+    - bosh-dns.{{ .Release.Namespace }}.svc.cluster.local
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}
+{{- end }}

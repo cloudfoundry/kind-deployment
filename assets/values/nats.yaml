@@ -1,0 +1,14 @@
+config:
+  merge:
+    write_deadline: 2s
+  nats:
+    tls:
+      enabled: true
+      merge:
+        timeout: 5
+      secretName: nats-tls
+natsBox:
+  enabled: false
+tlsCA:
+  enabled: true
+  secretName: nats-tls

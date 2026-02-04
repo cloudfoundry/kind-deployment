@@ -1,0 +1,244 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: istio-ingressgateway-certs
+  namespace: default
+spec:
+  commonName: istio-ingressgateway-certs
+  dnsNames:
+  - '*.127-0-0-1.nip.io'
+  - '*.apps.127-0-0-1.nip.io'
+  issuerRef:
+    kind: ClusterIssuer
+    name: ca-issuer
+  secretName: istio-ingressgateway-certs
+  usages:
+  - key encipherment
+  - digital signature
+  - server auth
+  - client auth
+  privateKey:
+    rotationPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    networking.istio.io/service-type: NodePort
+  labels:
+    gateway.istio.io/managed: istio.io-gateway-controller
+    gateway.networking.k8s.io/gateway-name: istio-gateway
+  name: istio-gateway-istio
+  namespace: default
+spec:
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ports:
+  - appProtocol: tcp
+    name: status-port
+    nodePort: 31381
+    port: 15021
+    protocol: TCP
+    targetPort: 15021
+  - appProtocol: tcp
+    name: policy-server
+    nodePort: 32212
+    port: 4003
+    protocol: TCP
+    targetPort: 4003
+  - appProtocol: tcp
+    name: service-discovery-controller
+    nodePort: 32213
+    port: 8054
+    protocol: TCP
+    targetPort: 8054
+  - appProtocol: http
+    name: http
+    nodePort: 31080
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  - appProtocol: https
+    name: https
+    nodePort: 31443
+    port: 443
+    protocol: TCP
+    targetPort: 443
+  - appProtocol: tcp
+    name: log-cache-api
+    nodePort: 31880
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - appProtocol: tcp
+    name: log-cache-syslog
+    nodePort: 31882
+    port: 8082
+    protocol: TCP
+    targetPort: 8082
+  - appProtocol: tcp
+    name: doppler
+    nodePort: 31883
+    port: 8083
+    protocol: TCP
+    targetPort: 8083
+  - appProtocol: tcp
+    name: ssh-proxy
+    nodePort: 31222
+    port: 2222
+    protocol: TCP
+    targetPort: 2222
+  - appProtocol: tcp
+    name: syslog-binding-cache
+    nodePort: 31914
+    port: 9000
+    protocol: TCP
+    targetPort: 9000
+  selector:
+    gateway.networking.k8s.io/gateway-name: istio-gateway
+  type: NodePort
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: istio-gateway-configuration
+  namespace: default
+data:
+  deployment: |
+    spec:
+      template:
+        spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: cloudfoundry.org/workload
+                    operator: NotIn
+                    values:
+                    - "true"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: kind-settings
+  namespace: default
+spec:
+  configPatches:
+  - applyTo: CLUSTER
+    match:
+      cluster:
+        name: outbound|443||gorouter.default.svc.cluster.local
+      context: GATEWAY
+    patch:
+      operation: MERGE
+      value:
+        typed_extension_protocol_options:
+          envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+            '@type': type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+            explicit_http_config:
+              http2_protocol_options:
+                max_inbound_window_update_frames_per_data_frame_sent: 20
+  workloadSelector:
+    labels:
+      gateway.networking.k8s.io/gateway-name: istio-gateway
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  annotations:
+    networking.istio.io/service-type: NodePort
+  name: istio-gateway
+  namespace: default
+spec:
+  gatewayClassName: istio
+  infrastructure:
+    annotations: {}
+    parametersRef:
+      group: ""
+      kind: ConfigMap
+      name: istio-gateway-configuration
+  listeners:
+  - allowedRoutes:
+      namespaces:
+        from: All
+    hostname: '*.127-0-0-1.nip.io'
+    name: http
+    port: 80
+    protocol: HTTP
+  - allowedRoutes:
+      namespaces:
+        from: All
+    hostname: '*.127-0-0-1.nip.io'
+    name: https
+    port: 443
+    protocol: HTTPS
+    tls:
+      certificateRefs:
+      - group: ""
+        kind: Secret
+        name: istio-ingressgateway-certs
+      mode: Terminate
+  - allowedRoutes:
+      namespaces:
+        from: All
+    hostname: credhub.127-0-0-1.nip.io
+    name: tls-credhub
+    port: 443
+    protocol: TLS
+    tls:
+      mode: Passthrough
+  - allowedRoutes:
+      namespaces:
+        from: All
+    hostname: uaa.127-0-0-1.nip.io
+    name: tls-uaa
+    port: 443
+    protocol: TLS
+    tls:
+      mode: Passthrough
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: log-cache-api
+    port: 8080
+    protocol: TCP
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: log-cache-syslog
+    port: 8082
+    protocol: TCP
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: doppler
+    port: 8083
+    protocol: TCP
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: ssh-proxy
+    port: 2222
+    protocol: TCP
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: syslog-binding-cache
+    port: 9000
+    protocol: TCP

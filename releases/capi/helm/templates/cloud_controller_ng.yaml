@@ -1,0 +1,315 @@
+{{ if .Values.cloudController.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloud-controller-configmap
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-1"
+data:
+  config.yaml: |-
+    {{- tpl (.Files.Get "files/cloud_controller_ng.yaml") . | nindent 4 }}
+  stacks.yaml: |-
+    default: cflinuxfs4
+    stacks:
+    - description: Cloud Foundry Linux-based filesystem (Ubuntu 22.04)
+      name: cflinuxfs4
+    deprecated_stacks:  []
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-configmap
+data:
+  nginx.conf: |-
+    {{- tpl (.Files.Get "files/nginx/nginx.conf") . | nindent 4 }}
+  nginx_external_endpoints.conf: |-
+    {{- tpl (.Files.Get "files/nginx/nginx_external_endpoints.conf") . | nindent 4 }}
+  nginx_server_mtls.conf: |-
+    {{- tpl (.Files.Get "files/nginx/nginx_server_mtls.conf") . | nindent 4 }}
+  public_upload.conf: |-
+    {{- tpl (.Files.Get "files/nginx/public_upload.conf") . | nindent 4 }}
+  mime.types: |-
+    {{- tpl (.Files.Get "files/nginx/mime.types") . | nindent 4 }}
+  nginx_server_public_tls.conf: |-
+    {{- tpl (.Files.Get "files/nginx/nginx_server_public_tls.conf") . | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloud-controller-route-registrar-configmap
+data:
+  route-registrar.json: |-
+    {
+      "message_bus_servers": [
+        {
+          "host": "{{ .Values.cloudController.nats.address }}"
+        }
+      ],
+      "nats_mtls_config": {
+        "enabled": true,
+        "cert_path": "/etc/ssl/certs/cloud-controller/tls.crt",
+        "key_path": "/etc/ssl/certs/cloud-controller/tls.key",
+        "ca_path": "/etc/ssl/certs/cloud-controller/ca.crt"
+      },
+      "host": "",
+      "routes": [
+        {
+          "name": "api",
+          "port": 9022,
+          "registration_interval": "10s",
+          "server_cert_domain_san": "{{ .Values.cloudController.externalDomain }}",
+          "tags": {
+            "component": "CloudController"
+          },
+          "uris": [
+            "{{ .Values.cloudController.externalDomain }}"
+          ]
+        }
+      ]
+    }
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cc-shared
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-2"
+stringData:
+  DB: postgres
+  DB_CONNECTION_STRING: postgres://postgres:{{ .Values.dbPassword }}@postgresql.{{ .Release.Namespace }}.svc.cluster.local:5432/cc
+  CLOUD_CONTROLLER_NG_CONFIG: /etc/cloud-controller/config.yaml
+  RAILS_ENV: production
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: cloud-controller
+  labels:
+    app.kubernetes.io/name: cloud-controller
+spec:
+  ports:
+    - port: 9023
+      name: https
+      targetPort: 9023
+    - port: 9024
+      name: https-ext
+      targetPort: 9024
+  selector:
+    app.kubernetes.io/name: cloud-controller
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: capi
+spec:
+  parentRefs:
+    - name: istio-gateway
+  hostnames:
+    - "{{ .Values.cloudController.externalDomain }}"
+  rules:
+    - backendRefs:
+        - name: gorouter
+          port: 443
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloud-controller
+  labels:
+    app.kubernetes.io/name: cloud-controller
+spec:
+  # This is a singleton.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cloud-controller
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cloud-controller
+    spec:
+      containers:
+        - name: cloud-controller
+          image: {{ .Values.cloudController.image.repository }}:{{ default .Chart.AppVersion .Values.cloudController.image.tag }}
+          imagePullPolicy: {{ .Values.cloudController.image.imagePullPolicy }}
+          command: ["bundle", "exec", "bin/cloud_controller", "-c", "/etc/cloud-controller/config.yaml"]
+          envFrom:
+            - secretRef:
+                name: cc-shared
+          env:
+            - name: INDEX
+              value: "1"
+          {{- if .Values.cloudController.resources }}
+          resources:
+            {{- toYaml .Values.cloudController.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: cloud-controller
+              mountPath: /etc/ssl/certs/cloud-controller
+            - name: etc-cloud-controller
+              mountPath: /etc/cloud-controller
+            - name: var-run
+              mountPath: /var/run
+            - name: tmpdir
+              mountPath: /tmp
+        - name: route-registrar
+          image: {{ .Values.routeRegistrar.image.repository }}:{{ default .Values.routeRegistrar.version .Values.routeRegistrar.image.tag }}
+          imagePullPolicy: {{ .Values.routeRegistrar.image.imagePullPolicy }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 9024
+              scheme: HTTPS
+          env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          {{- if .Values.routeRegistrar.resources }}
+          resources:
+            {{- toYaml .Values.routeRegistrar.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: cloud-controller
+              mountPath: /etc/ssl/certs/cloud-controller
+            - name: etc-route-registrar
+              mountPath: /etc/route-registrar-template
+            - name: tmpdir
+              mountPath: /tmp
+        - name: local-worker
+          image: {{ .Values.localWorker.image.repository }}:{{ default .Chart.AppVersion .Values.localWorker.image.tag }}
+          imagePullPolicy: {{ .Values.localWorker.image.imagePullPolicy }}
+          command: ["bundle", "exec", "rake", "jobs:local"]
+          envFrom:
+            - secretRef:
+                name: cc-shared
+          {{- if .Values.localWorker.resources }}
+          resources:
+            {{- toYaml .Values.localWorker.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: cloud-controller
+              mountPath: /etc/ssl/certs/cloud-controller
+            - name: etc-cloud-controller
+              mountPath: /etc/cloud-controller
+            - name: var-run
+              mountPath: /var/run
+            - name: tmpdir
+              mountPath: /tmp
+        - name: nginx
+          image: {{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}
+          imagePullPolicy: {{ .Values.nginx.image.imagePullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+            - name: https
+              containerPort: 443
+              protocol: TCP
+          {{- if .Values.nginx.resources }}
+          resources:
+            {{- toYaml .Values.nginx.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: var-run
+              mountPath: /var/run
+            - name: tmpdir
+              mountPath: /tmp
+            - name: cloud-controller
+              mountPath: /etc/ssl/certs/cloud-controller
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx_external_endpoints.conf
+              subPath: nginx_external_endpoints.conf
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx_server_mtls.conf
+              subPath: nginx_server_mtls.conf
+            - name: nginx-config
+              mountPath: /etc/nginx/public_upload.conf
+              subPath: public_upload.conf
+            - name: nginx-config
+              mountPath: /etc/nginx/mime.types
+              subPath: mime.types
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx_server_public_tls.conf
+              subPath: nginx_server_public_tls.conf
+        - name: udp-forwarder
+          image: {{ .Values.udpForwarder.image.repository }}:{{ default .Values.udpForwarder.version .Values.udpForwarder.image.tag }}
+          imagePullPolicy: {{ .Values.udpForwarder.image.imagePullPolicy }}
+          {{- if .Values.udpForwarder.resources }}
+          resources:
+            {{- toYaml .Values.udpForwarder.resources | nindent 12 }}
+          {{- end }}
+          env:
+            - name: UDP_PORT
+              value: "3457"
+            - name: LOGGREGATOR_AGENT_CA_FILE_PATH
+              value: /etc/ssl/certs/udp-forwarder/ca.crt
+            - name: LOGGREGATOR_AGENT_CERT_FILE_PATH
+              value: /etc/ssl/certs/udp-forwarder/tls.crt
+            - name: LOGGREGATOR_AGENT_KEY_FILE_PATH
+              value: /etc/ssl/certs/udp-forwarder/tls.key
+            - name: LOGGREGATOR_AGENT_ADDR
+              value: "forwarder-agent.{{ .Release.Namespace }}.svc.cluster.local:3458"
+            - name: METRICS_CA_FILE_PATH
+              value: /etc/ssl/certs/udp-forwarder/ca.crt
+            - name: METRICS_CERT_FILE_PATH
+              value: /etc/ssl/certs/udp-forwarder/tls.crt
+            - name: METRICS_KEY_FILE_PATH
+              value: /etc/ssl/certs/udp-forwarder/tls.key
+          volumeMounts:
+            - name: udp-forwarder
+              mountPath: /etc/ssl/certs/udp-forwarder
+      nodeSelector:
+        cloudfoundry.org/workload: "false"
+      volumes:
+        - name: cloud-controller
+          secret:
+            secretName: cloud-controller
+        - name: etc-cloud-controller
+          configMap:
+            name: cloud-controller-configmap
+        - name: etc-route-registrar
+          configMap:
+            name: cloud-controller-route-registrar-configmap
+        - name: nginx-config
+          configMap:
+            name: nginx-configmap
+        - name: udp-forwarder
+          secret:
+            secretName: udp-forwarder
+        - name: var-run # Share unix sockets between containers.
+          emptyDir: {}
+        - name: tmpdir
+          emptyDir: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cloud-controller
+spec:
+  secretName: cloud-controller
+  commonName: client
+  dnsNames:
+    - cloud-controller
+    - cloud-controller.{{ .Release.Namespace }}.svc
+    - cloud-controller.{{ .Release.Namespace }}.svc.cluster.local
+    - "{{ .Values.cloudController.externalDomain }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{ end }}

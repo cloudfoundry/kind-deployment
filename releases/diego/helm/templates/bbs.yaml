@@ -1,0 +1,161 @@
+{{- if .Values.bbs.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bbs-configmap
+data:
+  bbs.json: |-
+    {
+      "session_name": "bbs",
+      "uuid": "bbs-bosh-boshy-bosh-bosh",
+      "require_ssl": true,
+      "communication_timeout": "10s",
+      "desired_lrp_creation_timeout": "1m",
+      "lock_ttl": "15s",
+      "lock_retry_interval": "2s",
+      "report_interval": "1m",
+      "convergence_workers": 20,
+      "update_workers": 1000,
+      "task_callback_workers": 1000,
+      "listen_address": "0.0.0.0:8889",
+      "health_address": "127.0.0.1:8890",
+      "rep_client_session_cache_size": 0,
+      "log_level": "info",
+      "active_key_label": "key-2016-06",
+      "debug_address": "127.0.0.1:17017",
+      "cell_registrations_locket_enabled": true,
+      "max_task_retries": 3,
+      "max_data_string_length": 640,
+      "database_connection_string": "postgres://postgres:{{ .Values.dbPassword }}@postgresql.{{ .Release.Namespace }}.svc.cluster.local:5432/diego",
+      "encryption_keys": {
+        "key-2016-06": "MZvOZLfI9lLjUqPVZfJ7khVm1M4lq6"
+      },
+      "auctioneer_address": "https://auctioneer.{{ .Release.Namespace }}.svc.cluster.local:9016",
+      "auctioneer_require_tls": false,
+      "auctioneer_client_cert": "/etc/ssl/certs/bbs/tls.crt",
+      "auctioneer_client_key": "/etc/ssl/certs/bbs/tls.key",
+      "auctioneer_ca_cert": "/etc/ssl/certs/bbs/ca.crt",
+      "rep_client_cert": "/etc/ssl/certs/bbs/tls.crt",
+      "rep_client_key": "/etc/ssl/certs/bbs/tls.key",
+      "rep_ca_cert": "/etc/ssl/certs/bbs/ca.crt",
+      "sql_ca_cert_file": "/etc/ssl/certs/postgres/ca.crt",
+      "max_open_database_connections": 200,
+      "max_idle_database_connections": 200,
+      "db_connection_timeout": "30s",
+      "db_read_timeout": "600s",
+      "db_write_timeout": "600s",
+      "database_driver": "postgres",
+      "expire_completed_task_duration": "120s",
+      "expire_pending_task_duration": "1800s",
+      "converge_repeat_interval": "30s",
+      "kick_task_duration": "30s",
+      "time_format": "rfc3339",
+      "ca_file": "/etc/ssl/certs/bbs/ca.crt",
+      "cert_file": "/etc/ssl/certs/bbs/tls.crt",
+      "key_file": "/etc/ssl/certs/bbs/tls.key",
+      "locket_address": "locket.{{ .Release.Namespace }}.svc.cluster.local:8891",
+      "locket_ca_cert_file": "/etc/ssl/certs/bbs/ca.crt",
+      "locket_client_cert_file": "/etc/ssl/certs/bbs/tls.crt",
+      "locket_client_key_file": "/etc/ssl/certs/bbs/tls.key",
+      "locket_client_keepalive_time": 10,
+      "locket_client_keepalive_timeout": 22,
+      "loggregator": {
+        "loggregator_api_port": 3458,
+        "loggregator_api_host": "forwarder-agent.{{ .Release.Namespace }}.svc.cluster.local",
+        "loggregator_ca_path": "/etc/ssl/certs/bbs/ca.crt",
+        "loggregator_cert_path": "/etc/ssl/certs/bbs/tls.crt",
+        "loggregator_key_path": "/etc/ssl/certs/bbs/tls.key",
+        "loggregator_job_deployment": "cf",
+        "loggregator_job_name": "diego-api",
+        "loggregator_job_origin": "bbs",
+        "loggregator_source_id": "bbs"
+      }
+    }
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: bbs
+  labels:
+    app: bbs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bbs
+  template:
+    metadata:
+      labels:
+        app: bbs
+    spec:
+      containers:
+        - name: bbs
+          image: {{ .Values.bbs.image.repository }}:{{ default .Chart.AppVersion .Values.bbs.image.tag }}
+          imagePullPolicy: {{ .Values.bbs.image.imagePullPolicy }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8889
+          {{- if .Values.bbs.resources }}
+          resources:
+            {{- toYaml .Values.bbs.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: bbs
+              mountPath: /etc/ssl/certs/bbs
+            - name: postgres-tls
+              mountPath: /etc/ssl/certs/postgres
+            - name: bbs-config
+              mountPath: /bbs
+      nodeSelector:
+        cloudfoundry.org/workload: "false"
+      volumes:
+        - name: bbs
+          secret:
+            secretName: {{ default .Values.bbs.certificateSecret "bbs" }}
+        - name: postgres-tls
+          secret:
+            secretName: postgres-tls
+        - name: bbs-config
+          configMap:
+            name: bbs-configmap
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: bbs
+  labels:
+    app: bbs
+spec:
+  ports:
+    - port: 8889
+      targetPort: 8889
+      protocol: TCP
+  selector:
+    app: bbs
+---
+{{ if not .Values.bbs.certificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bbs
+spec:
+  secretName: bbs
+  commonName: bbs
+  dnsNames:
+    - bbs
+    - bbs.{{ .Release.Namespace }}.svc
+    - bbs.{{ .Release.Namespace }}.svc.cluster.local
+    - "{{ .Values.bbs.hostname }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}
+{{- end }}

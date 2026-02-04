@@ -1,0 +1,27 @@
+logCacheApi:
+  hostname: "log-cache-api.127-0-0-1.nip.io"
+  certificateSecret: ~
+  cfAuthProxy:
+    image:
+      repository: ghcr.io/cloudfoundry/k8s/cf-auth-proxy
+      tag: ~
+      imagePullPolicy: IfNotPresent
+  gateway:
+    image:
+      repository: ghcr.io/cloudfoundry/k8s/gateway
+      tag: ~
+      imagePullPolicy: IfNotPresent
+
+logCacheBackend:
+  hostname: "log-cache.127-0-0-1.nip.io"
+  certificateSecret: ~
+  syslogServer:
+    image:
+      repository: ghcr.io/cloudfoundry/k8s/syslog-server
+      tag: ~
+      imagePullPolicy: IfNotPresent
+  logCache:
+    image:
+      repository: ghcr.io/cloudfoundry/k8s/log-cache
+      tag: ~
+      imagePullPolicy: IfNotPresent

@@ -1,0 +1,7 @@
+name: log-cache
+version: 0.4.0
+description: Helm chart for Log Cache components
+type: application
+apiVersion: v2
+# renovate: depName=log-cache-release image=ghcr.io/cloudfoundry/k8s/gateway
+appVersion: 3.2.4

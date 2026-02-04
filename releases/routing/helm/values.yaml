@@ -1,0 +1,17 @@
+gorouter:
+  certificateSecret: ~
+  hostname: "gorouter.127-0-0-1.nip.io"
+  appsDomain: "*.apps.127-0-0-1.nip.io"
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/gorouter
+    tag: ~
+    imagePullPolicy: IfNotPresent
+
+udpForwarder:
+  # renovate: depName=loggregator-agent-release image=ghcr.io/cloudfoundry/k8s/udp-forwarder
+  version: "8.3.13"
+  certificateSecret: ~
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/udp-forwarder
+    tag: ~
+    imagePullPolicy: IfNotPresent

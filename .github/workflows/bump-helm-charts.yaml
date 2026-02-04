@@ -1,0 +1,79 @@
+name: Bump Helm Charts
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'releases/**/helm'
+  workflow_dispatch:
+
+jobs:
+  increase-helm-version:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+    env:
+      PR_TITLE: "Release: Bump chart versions"
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+        fetch-tags: true
+        persist-credentials: false
+    - name: Check if release commit
+      id: check_commit
+      run: |
+        if git log -1 --pretty=%B | grep -q "${{ env.PR_TITLE }}"; then
+          echo "This is a release commit. Exiting workflow."
+          echo "skip=true" >> $GITHUB_OUTPUT
+        else
+          echo "skip=false" >> $GITHUB_OUTPUT
+        fi
+    - name: Determine changed component charts since last tag to main
+      if: steps.check_commit.outputs.skip != 'true'
+      run: |
+        CHARTS=$(git diff --name-only $(git describe --tags --abbrev=0) HEAD | grep '^releases/.*/helm/' | grep -v '^releases/.*/helm/values.yaml' | cut -d'/' -f2 | sort -u | tr '\n' ',')
+        echo "CHANGED_CHARTS=${CHARTS%,}" >> $GITHUB_ENV
+    - name: Bump minor version in respective Chart.yaml
+      if: steps.check_commit.outputs.skip != 'true'
+      id: bump-version
+      uses: actions/github-script@v8
+      env:
+        CHANGED_CHARTS: ${{ env.CHANGED_CHARTS }}
+      with:
+        script: |
+          const fs = require('fs');
+          const changedCharts = process.env.CHANGED_CHARTS.split(',').filter(Boolean);
+          fs.writeFileSync('changelog.txt', '| Chart | Version Bump |\n|---|---|\n');
+          for (const chartName of changedCharts) {
+            const chartFilePath = `releases/${chartName}/helm/Chart.yaml`;
+            const chartFileContent = fs.readFileSync(chartFilePath, 'utf-8');
+            const versionMatch = chartFileContent.match(/version:\s*(\d+)\.(\d+)\.(\d+)/);
+            if (versionMatch) {
+              const minor = parseInt(versionMatch[2], 10);
+              const newVersion = `0.${minor + 1}.0`;
+              const oldVersion = `0.${minor}.0`;
+              const newChartFileContent = chartFileContent.replace(/version:\s*\d+\.\d+\.\d+/, `version: ${newVersion}`);
+              fs.writeFileSync(chartFilePath, newChartFileContent, 'utf-8');
+              console.log(`${chartName}: ${versionMatch[0]} --> ${newVersion}`);
+              fs.writeFileSync('changelog.txt', `| ${chartName} | ${oldVersion} -> ${newVersion} |\n`, { flag: 'a' });
+            } else {
+              core.setFailed(`No version found in ${chartFilePath}`);
+            }
+          }
+    - name: Create pull request
+      env:
+        CHANGED_CHARTS: ${{ env.CHANGED_CHARTS }}
+      if: env.CHANGED_CHARTS != '' && steps.check_commit.outputs.skip != 'true'
+      uses: peter-evans/create-pull-request@v8
+      with:
+        branch: draft-release
+        title: ${{ env.PR_TITLE }}
+        add-paths: 'releases/**/helm/Chart.yaml'
+        body-path: changelog.txt
+        commit-message: "${{ env.PR_TITLE }}\n\nlist-of-updated-charts:${{ env.CHANGED_CHARTS }}"
+        base: main

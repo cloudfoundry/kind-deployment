@@ -1,0 +1,98 @@
+{{ if .Values.cloudController.enabled }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: capi-db-migration
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "0"
+spec:
+  completions: 1
+  parallelism: 1
+  manualSelector: false
+  ttlSecondsAfterFinished: 60
+  template:
+    metadata:
+      name: capi-db-migration
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: capi-db-migration
+          image: {{ .Values.cloudController.image.repository }}:{{ default .Chart.AppVersion .Values.cloudController.image.tag }}
+          imagePullPolicy: {{ .Values.cloudController.image.imagePullPolicy }}
+          command: ["/usr/bin/setup-db.sh"]
+          env:
+            - name: DB_LOG_LEVEL
+              value: all
+          envFrom:
+            - secretRef:
+                name: cc-shared
+          volumeMounts:
+            - name: etc-cloud-controller
+              mountPath: /etc/cloud-controller
+            - name: cloud-controller
+              mountPath: /etc/ssl/certs/cloud-controller
+      volumes:
+        - name: cloud-controller
+          secret:
+            secretName: cloud-controller-db-migration
+        - name: etc-cloud-controller
+          configMap:
+            name: cloud-controller-configmap
+---
+{{ if not .Values.cloudController.tpsCertificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tps
+  namespace: default
+spec:
+  secretName: tps
+  commonName: tps
+  dnsNames:
+    - tps
+    - tps.{{ .Release.Namespace }}.svc
+    - tps.{{ .Release.Namespace }}.svc.cluster.local
+    - "{{ .Values.tpsWatcher.hostname }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cloud-controller-db-migration
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "-1"
+spec:
+  secretName: cloud-controller-db-migration
+  commonName: client
+  dnsNames:
+    - cloud-controller
+    - cloud-controller.{{ .Release.Namespace }}.svc
+    - cloud-controller.{{ .Release.Namespace }}.svc.cluster.local
+    - "{{ .Values.cloudController.externalDomain }}"
+    - "{{ .Values.cloudController.internalDomain }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{- end }}

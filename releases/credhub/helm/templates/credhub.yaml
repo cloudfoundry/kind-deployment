@@ -1,0 +1,103 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: credhub-config
+data:
+  application.yml: |
+  {{- tpl (.Files.Get "files/credhub.yaml") . | nindent 4 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: credhub
+  labels:
+    app: credhub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: credhub
+  template:
+    metadata:
+      name: credhub
+      labels:
+        app: credhub
+    spec:
+      containers:
+      - name: credhub-server
+        image: {{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+        {{- if .Values.resources }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        {{- end }}
+        ports:
+        - name: credhub-https
+          containerPort: 8844
+        - name: credhub-health
+          containerPort: 9001
+        env:
+        - name: TRUST_STORE_PASSWORD
+          value: changeit
+        - name: KEY_STORE_PASSWORD
+          value: changeit
+        - name: ENCRYPTION_PASSWORD
+          value: changeit
+        - name: SERVER_CA_PRIVATE_KEY_PATH
+          value: /etc/ssl/ca/tls.key
+        - name: SERVER_CA_CERT_PATH
+          value: /etc/ssl/ca/tls.crt
+        - name: UAA_CA_PATH
+          value: /etc/ssl/ca/tls.crt
+        - name: UAA_URL
+          value: https://uaa.{{ .Release.Namespace }}.svc.cluster.local
+        - name: SUBJECT_ALTERNATIVE_NAMES
+          value: "DNS:{{ .Values.hostname }},DNS:credhub.{{ .Release.Namespace }}.svc.cluster.local,DNS:credhub.{{ .Release.Namespace }}.svc,DNS:credhub.{{ .Release.Namespace }},DNS:credhub"
+        volumeMounts:
+        - name: config
+          mountPath: /app/config
+        - name: ca
+          mountPath: /etc/ssl/ca
+      nodeSelector:
+        cloudfoundry.org/workload: "false"
+      volumes:
+      - name: config
+        configMap:
+          name: credhub-config
+      - name: ca
+        secret:
+          secretName: root-ca
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: credhub
+  labels:
+    app: credhub
+spec:
+  ports:
+  - port: 8844
+    name: credhub-https
+    targetPort: 8844
+    protocol: TCP
+  - port: 9001
+    name: credhub-health
+    targetPort: 9001
+    protocol: TCP
+  selector:
+    app: credhub
+---
+kind: TLSRoute
+apiVersion: gateway.networking.k8s.io/v1alpha2
+metadata:
+  name: credhub
+  namespace: default
+spec:
+  parentRefs:
+    - name: istio-gateway
+  hostnames:
+  - "{{ .Values.hostname }}"
+  rules:
+  - backendRefs:
+    - name: credhub
+      port: 8844

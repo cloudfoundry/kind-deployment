@@ -1,0 +1,7 @@
+name: loggregator-agent
+version: 0.4.0
+description: Helm chart for Loggregator Agent components
+type: application
+apiVersion: v2
+# renovate: depName=loggregator-agent-release image=ghcr.io/cloudfoundry/k8s/syslog-binding-cache
+appVersion: 8.3.13

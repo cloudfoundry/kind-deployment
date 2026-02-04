@@ -1,0 +1,71 @@
+name: CF Acceptance Tests on KinD
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  kind-cats:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set kernel settings
+        run: |
+          docker run --rm \
+            --privileged \
+            --pid host \
+            alpine sh -c "sysctl -w fs.inotify.max_user_instances=512"
+      - name: Install dependencies
+        run: |
+          mkdir -p $HOME/.local/bin && echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          curl -L https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64 -o $HOME/.local/bin/kind
+          chmod +x $HOME/.local/bin/kind
+          curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=${CF_CLI_VERSION}&source=github" | tar -zx
+          mv cf8 $HOME/.local/bin/cf
+        env:
+          CF_CLI_VERSION: '8.14.1'
+          KIND_VERSION: '0.30.0'
+      - name: Run make up
+        run: |
+          echo '- role: worker
+            labels:
+              cloudfoundry.org/workload: "true"
+              cloudfoundry.org/zone: z2' >> kind.yaml
+          make create-kind
+          kubectl annotate node -l cloudfoundry.org/zone=z2 "cloudfoundry.org/placement-tags=isolated"
+          make up
+      - name: Login
+        run: make login
+      - name: Init
+        run: make bootstrap-complete
+      - name: Minimal Test
+        run: |
+          cf push -p examples/hello-js -i 2 -m 1024M hello-js
+          cf apps
+          curl --fail hello-js.apps.127-0-0-1.nip.io
+          cf delete -f hello-js
+      - name: setup CF tests
+        uses: ./.github/actions/setup-cf-tests
+        with:
+          test-repo: cf-acceptance-tests
+          config-template: ./.github/cats-config.tpl
+          config-output: ./.github/cats-config.json
+      - name: run CATS
+        env:
+          CONFIG: "${{ github.workspace }}/.github/cats-config.json"
+          GINKGO_NO_COLOR: "true"
+        run: |
+          ./cf-acceptance-tests/bin/test --no-color --github-output --timeout=180m --procs=2 --flake-attempts=2 --json-report report.json
+      - name: debug info
+        if: failure()
+        run: kubectl get events -A --sort-by='.lastTimestamp'
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: report
+          path: ./cf-acceptance-tests/report.json
+      

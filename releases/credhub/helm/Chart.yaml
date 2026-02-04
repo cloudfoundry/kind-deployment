@@ -1,0 +1,7 @@
+name: credhub
+version: 0.5.0
+description: Helm chart for CredHub components
+type: application
+apiVersion: v2
+# renovate: depName=credhub-release image=europe-west3-docker.pkg.dev/sap-se-gcp-istio-dev/public/cf/credhub
+appVersion: 2.14.17

@@ -1,0 +1,20 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: postgres-tls
+  namespace: default
+spec:
+  commonName: postgresql
+  dnsNames:
+  - postgresql
+  - postgresql.default.svc
+  - postgresql.default.svc.cluster.local
+  issuerRef:
+    kind: ClusterIssuer
+    name: ca-issuer
+  secretName: postgres-tls
+  usages:
+  - server auth
+  - client auth
+  privateKey:
+    rotationPolicy: Always

@@ -1,0 +1,44 @@
+loggregator:
+  enabled: true
+
+doppler:
+  hostname: "doppler.127-0-0-1.nip.io"
+  certificateSecret: ~
+  resources: ~
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/doppler
+    tag: ~
+    imagePullPolicy: IfNotPresent
+
+logStream:
+  address: "log-stream.127-0-0-1.nip.io"
+
+reverseLogProxy:
+  hostname: "reverse-log-proxy.127-0-0-1.nip.io"
+  certificateSecret: ~
+  resources: ~
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/reverse-log-proxy
+    tag: ~
+    imagePullPolicy: IfNotPresent
+
+reverseLogProxyGateway:
+  hostname: "reverse-log-proxy-gateway.127-0-0-1.nip.io"
+  certificateSecret: ~
+  resources: ~
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/reverse-log-proxy-gateway
+    tag: ~
+    imagePullPolicy: IfNotPresent
+
+trafficcontroller:
+  hostname: "trafficcontroller.127-0-0-1.nip.io"
+  systemDomain: "127-0-0-1.nip.io"
+  certificateSecret: ~
+  resources: ~
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/traffic-controller
+    tag: ~
+    imagePullPolicy: IfNotPresent
+
+oauthClientsSecret: ~

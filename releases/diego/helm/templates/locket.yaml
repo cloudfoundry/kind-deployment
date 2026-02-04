@@ -1,0 +1,124 @@
+{{- if .Values.locket.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: locket-configmap
+data:
+  locket.json: |-
+    {
+      "report_interval": "1m",
+      "ca_file": "/etc/ssl/certs/locket/ca.crt",
+      "cert_file": "/etc/ssl/certs/locket/tls.crt",
+      "key_file": "/etc/ssl/certs/locket/tls.key",
+      "debug_address": "127.0.0.1:17018",
+      "listen_address": "0.0.0.0:8891",
+      "log_level": "info",
+      "max_open_database_connections": 200,
+      "max_database_connection_lifetime": "1h",
+      "database_connection_string": "postgres://postgres:{{ .Values.dbPassword }}@postgresql:5432/locket",
+      "database_driver": "postgres",
+      "db_connection_timeout": "30s",
+      "db_read_timeout": "600s",
+      "db_write_timeout": "600s",
+      "time_format": "rfc3339",
+      "loggregator": {
+        "loggregator_use_v2_api": true,
+        "loggregator_api_port": 3458,
+        "loggregator_api_host": "forwarder-agent.{{ .Release.Namespace }}.svc.cluster.local",
+        "loggregator_ca_path": "/etc/ssl/certs/locket/ca.crt",
+        "loggregator_cert_path": "/etc/ssl/certs/locket/tls.crt",
+        "loggregator_key_path": "/etc/ssl/certs/locket/tls.key",
+        "loggregator_job_deployment": "cf",
+        "loggregator_job_name": "locket",
+        "loggregator_job_origin": "locket",
+        "loggregator_source_id": "locket"
+      }
+    }
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: locket
+  labels:
+    app: locket
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: locket
+  template:
+    metadata:
+      labels:
+        app: locket
+    spec:
+      containers:
+        - name: locket
+          image: {{ .Values.locket.image.repository }}:{{ default .Chart.AppVersion .Values.locket.image.tag }}
+          imagePullPolicy: {{ .Values.locket.image.imagePullPolicy }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8891
+          {{- if .Values.locket.resources }}
+          resources:
+            {{- toYaml .Values.locket.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: locket
+              mountPath: /etc/ssl/certs/locket
+            - name: postgres-tls
+              mountPath: /etc/ssl/certs/postgres
+            - name: locket-config
+              mountPath: /locket
+      nodeSelector:
+        cloudfoundry.org/workload: "false"
+      volumes:
+        - name: locket
+          secret:
+            secretName: {{ default .Values.locket.certificateSecret "locket" }}
+        - name: postgres-tls
+          secret:
+            secretName: postgres-tls
+        - name: locket-config
+          configMap:
+            name: locket-configmap
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: locket
+  labels:
+    app: locket
+spec:
+  ports:
+    - port: 8891
+      targetPort: 8891
+      protocol: TCP
+  selector:
+    app: locket
+---
+{{ if not .Values.locket.certificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: locket
+spec:
+  secretName: locket
+  commonName: client
+  dnsNames:
+    - locket
+    - locket.{{ .Release.Namespace }}.svc
+    - locket.{{ .Release.Namespace }}.svc.cluster.local
+    - "{{ .Values.locket.hostname }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}
+{{- end }}
