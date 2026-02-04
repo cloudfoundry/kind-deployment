@@ -42,7 +42,7 @@ jobs:
     - name: Publish Helm Chart
       if: steps.check_commit.outputs.skip != 'true'
       run: |
-        export REGISTRY_PREFIX="ghcr.io/cloudfoundry/k8s/helm"
+        export REGISTRY_PREFIX="ghcr.io/cloudfoundry/helm"
         UPDATED_CHARTS=$(git log -1 --pretty=%B | grep "list-of-updated-charts:" | cut -d':' -f2)
         
         # Publish only the updated charts
