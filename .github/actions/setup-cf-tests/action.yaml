@@ -20,22 +20,23 @@ outputs:
 runs:
   using: "composite"
   steps:
-
     - name: checkout CF test repository
       uses: actions/checkout@v6
       with:
         repository: "cloudfoundry/${{ inputs.test-repo }}"
         github-server-url: https://github.com
         path: "${{ inputs.test-repo }}"
-
     - name: setup Go
       uses: actions/setup-go@v6
       with:
         go-version-file: ./${{ inputs.test-repo }}/go.mod
         cache: false
-
     - name: setup Python
       uses: actions/setup-python@v6
       with:
         python-version: "3"
-
+    - name: templating config
+      shell: bash
+      run: |
+        source temp/secrets.sh
+        python3 -c 'import os,sys;[sys.stdout.write(os.path.expandvars(l)) for l in sys.stdin]' < ${{ inputs.config-template }} > ${{ inputs.config-output }}
