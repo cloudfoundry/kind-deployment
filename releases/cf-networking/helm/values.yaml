@@ -1,0 +1,54 @@
+policyServer:
+  enabled: true
+  resources: ~
+  certificateSecret: ~
+  hostname: "policy-server.127-0-0-1.nip.io"
+  externalDomain: api.127-0-0-1.nip.io
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/policy-server
+    tag: ~
+    imagePullPolicy: IfNotPresent
+  oauthClientsSecret: ~
+  dbPassword: ~
+  nats:
+    address: nats.default.svc.cluster.local:4222
+
+serviceDiscoveryController:
+  enabled: true
+  resources: ~
+  certificateSecret: ~
+  hostname: service-discovery-controller.default.svc.cluster.local
+  port: 8054
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/service-discovery-controller
+    tag: ~
+    imagePullPolicy: IfNotPresent
+  nats:
+    host: nats.default.svc.cluster.local
+    port: 4222
+
+boshDnsAdapter:
+  enabled: true
+  resources: ~
+  certificateSecret: ~
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/bosh-dns-adapter
+    tag: ~
+    imagePullPolicy: IfNotPresent
+
+boshDns:
+  resources: ~
+  certificateSecret: ~
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/bosh-dns
+    # renovate: depName=bosh-dns-release image=ghcr.io/cloudfoundry/k8s/bosh-dns
+    tag: "1.39.18"
+    imagePullPolicy: IfNotPresent
+
+
+routeRegistrar:
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/route-registrar
+    # renovate: depName=routing-release image=ghcr.io/cloudfoundry/k8s/route-registrar
+    tag: "0.362.0"
+    imagePullPolicy: IfNotPresent

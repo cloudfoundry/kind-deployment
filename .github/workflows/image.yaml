@@ -1,0 +1,170 @@
+name: Publish docker image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "docker-bake.hcl"
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Bake target"
+        required: false
+        type: string
+
+env:
+  REGISTRY_PREFIX: ghcr.io/cloudfoundry/k8s/
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      target: ${{ steps.determine-target.outputs.target }}
+      targets: ${{ steps.determine-target.outputs.targets }}
+      skip: ${{ steps.determine-target.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Determine target
+        id: determine-target
+        run: |
+          TARGET="${{ inputs.target }}"
+          [ -z "$TARGET" ] && {
+            COMMIT_MSG=$(git log -1 --pretty=%B)
+            case "$COMMIT_MSG" in
+              *cloudfoundry/cf-deployment*) TARGET="fileserver" ;;
+              *) TARGET=$(echo "$COMMIT_MSG" | sed -n 's/.*cloudfoundry\/\(.*\)-release.*/\1/p') ;;
+            esac
+          }
+
+          if [ -z "$TARGET" ]; then
+            echo "No target to build found. Skipping workflow."
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          ACTUAL_TARGETS=$(docker buildx bake "$TARGET" --print --progress quiet | \
+            jq -r --arg t "$TARGET" 'if .group[$t] then .group[$t].targets | join(" ") else $t end')
+
+          echo "target=$TARGET" >> $GITHUB_OUTPUT
+          echo "targets=$ACTUAL_TARGETS" >> $GITHUB_OUTPUT
+          echo "skip=false" >> $GITHUB_OUTPUT
+          echo "Building target: $TARGET (resolves to: $ACTUAL_TARGETS)"
+
+  build:
+    needs: prepare
+    if: needs.prepare.outputs.skip != 'true'
+    outputs:
+      digest-amd64: ${{ steps.export.outputs.digest-amd64 }}
+      digest-arm64: ${{ steps.export.outputs.digest-arm64 }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            image: ubuntu-24.04
+          - platform: linux/arm64
+            image: ubuntu-24.04-arm
+    runs-on: ["${{ matrix.image }}"]
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Authenticate to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        id: bake
+        run: |
+          docker buildx bake "${{ needs.prepare.outputs.target }}" --print --progress quiet | \
+            jq --arg targets "${{ needs.prepare.outputs.targets }}" '
+              ($targets | split(" ")) as $tlist |
+              .target |= with_entries(
+                select(.key as $k | $tlist | any(. == $k)) |
+                .value.tags |= (map(split(":")[0]) | unique)
+              )' \
+            > ${{ runner.temp }}/bake.json
+
+          docker buildx bake -f ${{ runner.temp }}/bake.json \
+            --set '*.output=type=image,push-by-digest=true,name-canonical=true,push=true' \
+            --set '*.platform=${{ matrix.platform }}' \
+            --metadata-file ${{ runner.temp }}/metadata.json ${{ needs.prepare.outputs.target }}
+      - name: Export digest
+        id: export
+        run: |
+          PLATFORM=$(echo ${{ matrix.platform }} | cut -d'/' -f2)
+          DIGESTS=$(jq -c 'map_values(."containerimage.digest")' ${{ runner.temp }}/metadata.json)
+          echo "Digests: $DIGESTS"
+          echo "digest-$PLATFORM=$(echo $DIGESTS | base64 -w 0)" >> $GITHUB_OUTPUT
+
+  merge:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+    needs:
+      - prepare
+      - build
+    if: needs.prepare.outputs.skip != 'true'
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Prepare tags
+        id: tags
+        run: |
+          TAGS_DATA=$(docker buildx bake "${{ needs.prepare.outputs.target }}" --print --progress quiet | \
+            jq -c --arg targets "${{ needs.prepare.outputs.targets }}" '
+              ($targets | split(" ")) as $tlist |
+              .target | to_entries |
+              map(select(.key as $k | $tlist | any(. == $k))) |
+              map({
+                name: .key,
+                tags: .value.tags,
+                image: (.value.tags[0] | split(":")[0])
+              })')
+
+          echo "Tags data: $TAGS_DATA"
+          echo "tags=$TAGS_DATA" >> $GITHUB_OUTPUT
+      - name: Authenticate to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create manifest list and push
+        env:
+          AMD64_DIGESTS: ${{ needs.build.outputs.digest-amd64 }}
+          ARM64_DIGESTS: ${{ needs.build.outputs.digest-arm64 }}
+          TAGS_DATA: ${{ steps.tags.outputs.tags }}
+        run: |
+          TARGETS="${{ needs.prepare.outputs.targets }}"
+          AMD64_DIGESTS=$(echo "$AMD64_DIGESTS" | base64 -d)
+          ARM64_DIGESTS=$(echo "$ARM64_DIGESTS" | base64 -d)
+
+          echo "AMD64 Digests: $AMD64_DIGESTS"
+          echo "ARM64 Digests: $ARM64_DIGESTS"
+
+          for target in $TARGETS; do
+            echo "--- Processing target: $target ---"
+
+            TAGS=$(jq -r --arg t "$target" '.[] | select(.name == $t) | .tags | join(",")' <<< "$TAGS_DATA")
+            IMAGE=$(jq -r --arg t "$target" '.[] | select(.name == $t) | .image' <<< "$TAGS_DATA")
+            AMD64=$(jq -r --arg t "$target" '.[$t]' <<< "$AMD64_DIGESTS")
+            ARM64=$(jq -r --arg t "$target" '.[$t]' <<< "$ARM64_DIGESTS")
+            
+            echo "  Image: $IMAGE"
+            echo "  Tags: $TAGS"
+            echo "  AMD64 digest: $AMD64"
+            echo "  ARM64 digest: $ARM64"
+            
+            docker buildx imagetools create \
+              $(tr ',' '\n' <<< "$TAGS" | sed 's/^/-t /') \
+              "${IMAGE}@${AMD64}" "${IMAGE}@${ARM64}"
+          done

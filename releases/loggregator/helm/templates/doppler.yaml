@@ -1,0 +1,107 @@
+{{- if .Values.loggregator.enabled }}
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: doppler
+  labels:
+    app: doppler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: doppler
+  template:
+    metadata:
+      labels:
+        app: doppler
+    spec:
+      containers:
+        - name: doppler
+          image: {{ .Values.doppler.image.repository }}:{{ default .Chart.AppVersion .Values.doppler.image.tag }}
+          imagePullPolicy: {{ .Values.doppler.image.imagePullPolicy }}
+          imagePullPolicy: IfNotPresent
+          {{- if .Values.doppler.resources }}
+          resources:
+            {{- toYaml .Values.doppler.resources | nindent 12 }}
+          {{- end }}
+          env:
+            - name: AGENT_GRPC_ADDRESS
+              value: "forwarder-agent.{{ .Release.Namespace }}.svc.cluster.local:3458"
+            - name: ROUTER_PORT
+              value: "8082"
+            - name: ROUTER_CA_FILE
+              value: /etc/ssl/certs/doppler/ca.crt
+            - name: ROUTER_CERT_FILE
+              value: /etc/ssl/certs/doppler/tls.crt
+            - name: ROUTER_KEY_FILE
+              value: /etc/ssl/certs/doppler/tls.key
+            - name: INGRESS_BUFFER_SIZE
+              value: "10000"
+            - name: "EGRESS_BUFFER_SIZE"
+              value: "1000"
+          volumeMounts:
+            - name: doppler
+              mountPath: /etc/ssl/certs/doppler
+      nodeSelector:
+        cloudfoundry.org/workload: "false"
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: doppler
+          secret:
+            secretName: {{ default .Values.doppler.certificateSecret "doppler" }}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: doppler
+  labels:
+    app: doppler
+spec:
+  ports:
+    - port: 8082
+      targetPort: 8082
+      name: https
+      protocol: TCP
+  selector:
+    app: doppler
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: doppler
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: doppler
+  rules:
+    - backendRefs:
+      - name: doppler
+        port: 8082
+---
+{{ if not .Values.doppler.certificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: doppler
+spec:
+  secretName: doppler
+  commonName: doppler
+  dnsNames:
+    - doppler
+    - doppler.{{ .Release.Namespace }}.svc
+    - doppler.{{ .Release.Namespace }}.svc.cluster.local
+    - "{{ .Values.doppler.hostname }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}
+{{- end }}

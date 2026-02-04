@@ -1,0 +1,67 @@
+auth-server:
+  url: {{ .Values.uaa.address }}
+  trust_store: /app/stores/trust_store.jks
+  trust_store_password: changeit
+encryption:
+  key_creation_enabled: true
+  providers:
+  - provider_name: internal-provider
+    provider_type: internal
+    keys:
+    - active: true
+      encryption_password: DN0fWc81xYAgPlxXv5YBDbbR4z4ktk
+security:
+  authorization:
+    acls:
+      enabled: true
+    permissions:
+    - actors:
+      - uaa-client:credhub_admin_client
+      operations:
+      - read
+      - write
+      - delete
+      - read_acl
+      - write_acl
+      path: "/*"
+    - actors:
+      - uaa-client:cc_service_key_client
+      operations:
+      - read
+      path: "/*"
+  oauth2:
+    enabled: true
+server:
+  connection-timeout: 5s
+  port: 8844
+  ssl:
+    enabled: true
+    key_store: /app/stores/key_store.jks
+    key_store_password: changeit
+    key_password: changeit
+    key_alias: cert
+    ciphers: TLS_DHE_RSA_WITH_AES_128_GCM_SHA256,TLS_DHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_AES_128_GCM_SHA256,TLS_AES_256_GCM_SHA384
+    client_auth: want
+    trust_store: /app/stores/trust_store.jks
+    trust_store_password: changeit
+    trust_store_type: JKS
+    enabled_protocols: TLSv1.2,TLSv1.3
+spring:
+  flyway:
+    enabled: true
+    locations:
+    - classpath:/db/migration/common
+    - classpath:/db/migration/postgres
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  datasource:
+    username: postgres
+    password: {{ .Values.dbPassword | quote }}
+    url: jdbc:postgresql://postgresql.default.svc.cluster.local:5432/credhub?autoReconnect=true&ssl=false&sslmode=allow
+  profiles:
+    active: prod
+certificates:
+  concatenate_cas: true
+  ca_minimum_duration_in_days: 0
+  leaf_minimum_duration_in_days: 0

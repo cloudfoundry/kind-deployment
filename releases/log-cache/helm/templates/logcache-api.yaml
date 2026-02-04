@@ -1,0 +1,139 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-cache-api
+  labels:
+    app: log-cache-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-cache-api
+  template:
+    metadata:
+      labels:
+        app: log-cache-api
+    spec:
+      containers:
+        - name: cf-auth-proxy
+          image: {{ .Values.logCacheApi.cfAuthProxy.image.repository }}:{{ default .Chart.AppVersion .Values.logCacheApi.cfAuthProxy.image.tag }}
+          imagePullPolicy: {{ .Values.logCacheApi.cfAuthProxy.image.imagePullPolicy }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8083
+          readinessProbe:
+            httpGet:
+              path: /api/v1/info
+              port: 8083
+            failureThreshold: 1
+            periodSeconds: 10
+          env:
+            - name: LOG_CACHE_GATEWAY_ADDR
+              value: http://localhost:8081
+            - name: CAPI_ADDR
+              value: "https://cloud-controller.{{ .Release.Namespace }}.svc.cluster.local:9024"
+            - name: CAPI_CA_PATH
+              value: /etc/ssl/certs/log-cache-api/ca.crt
+            - name: UAA_ADDR
+              value: "https://uaa.{{ .Release.Namespace }}.svc.cluster.local"
+            - name: UAA_CA_PATH
+              value: /etc/ssl/certs/log-cache-api/ca.crt
+            - name: PROMQL_UNIMPLEMENTED
+              value: "true"
+            - name: "ADDR"
+              value: "0.0.0.0:8083"
+          {{- if .Values.logCacheApi.resources }}
+          resources:
+            {{- toYaml .Values.logCacheApi.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: log-cache-api
+              mountPath: /etc/ssl/certs/log-cache-api
+              readOnly: true
+        - name: gateway
+          image: {{ .Values.logCacheApi.gateway.image.repository }}:{{ default .Chart.AppVersion .Values.logCacheApi.gateway.image.tag }}
+          imagePullPolicy: {{ .Values.logCacheApi.gateway.image.imagePullPolicy }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+          env:
+            - name: LOG_CACHE_ADDR
+              value: log-cache:8080
+            - name: "ADDR"
+              value: "0.0.0.0:8081"
+            - name: CA_PATH
+              value: /etc/ssl/certs/log-cache-api/ca.crt
+            - name: CERT_PATH
+              value: /etc/ssl/certs/log-cache-api/tls.crt
+            - name: KEY_PATH
+              value: /etc/ssl/certs/log-cache-api/tls.key
+          {{- if .Values.logCacheApi.resources }}
+          resources:
+            {{- toYaml .Values.logCacheApi.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+          - name: log-cache-api
+            mountPath: /etc/ssl/certs/log-cache-api
+            readOnly: true
+      nodeSelector:
+        cloudfoundry.org/workload: "false"
+      volumes:
+      - name: log-cache-api
+        secret:
+          secretName: {{ default .Values.logCacheApi.certificateSecret "log-cache-api" }}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: log-cache-api
+  labels:
+    app: log-cache-api
+spec:
+  ports:
+    - port: 8083
+      name: http
+      targetPort: 8083
+      protocol: TCP
+  selector:
+    app: log-cache-api
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: log-cache-api
+spec:
+  parentRefs:
+    - name: istio-gateway
+  hostnames:
+    - "{{ .Values.logCacheBackend.hostname }}"
+  rules:
+    - backendRefs:
+        - name: log-cache-api
+          port: 8083
+---
+{{ if not .Values.logCacheApi.certificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: log-cache-api
+spec:
+  secretName: log-cache-api
+  commonName: client
+  dnsNames:
+    - localhost
+    - log-cache-api
+    - log-cache-api.{{ .Release.Namespace }}.svc
+    - log-cache-api.{{ .Release.Namespace }}.svc.cluster.local
+    - "{{ .Values.logCacheApi.hostnmame }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}

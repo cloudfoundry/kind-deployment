@@ -1,0 +1,43 @@
+forwarderAgent:
+  enabled: false
+  aggregateDrain: false
+  certificateSecret: ~
+  resources: ~
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/forwarder-agent
+    tag: ~
+    imagePullPolicy: IfNotPresent
+
+loggregatorAgent:
+  doppler:
+    address: "doppler.default.svc.cluster.local:8082"
+  aggregateDrain: false
+  certificateSecret: ~
+  resources: ~
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/loggregator-agent
+    tag: ~
+    imagePullPolicy: IfNotPresent
+
+syslogAgent:
+  syslogBindingCache:
+    address: "https://syslog-binding-cache.default.svc.cluster.local:9000"
+  logCacheSyslog:
+    address: "syslog://log-cache-syslog.cf.ci.example.com:8082"
+  aggregateDrain: false
+  certificateSecret: ~
+  resources: ~
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/syslog-agent
+    tag: ~
+    imagePullPolicy: IfNotPresent
+
+syslogBindingCache:
+  hostname: "syslog-binding-cache.127-0-0-1.nip.io"
+  enabled: false
+  certificateSecret: ~
+  resources: ~
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/syslog-binding-cache
+    tag: ~
+    imagePullPolicy: IfNotPresent

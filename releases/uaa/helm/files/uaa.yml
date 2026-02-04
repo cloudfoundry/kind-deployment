@@ -1,0 +1,337 @@
+name: uaa
+disableInternalAuth: false
+disableInternalUserManagement: false
+issuer:
+  uri: {{ .Values.address }}
+login:
+  url: {{ .Values.address }}
+  idpDiscoveryEnabled: false
+  accountChooserEnabled: false
+  aliasEntitiesEnabled: false
+  checkOriginEnabled: false
+  allowOriginLoop: true
+  authorize:
+    url: {{ .Values.address }}/oauth/authorize
+  prompt:
+    username:
+      text: Email
+    password:
+      text: Password
+  saml:
+    activeKeyId: key1
+    keys:
+      key1:
+        key: |
+          -----BEGIN RSA PRIVATE KEY-----
+          MIICXQIBAAKBgQDHtC5gUXxBKpEqZTLkNvFwNGnNIkggNOwOQVNbpO0WVHIivig5
+          L39WqS9u0hnA+O7MCA/KlrAR4bXaeVVhwfUPYBKIpaaTWFQR5cTR1UFZJL/OF9vA
+          fpOwznoD66DDCnQVpbCjtDYWX+x6imxn8HCYxhMol6ZnTbSsFW6VZjFMjQIDAQAB
+          AoGAVOj2Yvuigi6wJD99AO2fgF64sYCm/BKkX3dFEw0vxTPIh58kiRP554Xt5ges
+          7ZCqL9QpqrChUikO4kJ+nB8Uq2AvaZHbpCEUmbip06IlgdA440o0r0CPo1mgNxGu
+          lhiWRN43Lruzfh9qKPhleg2dvyFGQxy5Gk6KW/t8IS4x4r0CQQD/dceBA+Ndj3Xp
+          ubHfxqNz4GTOxndc/AXAowPGpge2zpgIc7f50t8OHhG6XhsfJ0wyQEEvodDhZPYX
+          kKBnXNHzAkEAyCA76vAwuxqAd3MObhiebniAU3SnPf2u4fdL1EOm92dyFs1JxyyL
+          gu/DsjPjx6tRtn4YAalxCzmAMXFSb1qHfwJBAM3qx3z0gGKbUEWtPHcP7BNsrnWK
+          vw6By7VC8bk/ffpaP2yYspS66Le9fzbFwoDzMVVUO/dELVZyBnhqSRHoXQcCQQCe
+          A2WL8S5o7Vn19rC0GVgu3ZJlUrwiZEVLQdlrticFPXaFrn3Md82ICww3jmURaKHS
+          N+l4lnMda79eSp3OMmq9AkA0p79BvYsLshUJJnvbk76pCjR28PK4dV1gSDUEqQMB
+          qy45ptdwJLqLJCeNoR0JUcDNIRhOCuOPND7pcMtX6hI/
+          -----END RSA PRIVATE KEY-----
+        certificate: |
+          -----BEGIN CERTIFICATE-----
+          MIIDSTCCArKgAwIBAgIBADANBgkqhkiG9w0BAQQFADB8MQswCQYDVQQGEwJhdzEO
+          MAwGA1UECBMFYXJ1YmExDjAMBgNVBAoTBWFydWJhMQ4wDAYDVQQHEwVhcnViYTEO
+          MAwGA1UECxMFYXJ1YmExDjAMBgNVBAMTBWFydWJhMR0wGwYJKoZIhvcNAQkBFg5h
+          cnViYUBhcnViYS5hcjAeFw0xNTExMjAyMjI2MjdaFw0xNjExMTkyMjI2MjdaMHwx
+          CzAJBgNVBAYTAmF3MQ4wDAYDVQQIEwVhcnViYTEOMAwGA1UEChMFYXJ1YmExDjAM
+          BgNVBAcTBWFydWJhMQ4wDAYDVQQLEwVhcnViYTEOMAwGA1UEAxMFYXJ1YmExHTAb
+          BgkqhkiG9w0BCQEWDmFydWJhQGFydWJhLmFyMIGfMA0GCSqGSIb3DQEBAQUAA4GN
+          ADCBiQKBgQDHtC5gUXxBKpEqZTLkNvFwNGnNIkggNOwOQVNbpO0WVHIivig5L39W
+          qS9u0hnA+O7MCA/KlrAR4bXaeVVhwfUPYBKIpaaTWFQR5cTR1UFZJL/OF9vAfpOw
+          znoD66DDCnQVpbCjtDYWX+x6imxn8HCYxhMol6ZnTbSsFW6VZjFMjQIDAQABo4Ha
+          MIHXMB0GA1UdDgQWBBTx0lDzjH/iOBnOSQaSEWQLx1syGDCBpwYDVR0jBIGfMIGc
+          gBTx0lDzjH/iOBnOSQaSEWQLx1syGKGBgKR+MHwxCzAJBgNVBAYTAmF3MQ4wDAYD
+          VQQIEwVhcnViYTEOMAwGA1UEChMFYXJ1YmExDjAMBgNVBAcTBWFydWJhMQ4wDAYD
+          VQQLEwVhcnViYTEOMAwGA1UEAxMFYXJ1YmExHTAbBgkqhkiG9w0BCQEWDmFydWJh
+          QGFydWJhLmFyggEAMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEEBQADgYEAYvBJ
+          0HOZbbHClXmGUjGs+GS+xC1FO/am2suCSYqNB9dyMXfOWiJ1+TLJk+o/YZt8vuxC
+          KdcZYgl4l/L6PxJ982SRhc83ZW2dkAZI4M0/Ud3oePe84k8jm3A7EvH5wi5hvCkK
+          RpuRBwn3Ei+jCRouxTbzKPsuCVB+1sNyxMTXzf0=
+          -----END CERTIFICATE-----
+uaa:
+  url: {{ .Values.address }}
+  token:
+    url: {{ .Values.address }}/oauth/token
+  approvals:
+    url: {{ .Values.address }}/approvals
+  login:
+    url: {{ .Values.address }}/authenticate
+  limitedFunctionality:
+    statusFile: "/tmp/bbr_limited_mode.lock"
+    whitelist:
+      endpoints:
+      - "/oauth/authorize/**"
+      - "/oauth/token/**"
+      - "/check_token/**"
+      - "/login/**"
+      - "/login.do"
+      - "/logout/**"
+      - "/logout.do"
+      - "/saml/**"
+      - "/autologin/**"
+      - "/authenticate/**"
+      - "/idp_discovery/**"
+      methods:
+      - GET
+      - HEAD
+      - OPTIONS
+  oauth:
+    redirect_uri:
+      allow_unsafe_matching: true
+zones:
+  internal:
+    hostnames:
+    - uaa.default.svc.cluster.local
+database:
+  maxactive: 100
+  maxidle: 10
+  minidle: 0
+  removeabandoned: false
+  logabandoned: true
+  abandonedtimeout: 300
+  username: postgres
+  password: {{ .Values.dbPassword | quote }}
+  url: jdbc:postgresql://postgresql.default.svc.cluster.local:5432/uaa?sslmode=disable
+scim:
+  userids_enabled: true
+  user:
+    override: true
+  users:
+    - ccadmin|{{ .Values.ccAdminPassword }}|ccadmin|||clients.read,cloud_controller.admin,doppler.firehose,network.admin,openid,routing.router_groups.read,routing.router_groups.write,scim.read,scim.write|uaa
+servlet:
+  session-store: memory
+  idle-timeout: 1800
+  session-cookie:
+    max-age: -1
+    encode-base64: true
+require_https: true
+https_port: 8443
+logout:
+  redirect:
+    url: "/login"
+    parameter:
+      disable: false
+oauth:
+  user:
+    authorities:
+    - openid
+    - scim.me
+    - cloud_controller.read
+    - cloud_controller.write
+    - cloud_controller_service_permissions.read
+    - password.write
+    - uaa.user
+    - approvals.me
+    - oauth.approvals
+    - notification_preferences.read
+    - notification_preferences.write
+    - profile
+    - roles
+    - user_attributes
+    - uaa.offline_token
+  authorize:
+    ssl: true
+  client:
+    secret:
+      policy:
+        minLength: 0
+        maxLength: 255
+        requireUpperCaseCharacter: 0
+        requireLowerCaseCharacter: 0
+        requireDigit: 0
+        requireSpecialCharacter: 0
+        expireSecretInMonths: 0
+        global:
+          minLength: 0
+          maxLength: 255
+          requireUpperCaseCharacter: 0
+          requireLowerCaseCharacter: 0
+          requireDigit: 0
+          requireSpecialCharacter: 0
+          expireSecretInMonths: 0
+  clients:
+    cc-service-dashboards:
+      authorities: clients.read,clients.write,clients.admin
+      authorized-grant-types: client_credentials
+      secret: {{ .Values.oauthClientsSecret | quote }}
+      scope: openid,cloud_controller_service_permissions.read
+      id: cc-service-dashboards
+    cc_routing:
+      authorities: routing.router_groups.read
+      authorized-grant-types: client_credentials
+      secret: {{ .Values.oauthClientsSecret | quote }}
+      id: cc_routing
+    cc_service_key_client:
+      authorities: credhub.read,credhub.write
+      authorized-grant-types: client_credentials
+      secret: {{ .Values.oauthClientsSecret | quote }}
+      id: cc_service_key_client
+    cf:
+      access-token-validity: 1200
+      authorities: uaa.none
+      authorized-grant-types: password,refresh_token,urn:ietf:params:oauth:grant-type:jwt-bearer
+      override: true
+      refresh-token-validity: 2592000
+      secret: ''
+      scope: network.admin,network.write,cloud_controller.read,cloud_controller.write,openid,password.write,cloud_controller.admin,scim.read,scim.write,doppler.firehose,uaa.user,routing.router_groups.read,routing.router_groups.write,cloud_controller.admin_read_only,cloud_controller.global_auditor,perm.admin,clients.read
+      id: cf
+    cf_smoke_tests:
+      authorities: cloud_controller.admin,clients.read
+      authorized-grant-types: client_credentials
+      secret: {{ .Values.oauthClientsSecret | quote }}
+      id: cf_smoke_tests
+    cloud_controller_username_lookup:
+      authorities: scim.userids,scim.read
+      authorized-grant-types: client_credentials
+      override: true
+      secret: {{ .Values.oauthClientsSecret | quote }}
+      id: cloud_controller_username_lookup
+    credhub_admin_client:
+      authorities: credhub.read,credhub.write
+      authorized-grant-types: client_credentials
+      secret: {{ .Values.oauthClientsSecret | quote }}
+      id: credhub_admin_client
+    doppler:
+      authorities: uaa.resource
+      authorized-grant-types: client_credentials
+      override: true
+      secret: {{ .Values.oauthClientsSecret | quote }}
+      id: doppler
+    gorouter:
+      authorities: routing.routes.read
+      authorized-grant-types: client_credentials
+      secret: {{ .Values.oauthClientsSecret | quote }}
+      id: gorouter
+    network-policy:
+      authorities: uaa.resource,cloud_controller.admin_read_only
+      authorized-grant-types: client_credentials
+      secret: {{ .Values.oauthClientsSecret | quote }}
+      id: network-policy
+    routing_api_client:
+      authorities: routing.routes.write,routing.routes.read,routing.router_groups.read
+      authorized-grant-types: client_credentials
+      secret: {{ .Values.oauthClientsSecret | quote }}
+      id: routing_api_client
+    ssh-proxy:
+      authorized-grant-types: authorization_code
+      autoapprove: true
+      override: true
+      redirect-uri: {{ .Values.address }}/login
+      secret: {{ .Values.oauthClientsSecret | quote }}
+      scope: openid,cloud_controller.read,cloud_controller.write,cloud_controller.admin
+      id: ssh-proxy
+    tcp_emitter:
+      authorities: routing.routes.write,routing.routes.read
+      authorized-grant-types: client_credentials
+      secret: {{ .Values.oauthClientsSecret | quote }}
+      id: tcp_emitter
+    tcp_router:
+      authorities: routing.routes.read,routing.router_groups.read
+      authorized-grant-types: client_credentials
+      secret: {{ .Values.oauthClientsSecret | quote }}
+      id: tcp_router
+    admin:
+      authorized-grant-types: client_credentials
+      authorities: clients.read,clients.write,clients.secret,uaa.admin,scim.read,scim.write,password.write
+      id: admin
+      secret: {{ .Values.oauthClientsSecret | quote }}
+authentication:
+  enableUriEncodingCompatibilityMode: false
+  policy:
+    lockoutAfterFailures: 5
+    countFailuresWithinSeconds: 1200
+    lockoutPeriodSeconds: 300
+    global:
+      lockoutAfterFailures: 5
+      countFailuresWithinSeconds: 3600
+      lockoutPeriodSeconds: 300
+password:
+  policy:
+    minLength: 0
+    maxLength: 255
+    requireUpperCaseCharacter: 0
+    requireLowerCaseCharacter: 0
+    requireDigit: 0
+    requireSpecialCharacter: 0
+    expirePasswordInMonths: 0
+    global:
+      minLength: 0
+      maxLength: 255
+      requireUpperCaseCharacter: 0
+      requireLowerCaseCharacter: 0
+      requireDigit: 0
+      requireSpecialCharacter: 0
+      expirePasswordInMonths: 0
+cors:
+  enforceSystemZonePolicyInAllZones: true
+rest:
+  template:
+    timeout: 10000
+    maxTotal: 20
+    maxPerRoute: 5
+    maxKeepAlive: 0
+    validateAfterInactivity: 2000
+    retryCount: 0
+links:
+  global:
+    passwd: "/forgot_password"
+    signup: "/create_account"
+    homeRedirect: "/"
+  passwd: "/forgot_password"
+  signup: "/create_account"
+  homeRedirect: "/"
+jwt:
+  token:
+    policy:
+      activeKeyId: key-id-1
+      keys:
+        key-id-1:
+          signingAlg: RS256
+          signingKey: |
+            -----BEGIN PRIVATE KEY-----
+            MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCowKUlfOfJxXZt
+            DWkVs3xb4BZJiGlLYxUAaGRY2WbG/YjHT/6frOOK+N2jFyrtElHiRXJyhV4PTsOJ
+            YSVhKdAt15A+AoBwGLCKVHfRTLINMpyoNBDmuQKDY42XBXRoyyDvgppd5exXrncB
+            KzcVgS25LVoP8Nvn4XJcXweQejzHLX01SeqwNZCeHUeGSXKfG7a29bR/DagMTWnA
+            2X5YsRU+2VykK1/hVK/4ZrC0GIjrGZiwYEwL3Db0RIcWo/DQ1IJGGXIl/qsME0f/
+            vrqbMr+8TMDivMZMERSoPFOD/wmlGGH0PeqWNKyaoK2lCiWg4BpQoKpIlv+Eo+yl
+            77uv1xibAgMBAAECggEADtC4jwJ/MDuZ6pGtvKSBEgKp7wzyJZa00ZzYo0sVSi1L
+            58FSDiW15Zqn84YSR2iY1l//eY0HVYCDC6aDC07W9cQoaArjLzQ6GslQqm6GOtqX
+            +CJ3q2Uc+RKkuL7XWgEfZDexb4+PwNQfb/OIOgCZCY1kP0sHm3BNEIDQheXD1gtq
+            8KTOBy/TtN7rV940LoudgQ8vzz+ShhmG7Dt5yws/QzaBpryLncGsGYZSDnvvEBYY
+            dlbYQEgfLmzdKSDKW3DNV+duaBDeArxZViD7EqPpQxIOawBvl5bs6Radz7OEGZ7k
+            hTr2fYU4JGn4WJl61yJg4Xm6pp9cJmi+BIgwLrvXNQKBgQDTPjZ6jCPXAfY6WRVD
+            +hTKgrdhMzNALuiZeyWNSKiiDKgtx1A8OhUAgGzY/PeqmDabiVWKtso+EazfMwa+
+            BrScf+HEZFUvNJ5tGxe6nEEFCx0n5ELUM/L4SWCtD6eFCNYcAY1XvzPD1F3KzewE
+            vw8FbT34fef+YayuIF3PPODtJwKBgQDMgcEnXARRzsIC7i1ggqSU8N0OUSu+rA/h
+            Md9Uh9HsY18p8JtNezAQ2vV4RL3R/CUPGXeDvCBYWhXlkNmjdCAsk24DZHs2Q18x
+            TeHZ15PUtmd2tH/tAxANDi6RTTjpQI3w2poXHl2ZVuT8M+XkTv0WzI0c8TNog2RA
+            SzHd5z5JbQKBgQCDlvim5E+bKzywYjfuDYYQFNeZNCTT8aSxn1XoKf/qWooVYlin
+            ++KDWnzzurmpSoKR5z4jV/SqL6aJr6aej1zJNJx2E65A5r1d6AejFp0mQCMca4P5
+            3paXdlZD2EGZjMSb05extojPj6YRpK9G0aHQ1plJB12SSFQicEUfyKOw9wKBgD09
+            ScLoih6ZRH2uJwZ0eKZlLj0AT5IsYiD0V0Uv2svnwfKEK21bSzxw5Prb0t/TmqFX
+            5fMb3a+3YkE5TALnXk8a4uG/MCpCqHnSMaSTKqCS8o6YZIpr1V2jdoxqTHWEsDyE
+            qYnsvOiTHcTsIZZplN5D6KnXDKbqWZXrLoadnYhNAoGACESLgCy552WcM7vNt4Fw
+            7lR/O3gEnwD41gIx5EGa/UoA08Q+i7sBt9PkL4oQrJ/MYCcVNnmg9KrJdlqF4AlE
+            HYeZSkMuQDYHcaO9xtYP3QdhD+nLXbNrCxaSSaSX8tS4BjdcSH1yMyLFg5OqiJYg
+            wYFiptyKFm5QqFhFTY+20aE=
+            -----END PRIVATE KEY-----
+    revocable: false
+    refresh:
+      format: opaque
+      rotate: false
+      unique: false
+    claims:
+      exclude:
+        - excluded-claim1
+        - excluded-claim2

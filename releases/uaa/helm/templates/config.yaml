@@ -1,0 +1,53 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: uaa-spring-configmap
+data:
+  application.yml: |-
+    server:
+      http:
+        port: 8080
+        address: "127.0.0.1"
+        connection-timeout: 20000
+        keep-alive-timeout: 120000
+        bind-on-init: true
+      port: 8443
+      max-http-request-header-size: 14336
+      tomcat:
+        connection-timeout: 20000
+        keep-alive-timeout: 120000
+        remoteip:
+          remote-ip-header: "x-forwarded-for"
+          protocol-header: "x-forwarded-proto"
+          internal-proxies: 100\.\d{1,3}\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.1[6-9]{1}\.\d{1,3}\.\d{1,3}|172\.2[0-9]{1}\.\d{1,3}\.\d{1,3}|172\.3[0-1]{1}\.\d{1,3}\.\d{1,3}
+          port-header: "X-Forwarded-Port"
+        accesslog:
+          enabled: true
+          directory: /dev
+          prefix: stdout
+          suffix:
+          file-date-format:
+          buffered: false
+          rotate: false
+          pattern: "%h %l %u %t &quot;%m %U %H&quot; %s %{Content-Length}i %b &quot;X-Vcap-Request-Id: %{X-Vcap-Request-Id}i&quot; %I"
+      ssl:
+        enabled: true
+        enabled-protocols: "TLSv1.2,TLSv1.3"
+        ciphers: "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256,TLS_DHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_AES_128_GCM_SHA256,TLS_AES_256_GCM_SHA384"
+        protocol: TLS
+        certificate: file:/ssl/tls.crt
+        certificate-private-key: file:/ssl/tls.key
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: uaa-config
+stringData:
+  admin_client_credentials.yml: |
+    oauth:
+      clients:
+        admin:
+          secret: {{ .Values.uaaAdminSecret | quote }}
+  uaa.yml: |-
+  {{- tpl (.Files.Get "files/uaa.yml") . | nindent 4 }}

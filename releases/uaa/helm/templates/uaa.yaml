@@ -1,0 +1,136 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: uaa
+  annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
+  labels:
+    app: uaa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uaa
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
+      labels:
+        app: uaa
+    spec:
+      containers:
+        - name: uaa
+          image: {{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+          ports:
+            - containerPort: 8443
+              name: https
+          {{- if .Values.resources }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8443
+              scheme: HTTPS
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8443
+              scheme: HTTPS
+            periodSeconds: 3
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8443
+              scheme: HTTPS
+            failureThreshold: 30
+            periodSeconds: 10
+          volumeMounts:
+            - name: uaa-config
+              mountPath: /uaa.yml
+              subPath: uaa.yml
+              readOnly: true
+            - name: uaa-config
+              mountPath: /secrets/admin_client_credentials.yml
+              subPath: admin_client_credentials.yml
+              readOnly: true
+            - name: uaa-spring-config
+              mountPath: /application.yml
+              subPath: application.yml
+              readOnly: true
+            - name: uaa
+              mountPath: /ssl
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      nodeSelector:
+        cloudfoundry.org/workload: "false"
+      volumes:
+        - name: uaa-config
+          secret:
+            secretName: uaa-config
+        - name: uaa-spring-config
+          configMap:
+            name: uaa-spring-configmap
+        - name: uaa
+          secret:
+            secretName: {{ default "uaa" .Values.certificateSecret }}
+        - name: tmp
+          emptyDir: {}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: uaa
+  labels:
+    app: uaa
+spec:
+  ports:
+    - port: 443
+      name: https
+      targetPort: 8443
+  selector:
+    app: uaa
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: uaa
+spec:
+  parentRefs:
+    - name: istio-gateway
+  hostnames:
+    - "{{ .Values.hostname }}"
+  rules:
+    - backendRefs:
+        - name: uaa
+          port: 443
+---
+{{ if not .Values.certificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: uaa
+spec:
+  secretName: uaa
+  commonName: uaa
+  dnsNames:
+    - uaa
+    - uaa.{{ .Release.Namespace }}.svc
+    - uaa.{{ .Release.Namespace }}.svc.cluster.local
+    - "{{ .Values.hostname }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}

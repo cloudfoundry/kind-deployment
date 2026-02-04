@@ -1,0 +1,355 @@
+webserver: puma
+puma:
+  automatic_worker_count: false
+  workers: 4
+  max_threads: 10
+  max_db_connections_per_process: 10
+allow_docker_root_user: true
+additional_allowed_process_users:
+- vcap
+local_route: 127.0.0.1
+external_port: 9022
+tls_port: 9023
+pid_filename: /tmp/cloud_controller.pid
+readiness_port:
+  cloud_controller_worker: -1
+  clock: -1
+  deployment_updater: -1
+external_protocol: https
+external_domain: {{ .Values.cloudController.externalDomain }}
+temporary_disable_deployments: false
+deployment_updater:
+  update_frequency_in_seconds: 5
+  lock_key: "cf-deployment-updater"
+  lock_owner: "cf_deployment_updater.bosh-vm-id"
+internal_service_hostname: {{ .Values.cloudController.internalServiceHostname }}
+system_domain_organization: system
+system_domain: {{ .Values.cloudController.systemDomain }}
+app_domains:
+  - {{ .Values.cloudController.appDomain }}
+  - name: apps.internal
+    internal: true
+system_hostnames:
+  - api
+  - uaa
+  - login
+  - doppler
+  - loggregator
+jobs:
+  global:
+    timeout_in_seconds: 14400
+    worker_sleep_delay_in_seconds: 5
+  queues: {}
+app_usage_events:
+  cutoff_age_in_days: 31
+service_usage_events:
+  cutoff_age_in_days: 31
+audit_events:
+  cutoff_age_in_days: 31
+failed_jobs:
+  cutoff_age_in_days: 31
+  frequency_in_seconds: 144000 #4h
+pollable_jobs:
+  cutoff_age_in_days: 90
+service_operations_initial_cleanup:
+  frequency_in_seconds: 300
+completed_tasks:
+  cutoff_age_in_days: 31
+cpu_weight_min_memory: 128 #mb
+cpu_weight_max_memory: 8192 #mb
+default_app_memory: 1024 #mb
+default_app_disk_in_mb: 1024
+default_app_log_rate_limit_in_bytes_per_second: -1
+maximum_app_disk_in_mb: 2048
+max_retained_deployments_per_app: 100
+max_retained_builds_per_app: 100
+max_retained_revisions_per_app: 100
+broker_client_default_async_poll_interval_seconds: 60
+broker_client_max_async_poll_duration_minutes: 10080
+broker_client_async_poll_exponential_backoff_rate: 1.0
+broker_client_max_async_poll_interval_seconds: 86400
+broker_client_response_parser:
+  log_errors: true
+  log_validators: true
+  log_response_fields:
+    fetch_service_instance_last_operation:
+      - state
+    fetch_service_binding_last_operation:
+      - state
+shared_isolation_segment_name: "shared"
+info:
+  name: "vcap"
+  build: "2222"
+  version: 2
+  support_address: "http://support.cloudfoundry.com"
+  description: "CF API on Kubernetes"
+  app_ssh_endpoint: "{{ .Values.cloudController.appSSHEndpoint }}"
+  app_ssh_host_key_fingerprint: {{ .Values.cloudController.sshProxyKeyFingerprint | quote }}
+  app_ssh_oauth_client: "ssh-proxy"
+  min_cli_version: "8.14.0"
+  min_recommended_cli_version: "latest"
+instance_file_descriptor_limit: 16384
+login:
+  url: "{{ .Values.cloudController.loginUrl }}"
+  enabled: true
+nginx:
+  use_nginx: true
+  instance_socket: "/var/run/cloud_controller.sock"
+logging:
+  file: /dev/stdout
+  level: info
+  syslog: vcap.example
+  anonymize_ips: false
+  format:
+    timestamp: "rfc3339"
+  stdout_sink_enabled: false
+log_audit_events: false
+telemetry_log_path: /tmp/cloud_controller_telemetry.log
+loggregator:
+  router: "127.0.0.1:3457"
+  internal_url: "http://loggregator-trafficcontroller.default.svc.cluster.local:8081"
+logcache:
+  host: log-cache.default.svc.cluster.local
+  port: 8080
+logcache_tls:
+  key_file: "/etc/ssl/certs/cloud-controller/tls.key"
+  cert_file: "/etc/ssl/certs/cloud-controller/tls.crt"
+  ca_file: "/etc/ssl/certs/cloud-controller/ca.crt"
+  subject_name: "log_cache"
+doppler:
+  url: "{{ .Values.cloudController.doppler.url }}"
+log_cache:
+  url: "{{ .Values.cloudController.logCache.url }}"
+log_stream:
+  url: "{{ .Values.cloudController.logStream.url }}"
+uaa:
+  url: "{{ .Values.cloudController.uaa.url }}"
+  internal_url: https://uaa.default.svc.cluster.local
+  resource_id: "cloud_controller"
+  ca_file: "/etc/ssl/certs/cloud-controller/ca.crt"
+  client_timeout: 60
+
+uaa_client_name: "cc-service-dashboards"
+uaa_client_secret: {{ .Values.oauthClientsSecret | quote }}
+uaa_client_scope: openid,cloud_controller_service_permissions.read
+
+cloud_controller_username_lookup_client_name: "cloud_controller_username_lookup"
+cloud_controller_username_lookup_client_secret: {{ .Values.oauthClientsSecret | quote }}
+
+cc_service_key_client_name: "cc_service_key_client"
+cc_service_key_client_secret: {{ .Values.oauthClientsSecret | quote }}
+
+routing_api:
+  url: "http://localhost:3000"
+  routing_client_name: "routing-client"
+  routing_client_secret: "routing-secret"
+route_services_enabled: true
+volume_services_enabled: true
+disable_private_domain_cross_space_context_path_route_sharing: false
+quota_definitions:
+  default:
+    memory_limit: 10240
+    non_basic_services_allowed: true
+    total_reserved_route_ports: 100
+    total_routes: 1000
+    total_services: -1
+default_quota_definition: default
+resource_pool:
+  blobstore_type: webdav
+  webdav_config:
+    blobstore_timeout: 5
+    public_endpoint: {{ .Values.cloudController.webdavConfig.publicUrl }}
+    private_endpoint: {{ .Values.cloudController.webdavConfig.privateUrl }}
+    username: blobstore-user
+    password: {{ .Values.blobstorePassword | quote}}
+  minimum_size: 65536
+  maximum_size: 536870912
+  resource_directory_key: cc-resources
+  fog_connection: {}
+  fog_aws_storage_options: {}
+  fog_gcp_storage_options: {}
+packages:
+  blobstore_type: webdav
+  webdav_config:
+    blobstore_timeout: 5
+    public_endpoint: {{ .Values.cloudController.webdavConfig.publicUrl }}
+    private_endpoint: {{ .Values.cloudController.webdavConfig.privateUrl }}
+    username: blobstore-user
+    password: {{ .Values.blobstorePassword | quote}}
+  app_package_directory_key: cc-packages
+  max_valid_packages_stored: 5
+  max_package_size: 1073741824
+  fog_connection: {}
+  fog_aws_storage_options: {}
+  fog_gcp_storage_options: {}
+droplets:
+  blobstore_type: webdav
+  webdav_config:
+    blobstore_timeout: 5
+    public_endpoint: {{ .Values.cloudController.webdavConfig.publicUrl }}
+    private_endpoint: {{ .Values.cloudController.webdavConfig.privateUrl }}
+    username: blobstore-user
+    password: {{ .Values.blobstorePassword | quote}}
+  droplet_directory_key: cc-droplets
+  fog_connection: {}
+  fog_aws_storage_options: {}
+  fog_gcp_storage_options: {}
+  max_staged_droplets_stored: 5
+buildpacks:
+  blobstore_type: webdav
+  webdav_config:
+    blobstore_timeout: 5
+    public_endpoint: {{ .Values.cloudController.webdavConfig.publicUrl }}
+    private_endpoint: {{ .Values.cloudController.webdavConfig.privateUrl }}
+    username: blobstore-user
+    password: {{ .Values.blobstorePassword | quote}}
+  buildpack_directory_key: cc-buildpacks
+  fog_connection: {}
+  fog_aws_storage_options: {}
+  fog_gcp_storage_options: {}
+db_encryption_key: "asdfasdfasdf"
+database_encryption:
+  keys: { "encryption_key_0": "asdfasdfasdf" }
+  current_key_label: "encryption_key_0"
+  pbkdf2_hmac_iterations: 2048
+default_health_check_timeout: 60
+maximum_health_check_timeout: 180
+disable_custom_buildpacks: false
+broker_client_timeout_seconds: 60
+allow_app_ssh_access: true
+default_app_ssh_access: true
+renderer:
+  max_results_per_page: 100
+  default_results_per_page: 50
+  max_inline_relations_depth: 3
+install_buildpacks:
+  - name: java_buildpack
+    package: buildpack_java
+  - name: ruby_buildpack
+    package: buildpack_ruby
+  - name: node_buildpack
+    package: buildpack_node
+security_group_definitions:
+  - name: dummy1
+    rules: []
+  - name: dummy2
+    rules: []
+default_staging_security_groups:
+  - dummy3
+default_running_security_groups:
+  - dummy4
+security_groups:
+  enable_comma_delimited_destinations: false
+allowed_cors_domains:
+  - http://*.appspot.com
+  - http://*.inblue.net
+  - http://talkoncorners.com
+  - http://borrowedheaven.org
+rate_limiter:
+  enabled: false
+  per_process_general_limit: 2000
+  global_general_limit: 20000
+  per_process_unauthenticated_limit: 100
+  global_unauthenticated_limit: 1000
+  reset_interval_in_minutes: 60
+rate_limiter_v2_api:
+  enabled: false
+  per_process_general_limit: 1000
+  global_general_limit: 10000
+  per_process_admin_limit: 2000
+  global_admin_limit: 20000
+  reset_interval_in_minutes: 60
+temporary_enable_v2: true
+max_concurrent_service_broker_requests: 0
+diego:
+  file_server_url: {{ .Values.cloudController.diego.fileServerUrl }}
+  cc_uploader_url: {{ .Values.cloudController.diego.ccUploaderUrl }}
+  use_privileged_containers_for_running: false
+  use_privileged_containers_for_staging: false
+  enable_declarative_asset_downloads: false
+  lifecycle_bundles:
+    "buildpack/cflinuxfs4": "buildpack_app_lifecycle/buildpack_app_lifecycle.tgz"
+    "cnb/cflinuxfs4": "cnb_app_lifecycle/cnb_app_lifecycle.tgz"
+    "docker": "docker_app_lifecycle/docker_app_lifecycle.tgz"
+  droplet_destinations:
+    "cflinuxfs4": "/home/vcap"
+  insecure_docker_registry_list: []
+  docker_staging_stack: "cflinuxfs4"
+  bbs:
+    url: https://bbs.default.svc.cluster.local:8889
+    key_file: /etc/ssl/certs/cloud-controller/tls.key
+    cert_file: /etc/ssl/certs/cloud-controller/tls.crt
+    ca_file: /etc/ssl/certs/cloud-controller/ca.crt
+    connect_timeout: 10
+    send_timeout: 10
+    receive_timeout: 10
+  pid_limit: 2048
+directories:
+  tmpdir: /tmp
+  diagnostics: tmp
+stacks_file: /etc/cloud-controller/stacks.yaml
+newrelic_enabled: false
+max_annotations_per_resource: 200
+max_labels_per_resource: 50
+max_migration_duration_in_minutes: 45
+max_migration_statement_runtime_in_seconds: 30
+migration_psql_concurrent_statement_timeout_in_seconds: 1800
+db:
+  log_level: "info"
+  ssl_verify_hostname: false
+  max_connections: 42
+  pool_timeout: 60
+  log_db_queries: false
+  read_timeout: 3600
+  connection_validation_timeout: 3600
+  enable_paginate_window: true
+index: 0
+name: api
+request_timeout_in_seconds: 600
+skip_cert_verify: true
+app_bits_upload_grace_period_in_seconds: 500
+security_event_logging:
+  enabled: false
+  file: /tmp/security_events.log
+staging:
+  timeout_in_seconds: 900
+  legacy_md5_buildpack_paths_enabled: false
+  minimum_staging_memory_mb: 1024
+  minimum_staging_disk_mb: 4096
+  minimum_staging_file_descriptor_limit: 16384
+  auth:
+    user: "bob"
+    password: "laura"
+statsd_host: "127.0.0.1"
+statsd_port: 8125
+enable_statsd_metrics: true
+perform_blob_cleanup: false
+diego_sync:
+  frequency_in_seconds: 30
+pending_droplets:
+  frequency_in_seconds: 300
+  expiration_in_seconds: 42
+pending_builds:
+  expiration_in_seconds: 42
+  frequency_in_seconds: 300
+credhub_api:
+  internal_url: {{ .Values.cloudController.credhubApi.internalUrl }}
+  external_url: {{ .Values.cloudController.credhubApi.externalUrl }}
+  ca_cert_path: "/etc/ssl/certs/cloud-controller/ca.crt"
+credential_references:
+  interpolate_service_bindings: true
+internal_route_vip_range: "127.128.0.0/9"
+locket:
+  host: "locket.default.svc.cluster.local"
+  port: 8891
+  ca_file: "/etc/ssl/certs/cloud-controller/ca.crt"
+  cert_file: "/etc/ssl/certs/cloud-controller/tls.crt"
+  key_file: "/etc/ssl/certs/cloud-controller/tls.key"
+threadpool_size: 20
+default_app_lifecycle: buildpack
+custom_metric_tag_prefix_list: ["metric.tag.cloudfoundry.org"]
+max_manifest_service_binding_poll_duration_in_seconds: 60
+update_metric_tags_on_rename: true
+app_log_revision: false
+app_instance_stopping_state: true
+max_service_credential_bindings_per_app_service_instance: 1

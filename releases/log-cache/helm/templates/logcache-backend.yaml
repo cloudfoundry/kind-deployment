@@ -1,0 +1,185 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-cache-backend
+  labels:
+    app: log-cache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-cache
+  template:
+    metadata:
+      labels:
+        app: log-cache
+    spec:
+      containers:
+      - name: syslog-server
+        image: {{ .Values.logCacheBackend.syslogServer.image.repository }}:{{ default .Chart.AppVersion .Values.logCacheBackend.syslogServer.image.tag }}
+        imagePullPolicy: {{ .Values.logCacheBackend.syslogServer.image.imagePullPolicy }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8082
+        env:
+        - name: LOG_CACHE_ADDR
+          value: localhost:8080
+        - name: SYSLOG_PORT
+          value: "8082"
+        - name: SYSLOG_IDLE_TIMEOUT
+          value: "2m"
+        - name: SYSLOG_TRIM_MESSAGE_WHITESPACE
+          value: "false"
+        - name: SYSLOG_NON_TRANSPARENT_FRAMING
+          value: "false"
+        - name: CA_PATH
+          value: /etc/ssl/certs/log-cache/ca.crt
+        - name: CERT_PATH
+          value: /etc/ssl/certs/log-cache/tls.crt
+        - name: KEY_PATH
+          value: /etc/ssl/certs/log-cache/tls.key
+        volumeMounts:
+          - name: log-cache
+            mountPath: /etc/ssl/certs/log-cache
+        {{- if .Values.logCacheBackend.resources }}
+        resources:
+          {{- toYaml .Values.logCacheBackend.resources | nindent 12 }}
+        {{- end }}
+      - name: log-cache
+        image: {{ .Values.logCacheBackend.logCache.image.repository }}:{{ default .Chart.AppVersion .Values.logCacheBackend.logCache.image.tag }}
+        imagePullPolicy: {{ .Values.logCacheBackend.logCache.image.imagePullPolicy }}
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: ADDR
+          value: 0.0.0.0:8080
+        - name: MEMORY_LIMIT_PERCENT
+          value: "50"
+        - name: MAX_PER_SOURCE
+          value: "100000"
+        - name: QUERY_TIMEOUT
+          value: "10s"
+        - name: TRUNCATION_INTERVAL
+          value: "1s"
+        - name: PRUNES_PER_GC
+          value: "3"
+        - name: NODE_INDEX
+          value: "0"
+        - name: NODE_ADDRS
+          value: log-cache-headless.{{ .Release.Namespace }}.svc.cluster.local:8080
+        - name: CA_PATH
+          value: /etc/ssl/certs/log-cache/ca.crt
+        - name: CERT_PATH
+          value: /etc/ssl/certs/log-cache/tls.crt
+        - name: KEY_PATH
+          value: /etc/ssl/certs/log-cache/tls.key
+        volumeMounts:
+          - name: log-cache
+            mountPath: /etc/ssl/certs/log-cache
+        {{- if .Values.logCacheBackend.resources }}
+        resources:
+          {{- toYaml .Values.logCacheBackend.resources | nindent 12 }}
+        {{- end }}
+      nodeSelector:
+        cloudfoundry.org/workload: "false"
+      volumes:
+        - name: log-cache
+          secret:
+            secretName: {{ default .Values.logCacheBackend.certificateSecret "log-cache" }}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: log-cache-syslog
+  labels:
+    app: log-cache
+spec:
+  ports:
+    - port: 8082
+      name: syslog
+      targetPort: 8082
+      protocol: TCP
+  selector:
+    app: log-cache
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: log-cache
+  labels:
+    app: log-cache
+spec:
+  ports:
+    - port: 8080
+      name: logcache
+      targetPort: 8080
+  selector:
+    app: log-cache
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: log-cache-headless
+  labels:
+    app: log-cache
+spec:
+  clusterIP: None
+  ports:
+    - port: 8080
+      name: logcache
+      targetPort: 8080
+  selector:
+    app: log-cache
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: log-cache
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: log-cache-api
+  rules:
+    - backendRefs:
+        - name: log-cache
+          port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: log-cache-syslog
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: log-cache-syslog
+  rules:
+    - backendRefs:
+        - name: log-cache-syslog
+          port: 8082
+---
+{{ if not .Values.logCacheBackend.certificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: log-cache
+spec:
+  secretName: log-cache
+  commonName: client
+  dnsNames:
+    - localhost
+    - log-cache
+    - log_cache
+    - log-cache.{{ .Release.Namespace }}.svc
+    - log-cache.{{ .Release.Namespace }}.svc.cluster.local
+    - "{{ .Values.logCacheBackend.hostname }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}

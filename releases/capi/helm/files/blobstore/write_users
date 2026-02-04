@@ -1,0 +1,1 @@
+blobstore-user:{PLAIN}{{ .Values.blobstorePassword }}

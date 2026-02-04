@@ -1,0 +1,146 @@
+{{- if .Values.syslogBindingCache.enabled }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aggregate-drains
+  labels:
+    app: syslog-binding-cache
+type: Opaque
+stringData:
+  aggregate_drains.yml: |
+    ---
+    - url: syslog://log-cache-syslog.{{ .Release.Namespace }}.svc.cluster.local:8082?include-metrics-deprecated=true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: syslog-binding-cache
+  labels:
+    app: syslog-binding-cache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: syslog-binding-cache
+  template:
+    metadata:
+      labels:
+        app: syslog-binding-cache
+    spec:
+      containers:
+        - name: syslog-binding-cache
+          image: {{ .Values.syslogBindingCache.image.repository }}:{{ default .Chart.AppVersion .Values.syslogBindingCache.image.tag }}
+          imagePullPolicy: {{ .Values.syslogBindingCache.image.imagePullPolicy }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9000
+          env:
+            - name: CACHE_PORT
+              value: "9000"
+            - name: API_URL
+              value: "https://cloud-controller.{{ .Release.Namespace }}.svc.cluster.local:9023"
+            - name: API_CA_FILE_PATH
+              value: /etc/ssl/syslog-binding-cache/ca.crt
+            - name: API_CERT_FILE_PATH
+              value: /etc/ssl/syslog-binding-cache/tls.crt
+            - name: API_KEY_FILE_PATH
+              value: /etc/ssl/syslog-binding-cache/tls.key
+            - name: API_COMMON_NAME
+              value: cloud-controller
+            - name: CACHE_CA_FILE_PATH
+              value: /etc/ssl/syslog-binding-cache/ca.crt
+            - name: CACHE_CERT_FILE_PATH
+              value: /etc/ssl/syslog-binding-cache/tls.crt
+            - name: CACHE_KEY_FILE_PATH
+              value: /etc/ssl/syslog-binding-cache/tls.key
+            - name: CACHE_COMMON_NAME
+              value: syslog-binding-cache
+            - name: METRICS_CA_FILE_PATH
+              value: /etc/ssl/syslog-binding-cache/ca.crt
+            - name: METRICS_CERT_FILE_PATH
+              value: /etc/ssl/syslog-binding-cache/tls.crt
+            - name: METRICS_KEY_FILE_PATH
+              value: /etc/ssl/syslog-binding-cache/tls.key
+            - name: API_POLLING_INTERVAL
+              value: 1m
+            - name: API_BATCH_SIZE
+              value: '1000'
+            - name: API_DISABLE_KEEP_ALIVES
+              value: 'true'
+            - name: AGGREGATE_DRAINS_FILE
+              value: /etc/aggregate-drains/aggregate_drains.yml
+          {{- if .Values.syslogBindingCache.resources }}
+          resources:
+            {{- toYaml .Values.syslogBindingCache.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: syslog-binding-cache
+              mountPath: /etc/ssl/syslog-binding-cache
+              readOnly: true
+            - name: aggregate-drains
+              mountPath: /etc/aggregate-drains
+              readOnly: true
+      nodeSelector:
+        cloudfoundry.org/workload: "false"
+      volumes:
+      - name: syslog-binding-cache
+        secret:
+          secretName: {{ default .Values.syslogBindingCache.certificateSecret "syslog-binding-cache" }}
+      - name: aggregate-drains
+        secret:
+          secretName: aggregate-drains
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: syslog-binding-cache
+  labels:
+    app: syslog-binding-cache
+spec:
+  ports:
+    - port: 9000
+      name: http
+      targetPort: 9000
+      protocol: TCP
+  selector:
+    app: syslog-binding-cache
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: syslog-binding-cache
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: syslog-binding-cache
+  rules:
+    - backendRefs:
+      - name: syslog-binding-cache
+        port: 9000
+---
+{{ if not .Values.syslogBindingCache.certificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: syslog-binding-cache
+spec:
+  secretName: syslog-binding-cache
+  commonName: syslog-binding-cache
+  dnsNames:
+    - syslog-binding-cache
+    - syslog-binding-cache.{{ .Release.Namespace }}.svc
+    - syslog-binding-cache.{{ .Release.Namespace }}.svc.cluster.local
+    - "{{ .Values.syslogBindingCache.hostname }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}
+{{- end }}

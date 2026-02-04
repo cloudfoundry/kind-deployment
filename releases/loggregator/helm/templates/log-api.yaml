@@ -1,0 +1,314 @@
+
+{{ if .Values.loggregator.enabled }}
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: log-api
+  labels:
+    app: log-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-api
+  template:
+    metadata:
+      labels:
+        app: log-api
+    spec:
+      containers:
+        - name: reverse-log-proxy
+          image: {{ .Values.reverseLogProxy.image.repository }}:{{ default .Chart.AppVersion .Values.reverseLogProxy.image.tag }}
+          imagePullPolicy: {{ .Values.reverseLogProxy.image.imagePullPolicy }}
+          imagePullPolicy: IfNotPresent
+          {{- if .Values.reverseLogProxy.resources }}
+          resources:
+            {{- toYaml .Values.reverseLogProxy.resources | nindent 12 }}
+          {{- end }}
+          env:
+          - name: RLP_PORT
+            value: "8082"
+          - name: MAX_EGRESS_STREAMS
+            value: "1000"
+          - name: RLP_CERT_FILE
+            value: "/etc/ssl/certs/reverse-log-proxy/tls.crt"
+          - name: RLP_KEY_FILE
+            value: "/etc/ssl/certs/reverse-log-proxy/tls.key"
+          - name: RLP_CA_FILE
+            value: "/etc/ssl/certs/reverse-log-proxy/ca.crt"
+          - name: RLP_CIPHER_SUITES
+            value: "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+          - name: RLP_METRIC_EMITTER_INTERVAL
+            value: "1m"
+          - name: ROUTER_ADDRS
+            value: "doppler.{{ .Release.Namespace }}.svc.cluster.local:8082"
+          - name: AGENT_ADDR
+            value: "forwarder-agent.{{ .Release.Namespace }}.svc.cluster.local:3458"
+          volumeMounts:
+            - name: reverse-log-proxy
+              mountPath: /etc/ssl/certs/reverse-log-proxy
+        - name: reverse-log-proxy-gateway
+          image: {{ .Values.reverseLogProxyGateway.image.repository }}:{{ default .Chart.AppVersion .Values.reverseLogProxyGateway.image.tag }}
+          imagePullPolicy: {{ .Values.reverseLogProxyGateway.image.imagePullPolicy }}
+          imagePullPolicy: IfNotPresent
+          {{- if .Values.reverseLogProxyGateway.resources }}
+          resources:
+            {{- toYaml .Values.reverseLogProxyGateway.resources | nindent 12 }}
+          {{- end }}
+          env:
+          - name: GATEWAY_ADDR
+            value: "0.0.0.0:8088"
+          - name: HTTP_CERT_PATH
+            value: /etc/ssl/certs/reverse-log-proxy-gateway/tls.crt
+          - name: HTTP_KEY_PATH
+            value: /etc/ssl/certs/reverse-log-proxy-gateway/tls.key
+          - name: LOG_ACCESS_ADDR_EXTERNAL
+            value: http://cloud-controller.{{ .Release.Namespace }}.svc.cluster.local:9022
+          - name: LOG_ACCESS_ADDR
+            value: https://cloud-controller.{{ .Release.Namespace }}.svc.cluster.local:9023
+          - name: LOG_ACCESS_CERT_PATH
+            value: /etc/ssl/certs/reverse-log-proxy-gateway/tls.crt
+          - name: LOG_ACCESS_KEY_PATH
+            value: /etc/ssl/certs/reverse-log-proxy-gateway/tls.key
+          - name: LOG_ACCESS_CA_PATH
+            value: /etc/ssl/certs/reverse-log-proxy-gateway/ca.crt
+          - name: LOG_ACCESS_COMMON_NAME
+            value: "cloud-controller.{{ .Release.Namespace }}.svc.cluster.local"
+          - name: LOG_ADMIN_CLIENT_ID
+            value: "doppler"
+          - name: LOG_ADMIN_CLIENT_SECRET
+            value: {{ .Values.oauthClientsSecret | quote }}
+          - name: LOG_ADMIN_ADDR
+            value: "https://uaa.{{ .Release.Namespace }}.svc.cluster.local"
+          - name: LOG_ADMIN_CA_PATH
+            value: /etc/ssl/certs/reverse-log-proxy-gateway/ca.crt
+          - name: LOGS_PROVIDER_ADDR
+            value: "127.0.0.1:8082"
+          - name: LOGS_PROVIDER_CLIENT_CERT_PATH
+            value: /etc/ssl/certs/reverse-log-proxy-gateway/tls.crt
+          - name: LOGS_PROVIDER_CLIENT_KEY_PATH
+            value: /etc/ssl/certs/reverse-log-proxy-gateway/tls.key
+          - name: LOGS_PROVIDER_CA_PATH
+            value: /etc/ssl/certs/reverse-log-proxy-gateway/ca.crt
+          - name: LOGS_PROVIDER_COMMON_NAME
+            value: "reverse-log-proxy"
+          - name: METRICS_CA_FILE_PATH
+            value: /etc/ssl/certs/reverse-log-proxy-gateway/ca.crt
+          - name: METRICS_CERT_FILE_PATH
+            value: /etc/ssl/certs/reverse-log-proxy-gateway/tls.crt
+          - name: METRICS_KEY_FILE_PATH
+            value: /etc/ssl/certs/reverse-log-proxy-gateway/tls.key
+          volumeMounts:
+            - name: reverse-log-proxy-gateway
+              mountPath: /etc/ssl/certs/reverse-log-proxy-gateway
+        - name: trafficcontroller
+          image: {{ .Values.trafficcontroller.image.repository }}:{{ default .Chart.AppVersion .Values.trafficcontroller.image.tag }}
+          imagePullPolicy: {{ .Values.trafficcontroller.image.imagePullPolicy }}
+          imagePullPolicy: IfNotPresent
+          {{- if .Values.trafficcontroller.resources }}
+          resources:
+            {{- toYaml .Values.trafficcontroller.resources | nindent 12 }}
+          {{- end }}
+          env:
+          - name: AGENT_ADDR
+            value: "forwarder-agent.{{ .Release.Namespace }}.svc.cluster.local:3458"
+          - name: "ROUTER_ADDRS"
+            value: "doppler.{{ .Release.Namespace }}.svc.cluster.local:8082"
+          - name: ROUTER_CERT_FILE
+            value: "/etc/ssl/certs/trafficcontroller/tls.crt"
+          - name: ROUTER_KEY_FILE
+            value: "/etc/ssl/certs/trafficcontroller/tls.key"
+          - name: ROUTER_CA_FILE
+            value: "/etc/ssl/certs/trafficcontroller/ca.crt"
+          - name: CC_CERT_FILE
+            value: "/etc/ssl/certs/trafficcontroller/tls.crt"
+          - name: CC_KEY_FILE
+            value: "/etc/ssl/certs/trafficcontroller/tls.key"
+          - name: CC_CA_FILE
+            value: "/etc/ssl/certs/trafficcontroller/ca.crt"
+          - name: CC_SERVER_NAME
+            value: "cloud-controller.{{ .Release.Namespace }}.svc.cluster.local"
+          - name: TRAFFIC_CONTROLLER_API_HOST
+            value: "https://cloud-controller.{{ .Release.Namespace }}.svc.cluster.local:9023"
+          - name: TRAFFIC_CONTROLLER_OUTGOING_CERT_FILE
+            value: "/etc/ssl/certs/trafficcontroller/tls.crt"
+          - name: TRAFFIC_CONTROLLER_OUTGOING_KEY_FILE
+            value: "/etc/ssl/certs/trafficcontroller/tls.key"
+          - name: TRAFFIC_CONTROLLER_OUTGOING_DROPSONDE_PORT
+            value: "8081"
+          - name: TRAFFIC_CONTROLLER_SKIP_CERT_VERIFY
+            value: "true"
+          - name: TRAFFIC_CONTROLLER_UAA_HOST
+            value: "https://uaa.{{ .Release.Namespace }}.svc.cluster.local"
+          - name: TRAFFIC_CONTROLLER_UAA_CLIENT
+            value: doppler
+          - name: TRAFFIC_CONTROLLER_UAA_CLIENT_SECRET
+            value: {{ .Values.oauthClientsSecret | quote }}
+          - name: TRAFFIC_CONTROLLER_UAA_CA_CERT
+            value: "/etc/ssl/certs/trafficcontroller/ca.crt"
+          - name: TRAFFIC_CONTROLLER_METRIC_EMITTER_INTERVAL
+            value: "1m"
+          - name: TRAFFIC_CONTROLLER_SYSTEM_DOMAIN
+            value: {{ .Values.trafficcontroller.systemDomain }}
+          - name: TRAFFIC_CONTROLLER_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          volumeMounts:
+            - name: trafficcontroller
+              mountPath: /etc/ssl/certs/trafficcontroller
+      nodeSelector:
+        cloudfoundry.org/workload: "false"
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: trafficcontroller
+          secret:
+            secretName: {{ default .Values.trafficcontroller.certificateSecret "trafficcontroller" }}
+        - name: reverse-log-proxy
+          secret:
+            secretName: {{ default .Values.reverseLogProxy.certificateSecret "reverse-log-proxy" }}
+        - name: reverse-log-proxy-gateway
+          secret:
+            secretName: {{ default .Values.reverseLogProxyGateway.certificateSecret "reverse-log-proxy-gateway" }}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: log-api
+  labels:
+    app: log-api
+spec:
+  ports:
+    - port: 8088
+      name: rlp-gateway
+      targetPort: 8088
+    - port: 8081
+      name: trafficcontroller
+      targetPort: 8081
+  selector:
+    app: log-api
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: log-api
+spec:
+  targetRefs:
+    - kind: Service
+      group: ""
+      name: log-api
+  validation:
+    hostname: "log-api"
+    caCertificateRefs:
+      - kind: ConfigMap
+        group: ""
+        name: ca
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: log-stream
+spec:
+  parentRefs:
+    - name: istio-gateway
+  hostnames:
+    - "{{ .Values.logStream.address }}"
+  rules:
+    - backendRefs:
+        - name: log-api
+          port: 8088
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: doppler
+spec:
+  parentRefs:
+    - name: istio-gateway
+  hostnames:
+    - "{{ .Values.doppler.hostname }}"
+  rules:
+    - backendRefs:
+        - name: log-api
+          port: 8081
+---
+{{ if not .Values.reverseLogProxy.certificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: reverse-log-proxy
+spec:
+  secretName: reverse-log-proxy
+  commonName: reverse-log-proxy
+  dnsNames:
+    - loggregator
+    - reverse-log-proxy
+    - reverse-log-proxy.{{ .Release.Namespace }}.svc
+    - reverse-log-proxy.{{ .Release.Namespace }}.svc.cluster.local
+    - "{{ .Values.reverseLogProxy.hostname }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}
+---
+{{ if not .Values.reverseLogProxyGateway.certificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: reverse-log-proxy-gateway
+spec:
+  secretName: reverse-log-proxy-gateway
+  commonName: reverse-log-proxy-gateway
+  dnsNames:
+    - loggregator
+    - reverse-log-proxy-gateway
+    - reverse-log-proxy-gateway.{{ .Release.Namespace }}.svc
+    - reverse-log-proxy-gateway.{{ .Release.Namespace }}.svc.cluster.local
+    - "{{ .Values.reverseLogProxyGateway.hostname }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}
+---
+{{ if not .Values.trafficcontroller.certificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: trafficcontroller
+spec:
+  secretName: trafficcontroller
+  commonName: trafficcontroller
+  dnsNames:
+    - loggregator
+    - trafficcontroller
+    - trafficcontroller.{{ .Release.Namespace }}.svc
+    - trafficcontroller.{{ .Release.Namespace }}.svc.cluster.local
+    - "{{ .Values.trafficcontroller.hostname }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}
+{{- end }}

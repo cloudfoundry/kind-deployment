@@ -1,0 +1,40 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+networking:
+  disableDefaultCNI: true
+  kubeProxyMode: none
+featureGates:
+  PodAndContainerStatsFromCRI: true
+containerdConfigPatches:
+- |-
+  [plugins."io.containerd.grpc.v1.cri".registry]
+    config_path = "/etc/containerd/certs.d"
+kubeadmConfigPatches:
+  - |
+    kind: ClusterConfiguration
+    metadata:
+      name: config
+    controllerManager:
+      extraArgs:
+        authorization-always-allow-paths: /healthz,/readyz,/livez,/metrics
+        bind-address: 0.0.0.0
+    scheduler:
+      extraArgs:
+        authorization-always-allow-paths: /healthz,/readyz,/livez,/metrics
+        bind-address: 0.0.0.0
+nodes:
+- role: control-plane
+- role: worker
+  labels:
+    cloudfoundry.org/workload: "false"
+  extraPortMappings:
+  - containerPort: 31080
+    hostPort: 80
+  - containerPort: 31443
+    hostPort: 443
+  - containerPort: 31222
+    hostPort: 2222
+- role: worker
+  labels:
+    cloudfoundry.org/workload: "true"
+    cloudfoundry.org/zone: z1

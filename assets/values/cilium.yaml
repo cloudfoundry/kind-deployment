@@ -1,0 +1,9 @@
+ipam:
+  mode: kubernetes
+envoy:
+  enabled: false
+kubeProxyReplacement: true
+k8sServiceHost: cfk8s-control-plane
+k8sServicePort: 6443
+operator:
+  replicas: 1

@@ -1,0 +1,180 @@
+{{ if .Values.blobstore.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blobstore-configmap
+data:
+  nginx.conf: |-
+    {{- tpl (.Files.Get "files/blobstore/nginx.conf") . | nindent 4 }}
+  mime.types: |-
+    {{- tpl (.Files.Get "files/blobstore/mime.types") . | nindent 4 }}
+  blobstore.conf: |-
+    {{- tpl (.Files.Get "files/blobstore/blobstore.conf") . | nindent 4 }}
+  write_users: |-
+    {{- tpl (.Files.Get "files/blobstore/write_users") . | nindent 4 }}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: blobstore
+  labels:
+    app.kubernetes.io/name: blobstore
+spec:
+  ports:
+    - port: 443
+      name: https
+      targetPort: 443
+  selector:
+    app.kubernetes.io/name: blobstore
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/name: blobstore
+  name: blobstore
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blobstore
+  labels:
+    app.kubernetes.io/name: blobstore
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: blobstore
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: blobstore
+    spec:
+      initContainers:
+        - name: init
+          image: "{{ .Values.registry }}/alpine:latest"
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              for dir in cc-resources cc-packages cc-droplets cc-buildpacks; do
+                if [ ! -d "/data/$dir" ]; then
+                  echo "Creating directory /data/$dir"
+                  mkdir -p "/data/$dir"
+                  chmod 777 "/data/$dir"
+                fi
+              done
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      containers:
+        - name: nginx
+          image: {{ .Values.blobstore.image.repository }}:{{ .Values.blobstore.image.tag }}
+          imagePullPolicy: {{ .Values.blobstore.image.imagePullPolicy }}
+          ports:
+            - name: https
+              containerPort: 443
+              protocol: TCP
+          {{- if .Values.blobstore.resources }}
+          resources:
+            {{- toYaml .Values.blobstore.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: tmpdir
+              mountPath: /tmp
+            - name: nginx-config
+              mountPath: /usr/local/openresty/nginx/conf/nginx.conf
+              subPath: nginx.conf
+            - name: nginx-config
+              mountPath: /etc/nginx/config/sites/blobstore.conf
+              subPath: blobstore.conf
+            - name: nginx-config
+              mountPath: /etc/nginx/config/mime.types
+              subPath: mime.types
+            - name: nginx-config
+              mountPath: /etc/nginx/config/write_users
+              subPath: write_users
+            - name: data
+              mountPath: /data
+            - name: blobstore
+              mountPath: /etc/ssl/certs/blobstore
+              readOnly: true
+      nodeSelector:
+        cloudfoundry.org/workload: "false"
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: blobstore-configmap
+        - name: tmpdir
+          emptyDir: {}
+        - name: blobstore
+          secret:
+            secretName: {{ default .Values.blobstore.certificateSecret "blobstore" }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: blobstore
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: blobstore-tls
+spec:
+  targetRefs:
+    - kind: Service
+      group: ""
+      name: blobstore
+  validation:
+    hostname: "blobstore"
+    caCertificateRefs:
+      - kind: ConfigMap
+        group: ""
+        name: ca
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: blobstore
+spec:
+  parentRefs:
+    - name: istio-gateway
+  hostnames:
+    - "{{ .Values.blobstore.hostname }}"
+  rules:
+    - backendRefs:
+        - name: blobstore
+          port: 443
+---
+{{ if not .Values.blobstore.certificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: blobstore
+spec:
+  secretName: blobstore
+  commonName: blobstore
+  dnsNames:
+    - blobstore
+    - blobstore.{{ .Release.Namespace }}.svc
+    - blobstore.{{ .Release.Namespace }}.svc.cluster.local
+    - "{{ .Values.blobstore.hostname }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}
+{{ end }}

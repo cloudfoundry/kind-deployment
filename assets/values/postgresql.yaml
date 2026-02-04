@@ -1,0 +1,29 @@
+global:
+  security:
+    allowInsecureImages: true
+image:
+  repository: bitnamilegacy/postgresql
+primary:
+  initdb:
+    scripts:
+      init.sh: |
+        export PGPASSWORD=$POSTGRES_PASSWORD
+        for db in locket diego cc uaa credhub network_policy; do
+            psql -U postgres -h localhost -tc "SELECT 1 FROM pg_database WHERE datname = '$db'" | grep -q 1 || psql -U postgres -h localhost -c "CREATE DATABASE $db"
+        done
+        psql -U postgres -h localhost -d cc -c 'CREATE EXTENSION IF NOT EXISTS citext; CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; CREATE EXTENSION IF NOT EXISTS pgcrypto;'
+  nodeSelector:
+    cloudfoundry.org/workload: "false"
+  persistentVolumeClaimRetentionPolicy:
+    enabled: true
+    whenDeleted: Delete
+  resourcesPreset: none
+tls:
+  certFilename: tls.crt
+  certKeyFilename: tls.key
+  certificatesSecret: postgres-tls
+  enabled: true
+volumePermissions:
+  enabled: true
+  image:
+    repository: bitnamilegacy/os-shell

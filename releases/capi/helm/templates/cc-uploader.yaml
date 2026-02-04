@@ -1,0 +1,113 @@
+{{ if .Values.cloudController.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cc-uploader-configmap
+data:
+  cc-uploader.json: |-
+    {
+      "log_level": "debug",
+      "dropsonde_port": 3457,
+      "lager_config": {
+        "log_level": "debug",
+        "time_format": "rfc3339"
+      },
+      "listen_addr": "0.0.0.0:9090",
+      "debug_server_config": {
+        "debug_address": "127.0.0.1:17018"
+      },
+      "cc_ca_cert": "/etc/ssl/certs/cc-uploader/ca.crt",
+      "cc_client_cert": "/etc/ssl/certs/cc-uploader/tls.crt",
+      "cc_client_key": "/etc/ssl/certs/cc-uploader/tls.key",
+      "mutual_tls": {
+        "listen_addr": "0.0.0.0:9091",
+        "ca_cert": "/etc/ssl/certs/cc-uploader/ca.crt",
+        "server_cert": "/etc/ssl/certs/cc-uploader/tls.crt",
+        "server_key": "/etc/ssl/certs/cc-uploader/tls.key"
+      },
+      "disable_non_tls": false
+    }
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: cc-uploader
+  labels:
+    app: cc-uploader
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cc-uploader
+  template:
+    metadata:
+      labels:
+        app: cc-uploader
+    spec:
+      containers:
+        - name: cc-uploader
+          image: {{ .Values.ccUploader.image.repository }}:{{ default .Chart.AppVersion .Values.ccUploader.image.tag }}
+          imagePullPolicy: {{ .Values.ccUploader.image.imagePullPolicy }}
+          ports:
+            - containerPort: 9090
+          {{- if .Values.ccUploader.resources }}
+          resources:
+            {{- toYaml .Values.ccUploader.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: cc-uploader
+              mountPath: /etc/ssl/certs/cc-uploader
+            - name: cc-uploader-config
+              mountPath: /cc-uploader
+      nodeSelector:
+        cloudfoundry.org/workload: "false"
+      volumes:
+        - name: cc-uploader
+          secret:
+            secretName: {{ default .Values.ccUploader.certificateSecret "cc-uploader" }}
+        - name: cc-uploader-config
+          configMap:
+            name: cc-uploader-configmap
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: cc-uploader
+  labels:
+    app: cc-uploader
+spec:
+  ports:
+    - port: 9090
+      targetPort: 9090
+      name: tcp
+      protocol: TCP
+  selector:
+    app: cc-uploader
+---
+{{ if not .Values.ccUploader.certificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cc-uploader
+spec:
+  secretName: cc-uploader
+  commonName: client
+  dnsNames:
+    - localhost
+    - cc-uploader
+    - cc-uploader.{{ .Release.Namespace }}.svc
+    - cc-uploader.{{ .Release.Namespace }}.svc.cluster.local
+    - "{{ .Values.ccUploader.hostname }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}
+{{ end }}

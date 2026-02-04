@@ -1,0 +1,136 @@
+{{- if .Values.auctioneer.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auctioneer-configmap
+data:
+  auctioneer.json: |-
+    {
+      "auction_runner_workers": 1000,
+      "communication_timeout": "10s",
+      "report_interval": "1m",
+      "lock_retry_interval": "5s",
+      "lock_ttl": "15s",
+      "debug_address": "127.0.0.1:17001",
+      "listen_address": "0.0.0.0:9016",
+      "locks_locket_enabled": true,
+      "log_level": "debug",
+      "rep_client_session_cache_size": 4096,
+      "rep_require_tls": true,
+      "cell_state_timeout": "10s",
+      "bin_pack_first_fit_weight": 0.0,
+      "starting_container_weight": 0.25,
+      "starting_container_count_maximum": 0,
+      "bbs_ca_cert_file": "/etc/ssl/certs/auctioneer/ca.crt",
+      "bbs_client_cert_file": "/etc/ssl/certs/auctioneer/tls.crt",
+      "bbs_client_key_file": "/etc/ssl/certs/auctioneer/tls.key",
+      "bbs_address": "https://bbs.{{ .Release.Namespace }}.svc.cluster.local:8889",
+      "time_format": "rfc3339",
+      "rep_client_cert": "/etc/ssl/certs/auctioneer/tls.crt",
+      "rep_client_key": "/etc/ssl/certs/auctioneer/tls.key",
+      "rep_ca_cert": "/etc/ssl/certs/auctioneer/ca.crt",
+      "ca_cert_file": "/etc/ssl/certs/auctioneer/ca.crt",
+      "server_cert_file": "/etc/ssl/certs/auctioneer/tls.crt",
+      "server_key_file": "/etc/ssl/certs/auctioneer/tls.key",
+      "locket_address": "locket.{{ .Release.Namespace }}.svc.cluster.local:8891",
+      "uuid": "c4b2869a-494e-4664-9886-4886193b348d",
+      "locket_ca_cert_file": "/etc/ssl/certs/auctioneer/ca.crt",
+      "locket_client_cert_file": "/etc/ssl/certs/auctioneer/tls.crt",
+      "locket_client_key_file": "/etc/ssl/certs/auctioneer/tls.key",
+      "locket_client_keepalive_time": 10,
+      "locket_client_keepalive_timeout": 22,
+      "loggregator": {
+        "loggregator_use_v2_api": true,
+        "loggregator_api_port": 3458,
+        "loggregator_api_host": "forwarder-agent.{{ .Release.Namespace }}.svc.cluster.local",
+        "loggregator_ca_path": "/etc/ssl/certs/auctioneer/ca.crt",
+        "loggregator_cert_path": "/etc/ssl/certs/auctioneer/tls.crt",
+        "loggregator_key_path": "/etc/ssl/certs/auctioneer/tls.key",
+        "loggregator_job_deployment": "cf",
+        "loggregator_job_name": "auctioneer",
+        "loggregator_job_origin": "auctioneer",
+        "loggregator_source_id": "auctioneer"
+      }
+    }
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: auctioneer
+  labels:
+    app: auctioneer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auctioneer
+  template:
+    metadata:
+      labels:
+        app: auctioneer
+    spec:
+      containers:
+        - name: auctioneer
+          image: {{ .Values.auctioneer.image.repository }}:{{ default .Chart.AppVersion .Values.auctioneer.image.tag }}
+          imagePullPolicy: {{ .Values.auctioneer.image.imagePullPolicy }}
+          ports:
+            - containerPort: 8889
+          {{- if .Values.auctioneer.resources }}
+          resources:
+            {{- toYaml .Values.auctioneer.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: auctioneer
+              mountPath: /etc/ssl/certs/auctioneer
+            - name: auctioneer-config
+              mountPath: /auctioneer
+      nodeSelector:
+        cloudfoundry.org/workload: "false"
+      volumes:
+        - name: auctioneer
+          secret:
+            secretName: {{ default .Values.auctioneer.certificateSecret "auctioneer" }}
+        - name: auctioneer-config
+          configMap:
+            name: auctioneer-configmap
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: auctioneer
+  labels:
+    app: auctioneer
+spec:
+  ports:
+    - port: 9016
+      targetPort: 9016
+      protocol: TCP
+  selector:
+    app: auctioneer
+---
+{{ if not .Values.auctioneer.certificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: auctioneer
+spec:
+  secretName: auctioneer
+  commonName: auctioneer
+  dnsNames:
+    - auctioneer
+    - auctioneer.{{ .Release.Namespace }}.svc
+    - auctioneer.{{ .Release.Namespace }}.svc.cluster.local
+    - "{{ .Values.auctioneer.hostname }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}
+{{- end }}

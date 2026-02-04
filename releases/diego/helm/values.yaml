@@ -1,0 +1,61 @@
+auctioneer:
+  enabled: false
+  certificateSecret: ~
+  hostname: "auctioneer.default.svc.cluster.local"
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/auctioneer
+    tag: ~
+    imagePullPolicy: IfNotPresent
+
+bbs:
+  enabled: false
+  certificateSecret: ~
+  hostname: "bbs.default.svc.cluster.local"
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/bbs
+    tag: ~
+    imagePullPolicy: IfNotPresent
+  
+fileserver:
+  # renovate: depName=cf-deployment image=ghcr.io/cloudfoundry/k8s/fileserver
+  version: "54.6.0"
+  enabled: false
+  hostname: "file-server.127-0-0-1.nip.io"
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/fileserver
+    tag: ~
+    imagePullPolicy: IfNotPresent
+  
+locket:
+  enabled: false
+  certificateSecret: ~
+  hostname: "locket.default.svc.cluster.local"
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/locket
+    tag: ~
+    imagePullPolicy: IfNotPresent
+  
+sshProxy:
+  enabled: false
+  certificateSecret: ~
+  hostname: "ssh-proxy.127-0-0-1.nip.io"
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/ssh-proxy
+    tag: ~
+    imagePullPolicy: IfNotPresent
+  
+routeEmitter:
+  enabled: false
+  certificateSecret: ~
+  natsAddress: "nats.default.svc.cluster.local:4222"
+  locketAddress: "locket.default.svc.cluster.local:8891"
+  bbsAddress: "https://bbs.default.svc.cluster.local:8889"
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/route-emitter
+    tag: ~
+    imagePullPolicy: IfNotPresent
+
+dbPassword: ~
+sshProxyHostKey: ~
+diegoSSHCredentials: ~
+oauthClientsSecret: ~

@@ -1,0 +1,41 @@
+name: Setup CF Tests
+description: Common setup for CF testing workflows
+
+inputs:
+  test-repo:
+    description: 'CF test repository name (e.g., cf-acceptance-tests, cf-smoke-tests)'
+    required: true
+  config-template:
+    description: 'Config template file path'
+    required: true
+  config-output:
+    description: 'Config output file path'
+    required: true
+
+outputs:
+  test-repo-path:
+    description: 'Path to the checked out test repository'
+    value: ${{ inputs.test-repo }}
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: checkout CF test repository
+      uses: actions/checkout@v6
+      with:
+        repository: "cloudfoundry/${{ inputs.test-repo }}"
+        github-server-url: https://github.com
+        path: "${{ inputs.test-repo }}"
+
+    - name: setup Go
+      uses: actions/setup-go@v6
+      with:
+        go-version-file: ./${{ inputs.test-repo }}/go.mod
+        cache: false
+
+    - name: setup Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: "3"
+

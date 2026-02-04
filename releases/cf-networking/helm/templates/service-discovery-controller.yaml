@@ -1,0 +1,128 @@
+{{- if .Values.serviceDiscoveryController.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: service-discovery-controller-configmap
+data:
+  service-discovery-controller.json: |-
+    {
+      "address": "0.0.0.0",
+      "port": "{{ .Values.serviceDiscoveryController.port }}",
+      "index": "0",
+      "log_level_address": "127.0.0.1",
+      "log_level_port": 8055,
+      "server_cert": "/etc/ssl/certs/service-discovery-controller/tls.crt",
+      "server_key": "/etc/ssl/certs/service-discovery-controller/tls.key",
+      "ca_cert": "/etc/ssl/certs/service-discovery-controller/ca.crt",
+      "metron_port": 3457,
+      "staleness_threshold_seconds": 180,
+      "pruning_interval_seconds": 60,
+      "metrics_emit_seconds": 10,
+      "resume_pruning_delay_seconds": 60,
+      "warm_duration_seconds": 60,
+      "read_header_timeout": "30s",
+      "nats": {
+        "tls_enabled": true,
+        "ca_certs": "/etc/ssl/certs/service-discovery-controller/ca.crt",
+        "cert_chain": "/etc/ssl/certs/service-discovery-controller/tls.crt",
+        "private_key": "/etc/ssl/certs/service-discovery-controller/tls.key",
+        "hosts": [
+          {
+            "hostname": "{{ .Values.serviceDiscoveryController.nats.host }}",
+            "port": {{ .Values.serviceDiscoveryController.nats.port }}
+          }
+        ]
+      }
+    }
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: service-discovery-controller
+  labels:
+    app: service-discovery-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-discovery-controller
+  template:
+    metadata:
+      labels:
+        app: service-discovery-controller
+    spec:
+      containers:
+        - name: service-discovery-controller
+          image: {{ .Values.serviceDiscoveryController.image.repository }}:{{ default .Chart.AppVersion .Values.serviceDiscoveryController.image.tag }}
+          imagePullPolicy: {{ .Values.serviceDiscoveryController.image.imagePullPolicy }}
+          imagePullPolicy: IfNotPresent
+          {{- if .Values.serviceDiscoveryController.resources }}
+          resources:
+            {{- toYaml .Values.serviceDiscoveryController.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: service-discovery-controller
+              mountPath: /etc/ssl/certs/service-discovery-controller
+            - name: service-discovery-controller-config
+              mountPath: /service-discovery-controller
+      nodeSelector:
+        cloudfoundry.org/workload: "false"
+      volumes:
+        - name: service-discovery-controller
+          secret:
+            secretName: {{ default .Values.serviceDiscoveryController.certificateSecret "service-discovery-controller" }}
+        - name: service-discovery-controller-config
+          configMap:
+            name: service-discovery-controller-configmap
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: service-discovery-controller
+  labels:
+    app: service-discovery-controller
+spec:
+  ports:
+    - port: {{ .Values.serviceDiscoveryController.port }}
+      targetPort: {{ .Values.serviceDiscoveryController.port }}
+      protocol: TCP
+  selector:
+    app: service-discovery-controller
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: service-discovery-controller
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: service-discovery-controller
+  rules:
+    - backendRefs:
+        - name: service-discovery-controller
+          port: {{ .Values.serviceDiscoveryController.port }}
+---
+{{- if not .Values.serviceDiscoveryController.certificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: service-discovery-controller
+spec:
+  secretName: service-discovery-controller
+  commonName: service-discovery-controller
+  dnsNames:
+    - service-discovery-controller
+    - "{{ .Values.serviceDiscoveryController.hostname }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{- end }}
+{{- end }}

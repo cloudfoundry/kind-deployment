@@ -1,0 +1,40 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^docker-bake.hcl$/"
+      ],
+      "matchStrings": [
+        "# renovate: depName=(?<depName>.*?)( registryUrl=(?<registryUrl>.*?))?\\s+default\\s+= \"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+      ],
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v?(?<version>.*)$"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^scripts/deploy.sh$/"
+      ],
+      "matchStrings": [
+        "# renovate: depName=(?<depName>.*?)( registryUrl=(?<registryUrl>.*?))?\\s+.+_VERSION=\"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+      ],
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v?(?<version>.*)$"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^releases/.*/Chart.yaml$/",
+        "/^releases/.*/values.yaml$/"
+      ],
+      "matchStrings": [
+        "# renovate: depName=(?<depName>.*?) image=(?<packageName>.*?)\\s+appVersion: (?<currentValue>\\d+\\.\\d+\\.\\d+)",
+        "# renovate: depName=(?<depName>.*?) image=(?<packageName>.*?)\\s+version: \"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+      ],
+      "datasourceTemplate": "docker",
+      "extractVersionTemplate": "^v?(?<version>.*)$"
+    }
+  ]
+}

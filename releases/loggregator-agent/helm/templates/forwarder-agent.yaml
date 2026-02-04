@@ -1,0 +1,225 @@
+{{- if .Values.forwarderAgent.enabled }}
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: forwarder-agent
+  labels:
+    app: forwarder-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: forwarder-agent
+  template:
+    metadata:
+      labels:
+        app: forwarder-agent
+    spec:
+      containers:
+        - name: forwarder-agent
+          image: {{ .Values.forwarderAgent.image.repository }}:{{ default .Chart.AppVersion .Values.forwarderAgent.image.tag }}
+          imagePullPolicy: {{ .Values.forwarderAgent.image.imagePullPolicy }}
+          imagePullPolicy: IfNotPresent
+          {{- if .Values.forwarderAgent.resources }}
+          resources:
+            {{- toYaml .Values.forwarderAgent.resources | nindent 12 }}
+          {{- end }}
+          env:
+            - name: AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: AGENT_PORT
+              value: "3458"
+            - name: AGENT_CA_FILE_PATH
+              value: /etc/ssl/certs/forwarder-agent/ca.crt
+            - name: AGENT_CERT_FILE_PATH
+              value: /etc/ssl/certs/forwarder-agent/tls.crt
+            - name: AGENT_KEY_FILE_PATH
+              value: /etc/ssl/certs/forwarder-agent/tls.key
+            - name: METRICS_CA_FILE_PATH
+              value: /etc/ssl/certs/forwarder-agent/ca.crt
+            - name: METRICS_CERT_FILE_PATH
+              value: /etc/ssl/certs/forwarder-agent/tls.crt
+            - name: METRICS_KEY_FILE_PATH
+              value: /etc/ssl/certs/forwarder-agent/tls.key
+          volumeMounts:
+            - name: forwarder-agent
+              mountPath: /etc/ssl/certs/forwarder-agent
+        - name: loggregator-agent
+          image: {{ .Values.loggregatorAgent.image.repository }}:{{ default .Chart.AppVersion .Values.loggregatorAgent.image.tag }}
+          imagePullPolicy: {{ .Values.loggregatorAgent.image.imagePullPolicy }}
+          imagePullPolicy: IfNotPresent
+          {{- if .Values.loggregatorAgent.resources }}
+          resources:
+            {{- toYaml .Values.loggregatorAgent.resources | nindent 12 }}
+          {{- end }}
+          env:
+            - name: AGENT_PORT
+              value: "3459"
+            - name: AGENT_CA_FILE
+              value: /etc/ssl/certs/loggregator-agent/ca.crt
+            - name: AGENT_CERT_FILE
+              value: /etc/ssl/certs/loggregator-agent/tls.crt
+            - name: AGENT_KEY_FILE
+              value: /etc/ssl/certs/loggregator-agent/tls.key
+            - name: METRICS_CA_FILE_PATH
+              value: /etc/ssl/certs/loggregator-agent/ca.crt
+            - name: METRICS_CERT_FILE_PATH
+              value: /etc/ssl/certs/loggregator-agent/tls.crt
+            - name: METRICS_KEY_FILE_PATH
+              value: /etc/ssl/certs/loggregator-agent/tls.key
+            - name: AGENT_DISABLE_UDP
+              value: "true"
+            - name: ROUTER_ADDR
+              value: "{{ .Values.loggregatorAgent.doppler.address }}"
+          volumeMounts:
+            - name: loggregator-agent
+              mountPath: /etc/ssl/certs/loggregator-agent
+        - name: syslog-agent
+          image: {{ .Values.syslogAgent.image.repository }}:{{ default .Chart.AppVersion .Values.syslogAgent.image.tag }}
+          imagePullPolicy: {{ .Values.syslogAgent.image.imagePullPolicy }}
+          imagePullPolicy: IfNotPresent
+          {{- if .Values.syslogAgent.resources }}
+          resources:
+            {{- toYaml .Values.syslogAgent.resources | nindent 12 }}
+          {{- end }}
+          env:
+            - name: AGENT_PORT
+              value: "3460"
+            - name: AGENT_CA_FILE_PATH
+              value: /etc/ssl/certs/syslog-agent/ca.crt
+            - name: AGENT_CERT_FILE_PATH
+              value: /etc/ssl/certs/syslog-agent/tls.crt
+            - name: AGENT_KEY_FILE_PATH
+              value: /etc/ssl/certs/syslog-agent/tls.key
+            - name: METRICS_CA_FILE_PATH
+              value: /etc/ssl/certs/syslog-agent/ca.crt
+            - name: METRICS_CERT_FILE_PATH
+              value: /etc/ssl/certs/syslog-agent/tls.crt
+            - name: METRICS_KEY_FILE_PATH
+              value: /etc/ssl/certs/syslog-agent/tls.key
+            - name: CACHE_URL
+              value: "{{ .Values.syslogAgent.syslogBindingCache.address }}"
+            - name: CACHE_COMMON_NAME
+              value: syslog-binding-cache
+            - name: CACHE_CA_FILE_PATH
+              value: /etc/ssl/certs/syslog-agent/ca.crt
+            - name: CACHE_CERT_FILE_PATH
+              value: /etc/ssl/certs/syslog-agent/tls.crt
+            - name: CACHE_KEY_FILE_PATH
+              value: /etc/ssl/certs/syslog-agent/tls.key
+            - name: DRAIN_TRUSTED_CA_FILE
+              value: /etc/ssl/certs/syslog-agent/ca.crt
+            {{- if .Values.forwarderAgent.aggregateDrain }}
+            - name: AGGREGATE_DRAIN_URLS
+              value: "{{ .Values.syslogAgent.logCacheSyslog.address }}?include-metrics-deprecated=true"
+            {{- end }}
+          volumeMounts:
+            - name: syslog-agent
+              mountPath: /etc/ssl/certs/syslog-agent
+      nodeSelector:
+        cloudfoundry.org/workload: "false"
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: syslog-agent
+          secret:
+            secretName: {{ default .Values.forwarderAgent.syslogAgentCertificateSecret "syslog-agent" }}
+        - name: forwarder-agent
+          secret:
+            secretName: {{ default .Values.forwarderAgent.forwarderAgentCertificateSecret "forwarder-agent" }}
+        - name: loggregator-agent
+          secret:
+            secretName: {{ default .Values.forwarderAgent.loggregatorAgentCertificateSecret "loggregator-agent" }}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: forwarder-agent
+  labels:
+    app: forwarder-agent
+spec:
+  ports:
+    - port: 3458
+      targetPort: 3458
+      protocol: TCP
+  selector:
+    app: forwarder-agent
+---
+{{ if not .Values.syslogAgent.certificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: syslog-agent
+spec:
+  secretName: syslog-agent
+  commonName: syslog-agent
+  dnsNames:
+    - metron
+    {{- if .Values.syslogAgent.aggregateDrain }}
+    - syslog-agent.{{ .Release.Namespace }}.svc.cluster.local
+    {{- end }}
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}
+---
+{{ if not .Values.forwarderAgent.certificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: forwarder-agent
+spec:
+  secretName: forwarder-agent
+  commonName: forwarder-agent
+  dnsNames:
+    - metron
+    {{- if .Values.forwarderAgent.aggregateDrain }}
+    - forwarder-agent.{{ .Release.Namespace }}.svc.cluster.local
+    {{- end }}
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}
+---
+{{ if not .Values.loggregatorAgent.certificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: loggregator-agent
+spec:
+  secretName: loggregator-agent
+  commonName: loggregator-agent
+  dnsNames:
+    - metron
+    {{- if .Values.loggregatorAgent.aggregateDrain }}
+    - loggregator-agent.{{ .Release.Namespace }}.svc.cluster.local
+    {{- end }}
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{end }}
+{{- end }}
