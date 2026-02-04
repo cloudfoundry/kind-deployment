@@ -1,5 +1,5 @@
 name: cf-networking
-version: 0.5.0
+version: 0.6.0
 description: Helm chart for CF Networking components
 type: application
 apiVersion: v2
