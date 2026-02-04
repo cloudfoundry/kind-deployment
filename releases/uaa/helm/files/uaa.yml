@@ -245,6 +245,10 @@ oauth:
       authorities: clients.read,clients.write,clients.secret,uaa.admin,scim.read,scim.write,password.write
       id: admin
       secret: {{ .Values.oauthClientsSecret | quote }}
+    nfs-broker-credhub-client:
+      authorities: credhub.read,credhub.write
+      authorized-grant-types: client_credentials
+      secret: {{ .Values.oauthClientsSecret | quote }}
 authentication:
   enableUriEncodingCompatibilityMode: false
   policy:

@@ -3,7 +3,7 @@ variable "REGISTRY_PREFIX" {
 }
 
 group "all" {
-  targets = ["routing", "cf-networking", "capi", "diego", "loggregator", "loggregator-agent", "log-cache", "fileserver", "bosh-dns", "uaa", "cflinuxfs4", "misc"]
+  targets = ["routing", "cf-networking", "capi", "diego", "loggregator", "loggregator-agent", "log-cache", "fileserver", "bosh-dns", "uaa", "cflinuxfs4", "nfs-volume", "misc"]
 }
 
 group "default" {
@@ -225,6 +225,25 @@ target "cflinuxfs4" {
 
   args = {
     "CFLINUXFS4_VERSION" = CFLINUXFS4_VERSION
+  }
+}
+
+variable "NFS_VOLUME_RELEASE_VERSION" {
+  # renovate: depName=cloudfoundry/nfs-volume-release
+  default = "7.47.0"
+}
+
+target "nfs-volume" {
+  dockerfile = "releases/nfs-volume-release/${component}.Dockerfile"
+  tags = [ "${REGISTRY_PREFIX}${component}:latest", "${REGISTRY_PREFIX}${component}:${NFS_VOLUME_RELEASE_VERSION}" ]
+  name = component
+
+  matrix = {
+    "component" = [ "nfsv3driver", "nfsbroker" ]
+  }
+
+  contexts = {
+    "src" = "https://github.com/cloudfoundry/nfs-volume-release.git#v${NFS_VOLUME_RELEASE_VERSION}:src"
   }
 }
 

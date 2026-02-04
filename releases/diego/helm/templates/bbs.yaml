@@ -93,7 +93,6 @@ spec:
         - name: bbs
           image: {{ .Values.bbs.image.repository }}:{{ default .Chart.AppVersion .Values.bbs.image.tag }}
           imagePullPolicy: {{ .Values.bbs.image.imagePullPolicy }}
-          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8889
           {{- if .Values.bbs.resources }}

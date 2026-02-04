@@ -1,0 +1,146 @@
+{{- if .Values.nfsbroker.enabled }}
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nfsbroker-configmap
+data:
+  services.json: |
+    [
+      {
+        "id": "997f8f26-e10c-11e7-80c1-9a214cf093ae",
+        "name": "nfs",
+        "description": "Existing NFSv3 and v4 volumes (see: https://code.cloudfoundry.org/nfs-volume-release/)",
+        "bindable": true,
+        "plan_updateable": false,
+        "tags": [
+          "nfs"
+        ],
+        "plans": [
+          {
+            "id": "09a09260-1df5-4445-9ed7-1ba56dadbbc8",
+            "name": "Existing",
+            "description": "A preexisting filesystem",
+            "metadata": {
+              "costs": [
+                {
+                  "amount": {
+                    "usd": 0.0
+                  },
+                  "unit": "MONTHLY"
+                }
+              ],
+              "displayName": "Existing Filesystems"
+            }
+          }
+        ],
+        "requires": [
+          "volume_mount"
+        ],
+        "metadata": {
+          "displayName": "NFS V3 / V4 Volume Broker",
+          "longDescription": "Broker for existing NFSv3 and v4 volumes",
+          "providerDisplayName": "Dell / Pivotal",
+          "documentationUrl": "https://docs.cloudfoundry.org/devguide/services/using-vol-services.html"
+        }
+      }
+    ]
+---
+kind: Secret
+apiVersion: v1
+type: Opaque
+metadata:
+  name: nfsbroker-credentials
+stringData:
+  USERNAME: nfsbroker
+  PASSWORD: nfsbroker
+  UAA_CLIENT_ID: "nfsbroker-credhub-client"
+  UAA_CLIENT_SECRET: {{ .Values.nfsbroker.oauthClientsSecret | quote }}
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: nfsbroker
+  labels:
+    app: nfsbroker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nfsbroker
+  template:
+    metadata:
+      labels:
+        app: nfsbroker
+    spec:
+      containers:
+        - name: nfsbroker
+          image: {{ .Values.nfsbroker.image.repository }}:{{ default .Chart.AppVersion .Values.nfsbroker.image.tag }}
+          imagePullPolicy: {{ .Values.nfsbroker.image.imagePullPolicy }}
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: nfsbroker-credentials
+          args:
+            - --listenAddr=0.0.0.0:8080
+            - --servicesConfig=/services.json
+            - --credhubURL={{ .Values.nfsbroker.credhubURL }}
+            - --credhubCACertPath=/ssl/ca.crt
+            - --storeID=nfsbroker
+            - --logLevel=info
+            - --timeFormat=rfc3339
+            - --allowedOptions=source,uid,gid,auto_cache,readonly,version,mount,cache
+          volumeMounts:
+            - name: server-certs
+              mountPath: /ssl
+              readOnly: true
+            - name: services-config
+              mountPath: /services.json
+              subPath: services.json
+      nodeSelector:
+        cloudfoundry.org/workload: "false"
+      volumes:
+        - name: services-config
+          configMap:
+            name: nfsbroker-configmap
+        - name: server-certs
+          secret:
+            secretName: {{ default .Values.nfsbroker.certificateSecret "nfsbroker" }}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: nfsbroker
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app: nfsbroker
+{{- if not .Values.nfsbroker.certificateSecret }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nfsbroker
+spec:
+  secretName: nfsbroker
+  commonName: client
+  dnsNames:
+    - nfsbroker
+    - nfsbroker.{{ .Release.Namespace }}.svc
+    - nfsbroker.{{ .Release.Namespace }}.svc.cluster.local
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{- end }}
+{{- end }}

@@ -1,0 +1,17 @@
+nfsbroker:
+  enabled: true
+  certificateSecret: ~
+  oauthClientsSecret: ~
+  credhubURL: https://credhub.default.svc.cluster.local:8844
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/nfsbroker
+    tag: ~
+    imagePullPolicy: IfNotPresent
+
+
+nfsv3driver:
+  enabled: true
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/nfsv3driver
+    tag: ~
+    imagePullPolicy: IfNotPresent
