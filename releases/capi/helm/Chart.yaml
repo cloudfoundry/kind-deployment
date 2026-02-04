@@ -4,4 +4,4 @@ description: Helm chart for CF API components
 type: application
 apiVersion: v2
 # renovate: depName=capi-release image=ghcr.io/cloudfoundry/k8s/cloud-controller
-appVersion: 1.224.0
+appVersion: 1.225.0
