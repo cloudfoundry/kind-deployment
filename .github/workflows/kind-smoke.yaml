@@ -82,9 +82,6 @@ jobs:
           kubectl get pod -l app.kubernetes.io/name=cloud-controller -o wide
           kubectl get pod -l app.kubernetes.io/name=cloud-controller -o jsonpath='{.status.containerStatuses[*].state}' | jq
           kubectl logs -l app.kubernetes.io/name=cloud-controller --all-containers=true
-          echo "===== BLOBSTORE ====="
-          kubectl get pod -l app.kubernetes.io/name=blobstore -o wide
-          kubectl logs -l app.kubernetes.io/name=blobstore
           echo "===== CC_WORKER ====="
           kubectl get pod -l app.kubernetes.io/name=cc-worker -o wide
           kubectl logs -l app.kubernetes.io/name=cc-worker

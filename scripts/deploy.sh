@@ -46,6 +46,8 @@ helm upgrade --hide-notes --install postgresql --repo https://charts.bitnami.com
 
 kubectl rollout status statefulset nats
 
+helm upgrade -i minio oci://registry-1.docker.io/bitnamicharts/minio --set rootUser=rootuser,rootPassword=rootpass123 --set console.enabled=false --set resourcesPreset=small --set auth.rootPassword=$BLOBSTORE_PASSWORD --set image.repository=bitnamilegacy/minio --set global.security.allowInsecureImages=true --hide-notes --wait
+
 helm upgrade --install loggregator-agent releases/loggregator-agent/helm --set "syslogBindingCache.enabled=true" --set "forwarderAgent.enabled=true"
 helm upgrade --install routing releases/routing/helm
 helm upgrade --install loggregator releases/loggregator/helm --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET
@@ -58,7 +60,7 @@ helm upgrade --install diego releases/diego/helm --set dbPassword=$DB_PASSWORD -
 helm upgrade --install tps-watcher releases/capi/helm --set "tpsWatcher.enabled=true"
 helm upgrade --install route-emitter releases/diego/helm --set "routeEmitter.enabled=true"
 helm upgrade --install k8s-rep oci://ghcr.io/cloudfoundry/helm/k8s-rep:$K8S_REP_VERSION --set-file caCertificate="$CERTS_DIR/ca.crt" --set "stacks.cflinuxfs4=ghcr.io/cloudfoundry/k8s/cflinuxfs4:$CFLINUXFS4_VERSION"
-helm upgrade --install api releases/capi/helm --set blobstorePassword=$BLOBSTORE_PASSWORD --set dbPassword=$DB_PASSWORD --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set cloudController.sshProxyKeyFingerprint=$SSH_PROXY_KEY_FINGERPRINT --set "blobstore.enabled=true" --set "cloudController.enabled=true" --wait
+helm upgrade --install api releases/capi/helm --set cloudController.blobstore.password=$BLOBSTORE_PASSWORD --set dbPassword=$DB_PASSWORD --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set cloudController.sshProxyKeyFingerprint=$SSH_PROXY_KEY_FINGERPRINT --set "cloudController.enabled=true" --wait
 helm upgrade --install cf-networking releases/cf-networking/helm --set policyServer.dbPassword=$DB_PASSWORD --set policyServer.oauthClientsSecret=$OAUTH_CLIENTS_SECRET
 helm upgrade --install policy-agent oci://ghcr.io/cloudfoundry/helm/policy-agent:$POLICY_AGENT_VERSION
 
@@ -75,7 +77,6 @@ kubectl get configmap coredns -n kube-system -o jsonpath='{.data.Corefile}' | gr
 
 kubectl rollout status deployment auctioneer
 kubectl rollout status deployment bbs
-kubectl rollout status deployment blobstore
 kubectl rollout status deployment cc-deployment-updater
 kubectl rollout status deployment cc-uploader
 kubectl rollout status deployment cc-worker

@@ -253,7 +253,7 @@ target "misc" {
   name = component
 
   matrix = {
-    "component" = [ "blobstore", "cc-nginx" ]
+    "component" = [ "cc-nginx" ]
   }
 
   contexts = {

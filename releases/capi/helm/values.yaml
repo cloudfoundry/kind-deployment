@@ -1,15 +1,3 @@
-blobstore:
-  enabled: false
-  certificateSecret: ~
-  address: https://blobstore.default.svc.cluster.local
-  hostname: "blobstore.127-0-0-1.nip.io"
-  image:
-    repository: ghcr.io/cloudfoundry/k8s/blobstore
-    tag: "latest"
-    imagePullPolicy: IfNotPresent
-  nodeSelector: ~
-  tolerations: ~
-
 ccDeploymentUpdater:
   nodeSelector: ~
   tolerations: ~
@@ -56,9 +44,9 @@ cloudController:
     url: https://log-stream.127-0-0-1.nip.io
   uaa:
     url: https://uaa.127-0-0-1.nip.io
-  webdavConfig:
-    publicUrl: https://blobstore.127-0-0-1.nip.io
-    privateUrl: https://blobstore.default.svc.cluster.local
+  blobstore:
+    password: ~
+    endpoint: http://blobstore.127-0-0-1.nip.io
   diego:
     fileServerUrl: https://file-server.127-0-0-1.nip.io
     ccUploaderUrl: http://cc-uploader.default.svc.cluster.local:9090
@@ -109,5 +97,3 @@ tpsWatcher:
 
 dbPassword: ~
 oauthClientsSecret: ~
-blobstorePassword: ~
-
