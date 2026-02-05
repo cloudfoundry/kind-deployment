@@ -77,7 +77,7 @@ spec:
       volumes:
         - name: service-discovery-controller
           secret:
-            secretName: {{ default .Values.serviceDiscoveryController.certificateSecret "service-discovery-controller" }}
+            secretName: {{ default "service-discovery-controller" .Values.serviceDiscoveryController.certificateSecret }}
         - name: service-discovery-controller-config
           configMap:
             name: service-discovery-controller-configmap

@@ -124,7 +124,7 @@ spec:
           emptyDir: {}
         - name: blobstore
           secret:
-            secretName: {{ default .Values.blobstore.certificateSecret "blobstore" }}
+            secretName: {{ default "blobstore" .Values.blobstore.certificateSecret }}
         - name: data
           persistentVolumeClaim:
             claimName: blobstore

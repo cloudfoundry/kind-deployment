@@ -185,17 +185,17 @@ spec:
           - name: CA_CRT
             valueFrom:
               secretKeyRef:
-                name: {{ default .Values.gorouter.certificateSecret "gorouter" }}
+                name: {{ default  "gorouter" .Values.gorouter.certificateSecret }}
                 key: ca.crt
           - name: TLS_CRT
             valueFrom:
               secretKeyRef:
-                name: {{ default .Values.gorouter.certificateSecret "gorouter" }}
+                name: {{ default  "gorouter" .Values.gorouter.certificateSecret }}
                 key: tls.crt
           - name: TLS_KEY
             valueFrom:
               secretKeyRef:
-                name: {{ default .Values.gorouter.certificateSecret "gorouter" }}
+                name: {{ default  "gorouter" .Values.gorouter.certificateSecret }}
                 key: tls.key
       containers:
         - name: gorouter
@@ -214,7 +214,7 @@ spec:
             {{- toYaml .Values.gorouter.resources | nindent 12 }}
           {{- end }}
         - name: udp-forwarder
-          image: {{ .Values.udpForwarder.image.repository }}:{{ default .Values.udpForwarder.version .Values.udpForwarder.image.tag }}
+          image: {{ .Values.udpForwarder.image.repository }}:{{ .Values.udpForwarder.image.tag }}
           imagePullPolicy: {{ .Values.udpForwarder.image.imagePullPolicy }}
           imagePullPolicy: IfNotPresent
           {{- if .Values.udpForwarder.resources }}

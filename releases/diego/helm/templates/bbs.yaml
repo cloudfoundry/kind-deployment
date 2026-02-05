@@ -117,7 +117,7 @@ spec:
       volumes:
         - name: bbs
           secret:
-            secretName: {{ default .Values.bbs.certificateSecret "bbs" }}
+            secretName: {{ default "bbs" .Values.bbs.certificateSecret }}
         - name: postgres-tls
           secret:
             secretName: postgres-tls

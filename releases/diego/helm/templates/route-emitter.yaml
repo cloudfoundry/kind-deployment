@@ -152,7 +152,7 @@ spec:
           emptyDir: {}
         - name: route-emitter
           secret:
-            secretName: {{ default .Values.routeEmitter.certificateSecret "route-emitter" }}
+            secretName: {{ default "route-emitter" .Values.routeEmitter.certificateSecret }}
         - name: route-emitter-config
           configMap:
             name: route-emitter-configmap

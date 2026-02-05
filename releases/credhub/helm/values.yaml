@@ -11,3 +11,5 @@ nodeSelector: ~
 tolerations: ~
 
 dbPassword: ~
+
+caCertificateSecret: root-ca

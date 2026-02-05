@@ -95,7 +95,7 @@ spec:
       volumes:
         - name: ssh-proxy
           secret:
-            secretName: {{ default .Values.sshProxy.certificateSecret "ssh-proxy" }}
+            secretName: {{ default "ssh-proxy" .Values.sshProxy.certificateSecret }}
         - name: ssh-proxy-config
           configMap:
             name: ssh-proxy-configmap

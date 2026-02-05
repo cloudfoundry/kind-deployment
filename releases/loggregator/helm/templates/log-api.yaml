@@ -171,13 +171,13 @@ spec:
           emptyDir: {}
         - name: trafficcontroller
           secret:
-            secretName: {{ default .Values.trafficcontroller.certificateSecret "trafficcontroller" }}
+            secretName: {{ default "trafficcontroller" .Values.trafficcontroller.certificateSecret }}
         - name: reverse-log-proxy
           secret:
-            secretName: {{ default .Values.reverseLogProxy.certificateSecret "reverse-log-proxy" }}
+            secretName: {{ default "reverse-log-proxy" .Values.reverseLogProxy.certificateSecret }}
         - name: reverse-log-proxy-gateway
           secret:
-            secretName: {{ default .Values.reverseLogProxyGateway.certificateSecret "reverse-log-proxy-gateway" }}
+            secretName: {{ default "reverse-log-proxy-gateway" .Values.reverseLogProxyGateway.certificateSecret }}
 ---
 kind: Service
 apiVersion: v1

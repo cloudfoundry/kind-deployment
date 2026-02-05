@@ -162,10 +162,10 @@ spec:
       volumes:
         - name: bosh-dns-adapter
           secret:
-            secretName: {{ default .Values.boshDnsAdapter.certificateSecret "bosh-dns-adapter" }}
+            secretName: {{ default "bosh-dns-adapter" .Values.boshDnsAdapter.certificateSecret }}
         - name: bosh-dns
           secret:
-            secretName: {{ default .Values.boshDns.certificateSecret "bosh-dns" }}
+            secretName: {{ default "bosh-dns" .Values.boshDns.certificateSecret }}
         - name: bosh-dns-config
           configMap:
             name: bosh-dns-configmap

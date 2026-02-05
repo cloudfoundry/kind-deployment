@@ -81,7 +81,7 @@ spec:
       volumes:
         - name: locket
           secret:
-            secretName: {{ default .Values.locket.certificateSecret "locket" }}
+            secretName: {{ default "locket" .Values.locket.certificateSecret }}
         - name: postgres-tls
           secret:
             secretName: postgres-tls

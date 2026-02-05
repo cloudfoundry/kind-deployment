@@ -10,10 +10,9 @@ gorouter:
   tolerations: ~
 
 udpForwarder:
-  # renovate: depName=loggregator-agent-release image=ghcr.io/cloudfoundry/k8s/udp-forwarder
-  version: "8.3.13"
   certificateSecret: ~
   image:
     repository: ghcr.io/cloudfoundry/k8s/udp-forwarder
-    tag: ~
+    # renovate: depName=loggregator-agent-release image=ghcr.io/cloudfoundry/k8s/udp-forwarder
+    tag: "8.3.13"
     imagePullPolicy: IfNotPresent

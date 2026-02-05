@@ -21,13 +21,12 @@ bbs:
   tolerations: ~
   
 fileserver:
-  # renovate: depName=cf-deployment image=ghcr.io/cloudfoundry/k8s/fileserver
-  version: "54.6.0"
   enabled: false
   hostname: "file-server.127-0-0-1.nip.io"
   image:
     repository: ghcr.io/cloudfoundry/k8s/fileserver
-    tag: ~
+    # renovate: depName=cf-deployment image=ghcr.io/cloudfoundry/k8s/fileserver
+    tag: "54.6.0"
     imagePullPolicy: IfNotPresent
   nodeSelector: ~
   tolerations: ~

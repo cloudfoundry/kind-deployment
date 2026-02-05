@@ -42,7 +42,7 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: {{ .Values.fileserver.image.repository }}:{{ default .Values.fileserver.version .Values.fileserver.image.tag }}
+          image: {{ .Values.fileserver.image.repository }}:{{ .Values.fileserver.image.tag }}
           imagePullPolicy: {{ .Values.fileserver.image.imagePullPolicy }}
           imagePullPolicy: IfNotPresent
           ports:

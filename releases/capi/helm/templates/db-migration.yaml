@@ -37,36 +37,11 @@ spec:
       volumes:
         - name: cloud-controller
           secret:
-            secretName: cloud-controller-db-migration
+            secretName: {{ default "cloud-controller-db-migration" .Values.cloudController.certificateSecret }}
         - name: etc-cloud-controller
           configMap:
             name: cloud-controller-configmap
----
-{{ if not .Values.cloudController.tpsCertificateSecret }}
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: tps
-  namespace: default
-spec:
-  secretName: tps
-  commonName: tps
-  dnsNames:
-    - tps
-    - tps.{{ .Release.Namespace }}.svc
-    - tps.{{ .Release.Namespace }}.svc.cluster.local
-    - "{{ .Values.tpsWatcher.hostname }}"
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{end }}
+{{- if not .Values.cloudController.certificateSecret }}
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -95,4 +70,5 @@ spec:
     - client auth
   privateKey:
     rotationPolicy: Always
+{{- end }}
 {{- end }}

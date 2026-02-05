@@ -158,7 +158,7 @@ spec:
             - name: tmpdir
               mountPath: /tmp
         - name: route-registrar
-          image: {{ .Values.routeRegistrar.image.repository }}:{{ default .Values.routeRegistrar.version .Values.routeRegistrar.image.tag }}
+          image: {{ .Values.routeRegistrar.image.repository }}:{{ .Values.routeRegistrar.image.tag }}
           imagePullPolicy: {{ .Values.routeRegistrar.image.imagePullPolicy }}
           livenessProbe:
             httpGet:
@@ -241,7 +241,7 @@ spec:
               mountPath: /etc/nginx/nginx_server_public_tls.conf
               subPath: nginx_server_public_tls.conf
         - name: udp-forwarder
-          image: {{ .Values.udpForwarder.image.repository }}:{{ default .Values.udpForwarder.version .Values.udpForwarder.image.tag }}
+          image: {{ .Values.udpForwarder.image.repository }}:{{ .Values.udpForwarder.image.tag }}
           imagePullPolicy: {{ .Values.udpForwarder.image.imagePullPolicy }}
           {{- if .Values.udpForwarder.resources }}
           resources:
@@ -278,7 +278,7 @@ spec:
       volumes:
         - name: cloud-controller
           secret:
-            secretName: cloud-controller
+            secretName: {{ default "cloud-controller" .Values.cloudController.certificateSecret }}
         - name: etc-cloud-controller
           configMap:
             name: cloud-controller-configmap
@@ -295,6 +295,7 @@ spec:
           emptyDir: {}
         - name: tmpdir
           emptyDir: {}
+{{- if not .Values.cloudController.certificateSecret }}
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -318,4 +319,5 @@ spec:
     - client auth
   privateKey:
     rotationPolicy: Always
-{{ end }}
+{{- end }}
+{{- end }}

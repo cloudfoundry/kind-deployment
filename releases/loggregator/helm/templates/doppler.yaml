@@ -56,7 +56,7 @@ spec:
           emptyDir: {}
         - name: doppler
           secret:
-            secretName: {{ default .Values.doppler.certificateSecret "doppler" }}
+            secretName: {{ default "doppler" .Values.doppler.certificateSecret }}
 ---
 kind: Service
 apiVersion: v1

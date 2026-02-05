@@ -251,7 +251,7 @@ spec:
             name: policy-server-configmap
         - name: policy-server
           secret:
-            secretName: {{ default .Values.policyServer.certificateSecret "policy-server" }}
+            secretName: {{ default "policy-server" .Values.policyServer.certificateSecret }}
         - name: etc-route-registrar
           configMap:
             name: policy-server-route-registrar-configmap

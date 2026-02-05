@@ -96,7 +96,7 @@ spec:
       volumes:
         - name: auctioneer
           secret:
-            secretName: {{ default .Values.auctioneer.certificateSecret "auctioneer" }}
+            secretName: {{ default "auctioneer" .Values.auctioneer.certificateSecret }}
         - name: auctioneer-config
           configMap:
             name: auctioneer-configmap

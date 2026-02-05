@@ -35,8 +35,8 @@ ccWorkerClock:
 
 cloudController:
   enabled: false
+  certificateSecret: ~
   appDomain: apps.127-0-0-1.nip.io
-  tpsCertificateSecret: ~
   externalDomain: api.127-0-0-1.nip.io
   internalDomain: cloud-controller.default.svc.cluster.local
   internalServiceHostname: cloud-controller.default.svc.cluster.local
@@ -77,11 +77,10 @@ localWorker:
     imagePullPolicy: IfNotPresent
 
 routeRegistrar:
-  # renovate: depName=routing-release image=ghcr.io/cloudfoundry/k8s/route-registrar
-  version: "0.362.0"
   image:
     repository: ghcr.io/cloudfoundry/k8s/route-registrar
-    tag: ~
+    # renovate: depName=routing-release image=ghcr.io/cloudfoundry/k8s/route-registrar
+    tag: "0.362.0"
     imagePullPolicy: IfNotPresent
 
 nginx:
@@ -91,15 +90,15 @@ nginx:
     imagePullPolicy: Always
 
 udpForwarder:
-  # renovate: depName=loggregator-agent-release image=ghcr.io/cloudfoundry/k8s/udp-forwarder
-  version: "8.3.13"
   image:
     repository: ghcr.io/cloudfoundry/k8s/udp-forwarder
-    tag: ~
+    # renovate: depName=loggregator-agent-release image=ghcr.io/cloudfoundry/k8s/udp-forwarder
+    tag: "8.3.13"
     imagePullPolicy: IfNotPresent
 
 tpsWatcher:
   enabled: false
+  certificateSecret: ~
   hostname: tps.default.svc.cluster.local
   image:
     repository: ghcr.io/cloudfoundry/k8s/tps-watcher

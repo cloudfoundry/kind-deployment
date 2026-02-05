@@ -91,7 +91,7 @@ spec:
       volumes:
         - name: log-cache
           secret:
-            secretName: {{ default .Values.logCacheBackend.certificateSecret "log-cache" }}
+            secretName: {{ default "log-cache" .Values.logCacheBackend.certificateSecret }}
 ---
 kind: Service
 apiVersion: v1

@@ -74,8 +74,34 @@ spec:
           emptyDir: {}
         - name: tps-watcher
           secret:
-            secretName: tps
+            secretName: {{ default "tps-watcher" .Values.tpsWatcher.certificateSecret }}
         - name: tps-watcher-config
           configMap:
             name: tps-watcher-configmap
-{{ end }}
+{{ if not .Values.tpsWatcher.certificateSecret }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tps-watcher
+  namespace: default
+spec:
+  secretName: tps-watcher
+  commonName: tps-watcher
+  dnsNames:
+    - tps
+    - tps.{{ .Release.Namespace }}.svc
+    - tps.{{ .Release.Namespace }}.svc.cluster.local
+    - "{{ .Values.tpsWatcher.hostname }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{- end }}
+{{- end }}

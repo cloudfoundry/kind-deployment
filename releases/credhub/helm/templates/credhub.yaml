@@ -72,7 +72,7 @@ spec:
           name: credhub-config
       - name: ca
         secret:
-          secretName: root-ca
+          secretName: {{ .Values.caCertificateSecret }}
 ---
 apiVersion: v1
 kind: Service
