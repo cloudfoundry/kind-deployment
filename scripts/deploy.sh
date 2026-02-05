@@ -7,7 +7,7 @@ DEPLOY_DIR="$SCRIPT_DIR/../temp"
 CERTS_DIR="$DEPLOY_DIR/certs"
 
 # renovate: depName=cloudfoundry/k8s-garden-client
-K8S_REP_VERSION="0.2.1"
+K8S_REP_VERSION="0.2.2"
 # renovate: depName=cloudfoundry/k8s-policy-agent
 POLICY_AGENT_VERSION="0.1.0"
 
