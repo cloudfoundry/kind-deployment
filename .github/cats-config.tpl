@@ -21,7 +21,7 @@
     "include_http2_routing": true,
     "include_internet_dependent": true,
     "include_isolation_segments": true,
-    "include_private_docker_registry": true,
+    "include_private_docker_registry": false,
     "include_route_services": true,
     "include_routing": true,
     "include_ipv6": false,
