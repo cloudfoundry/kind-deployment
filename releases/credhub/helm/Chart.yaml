@@ -1,5 +1,5 @@
 name: credhub
-version: 0.5.0
+version: 0.6.0
 description: Helm chart for CredHub components
 type: application
 apiVersion: v2
