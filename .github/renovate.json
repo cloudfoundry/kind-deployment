@@ -31,11 +31,13 @@
       "customType": "regex",
       "managerFilePatterns": [
         "/^releases/.*/Chart.yaml$/",
-        "/^releases/.*/values.yaml$/"
+        "/^releases/.*/values.yaml$/",
+        "/^scripts/deploy.sh$/"
       ],
       "matchStrings": [
         "# renovate: depName=(?<depName>.*?) image=(?<packageName>.*?)\\s+appVersion: (?<currentValue>\\d+\\.\\d+\\.\\d+)",
-        "# renovate: depName=(?<depName>.*?) image=(?<packageName>.*?)\\s+tag: \"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+        "# renovate: depName=(?<depName>.*?) image=(?<packageName>.*?)\\s+tag: \"(?<currentValue>\\d+\\.\\d+\\.\\d+)\"",
+        "# renovate: depName=(?<depName>.*?) image=(?<packageName>.*?)\\s+.+_VERSION=\"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
       ],
       "datasourceTemplate": "docker",
       "extractVersionTemplate": "^v?(?<version>.*)$"
