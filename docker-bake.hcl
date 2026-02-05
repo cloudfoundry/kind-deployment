@@ -204,7 +204,7 @@ target "uaa" {
 }
 
 variable "CREDHUB_RELEASE_VERSION" {
-  # renovate: depName=cloudfoundry/credhub-release
+  # renovate: depName=pivotal/credhub-release
   default = "2.14.17"
 }
 
