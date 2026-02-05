@@ -40,8 +40,14 @@ spec:
               mountPath: /etc/cloud-controller
             - name: tmpdir
               mountPath: /tmp
+      {{- if .Values.ccWorker.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.ccWorker.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.ccWorker.tolerations }}
+      tolerations:
+        {{- toYaml .Values.ccWorker.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
         - name: cloud-controller
           secret:

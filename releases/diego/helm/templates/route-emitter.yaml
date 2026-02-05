@@ -156,8 +156,14 @@ spec:
         - name: route-emitter-config
           configMap:
             name: route-emitter-configmap
+      {{- if .Values.routeEmitter.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "true"
+        {{- toYaml .Values.routeEmitter.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.routeEmitter.tolerations }}
+      tolerations:
+        {{- toYaml .Values.routeEmitter.tolerations | nindent 8 }}
+      {{- end }}
 ---
 {{ if not .Values.routeEmitter.certificateSecret }}
 apiVersion: cert-manager.io/v1

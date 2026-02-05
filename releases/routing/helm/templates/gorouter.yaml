@@ -241,8 +241,14 @@ spec:
           volumeMounts:
             - name: udp-forwarder
               mountPath: /etc/ssl/certs/udp-forwarder
+      {{- if .Values.gorouter.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.gorouter.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.gorouter.tolerations }}
+      tolerations:
+        {{- toYaml .Values.gorouter.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
         - name: tmp
           emptyDir: {}

@@ -53,6 +53,9 @@ helm upgrade --install --repo https://helm.cilium.io/ cilium cilium --version "1
 echo "Waiting for nodes to become ready after CNI installation..."
 kubectl wait --for=condition=Ready nodes --all --timeout=300s
 
+echo "Applying taints to workload nodes..."
+kubectl taint nodes -l cloudfoundry.org/cell=true cloudfoundry.org/cell=true:NoSchedule --overwrite || true
+
 kubectl cluster-info
 
 corefile=$(kubectl -n kube-system get configmap coredns -o jsonpath='{.data.Corefile}' | sed '/kubernetes/i \

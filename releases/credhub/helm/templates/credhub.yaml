@@ -58,8 +58,14 @@ spec:
           mountPath: /app/config
         - name: ca
           mountPath: /etc/ssl/ca
+      {{- if .Values.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
       - name: config
         configMap:

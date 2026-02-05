@@ -11,6 +11,8 @@ logCacheApi:
       repository: ghcr.io/cloudfoundry/k8s/gateway
       tag: ~
       imagePullPolicy: IfNotPresent
+  nodeSelector: ~
+  tolerations: ~
 
 logCacheBackend:
   hostname: "log-cache.127-0-0-1.nip.io"
@@ -25,3 +27,5 @@ logCacheBackend:
       repository: ghcr.io/cloudfoundry/k8s/log-cache
       tag: ~
       imagePullPolicy: IfNotPresent
+  nodeSelector: ~
+  tolerations: ~

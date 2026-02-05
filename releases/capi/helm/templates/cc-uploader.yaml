@@ -60,8 +60,14 @@ spec:
               mountPath: /etc/ssl/certs/cc-uploader
             - name: cc-uploader-config
               mountPath: /cc-uploader
+      {{- if .Values.ccUploader.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.ccUploader.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.ccUploader.tolerations }}
+      tolerations:
+        {{- toYaml .Values.ccUploader.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
         - name: cc-uploader
           secret:

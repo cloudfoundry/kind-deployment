@@ -26,7 +26,6 @@ nodes:
 - role: control-plane
 - role: worker
   labels:
-    cloudfoundry.org/workload: "false"
   extraPortMappings:
   - containerPort: 31080
     hostPort: 80
@@ -36,5 +35,5 @@ nodes:
     hostPort: 2222
 - role: worker
   labels:
-    cloudfoundry.org/workload: "true"
+    cloudfoundry.org/cell: "true"
     cloudfoundry.org/zone: z1

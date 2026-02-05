@@ -98,26 +98,6 @@ spec:
     gateway.networking.k8s.io/gateway-name: istio-gateway
   type: NodePort
 ---
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: istio-gateway-configuration
-  namespace: default
-data:
-  deployment: |
-    spec:
-      template:
-        spec:
-          affinity:
-            nodeAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-                nodeSelectorTerms:
-                - matchExpressions:
-                  - key: cloudfoundry.org/workload
-                    operator: NotIn
-                    values:
-                    - "true"
----
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
 metadata:
@@ -152,12 +132,6 @@ metadata:
   namespace: default
 spec:
   gatewayClassName: istio
-  infrastructure:
-    annotations: {}
-    parametersRef:
-      group: ""
-      kind: ConfigMap
-      name: istio-gateway-configuration
   listeners:
   - allowedRoutes:
       namespaces:

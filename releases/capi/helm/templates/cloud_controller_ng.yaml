@@ -267,8 +267,14 @@ spec:
           volumeMounts:
             - name: udp-forwarder
               mountPath: /etc/ssl/certs/udp-forwarder
+      {{- if .Values.cloudController.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.cloudController.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.cloudController.tolerations }}
+      tolerations:
+        {{- toYaml .Values.cloudController.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
         - name: cloud-controller
           secret:

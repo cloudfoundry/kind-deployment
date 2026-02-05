@@ -106,8 +106,14 @@ spec:
               mountPath: /etc/ssl/certs/postgres
             - name: bbs-config
               mountPath: /bbs
+      {{- if .Values.bbs.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.bbs.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.bbs.tolerations }}
+      tolerations:
+        {{- toYaml .Values.bbs.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
         - name: bbs
           secret:

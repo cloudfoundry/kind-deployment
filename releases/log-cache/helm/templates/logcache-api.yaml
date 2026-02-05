@@ -76,8 +76,14 @@ spec:
           - name: log-cache-api
             mountPath: /etc/ssl/certs/log-cache-api
             readOnly: true
+      {{- if .Values.logCacheApi.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.logCacheApi.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.logCacheApi.tolerations }}
+      tolerations:
+        {{- toYaml .Values.logCacheApi.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
       - name: log-cache-api
         secret:

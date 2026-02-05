@@ -61,8 +61,14 @@ spec:
               mountPath: /tps-watcher
             - name: tmp
               mountPath: /tmp
+      {{- if .Values.tpsWatcher.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.tpsWatcher.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tpsWatcher.tolerations }}
+      tolerations:
+        {{- toYaml .Values.tpsWatcher.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
         - name: tmp
           emptyDir: {}

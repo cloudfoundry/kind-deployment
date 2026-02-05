@@ -43,8 +43,14 @@ spec:
           volumeMounts:
             - name: doppler
               mountPath: /etc/ssl/certs/doppler
+      {{- if .Values.doppler.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.doppler.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.doppler.tolerations }}
+      tolerations:
+        {{- toYaml .Values.doppler.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
         - name: tmp
           emptyDir: {}

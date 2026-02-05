@@ -7,6 +7,9 @@ image:
   tag: ~
   imagePullPolicy: IfNotPresent
 
+nodeSelector: ~
+tolerations: ~
+
 uaaAdminSecret: ~
 oauthClientsSecret: ~
 dbPassword: ~

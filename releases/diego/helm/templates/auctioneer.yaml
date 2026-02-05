@@ -85,8 +85,14 @@ spec:
               mountPath: /etc/ssl/certs/auctioneer
             - name: auctioneer-config
               mountPath: /auctioneer
+      {{- if .Values.auctioneer.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.auctioneer.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.auctioneer.tolerations }}
+      tolerations:
+        {{- toYaml .Values.auctioneer.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
         - name: auctioneer
           secret:

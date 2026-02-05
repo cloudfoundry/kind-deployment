@@ -7,6 +7,8 @@ forwarderAgent:
     repository: ghcr.io/cloudfoundry/k8s/forwarder-agent
     tag: ~
     imagePullPolicy: IfNotPresent
+  nodeSelector: ~
+  tolerations: ~
 
 loggregatorAgent:
   doppler:
@@ -41,3 +43,5 @@ syslogBindingCache:
     repository: ghcr.io/cloudfoundry/k8s/syslog-binding-cache
     tag: ~
     imagePullPolicy: IfNotPresent
+  nodeSelector: ~
+  tolerations: ~

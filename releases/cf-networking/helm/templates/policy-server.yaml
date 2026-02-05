@@ -237,8 +237,14 @@ spec:
               mountPath: /etc/route-registrar-template
             - name: tmpdir
               mountPath: /tmp
+      {{- if .Values.policyServer.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.policyServer.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.policyServer.tolerations }}
+      tolerations:
+        {{- toYaml .Values.policyServer.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
         - name: policy-server-config
           configMap:

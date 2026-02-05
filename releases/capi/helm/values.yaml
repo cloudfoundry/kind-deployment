@@ -7,10 +7,16 @@ blobstore:
     repository: ghcr.io/cloudfoundry/k8s/blobstore
     tag: "latest"
     imagePullPolicy: IfNotPresent
+  nodeSelector: ~
+  tolerations: ~
 
-ccDeploymentUpdater:  {}
+ccDeploymentUpdater:
+  nodeSelector: ~
+  tolerations: ~
 
-ccWorker: {}
+ccWorker:
+  nodeSelector: ~
+  tolerations: ~
 
 ccUploader:
   certificateSecret: ~
@@ -19,9 +25,13 @@ ccUploader:
     repository: ghcr.io/cloudfoundry/k8s/cc-uploader
     tag: ~
     imagePullPolicy: IfNotPresent
+  nodeSelector: ~
+  tolerations: ~
 
 
-ccWorkerClock: {}
+ccWorkerClock:
+  nodeSelector: ~
+  tolerations: ~
 
 cloudController:
   enabled: false
@@ -57,6 +67,8 @@ cloudController:
     externalUrl: https://credhub.127-0-0-1.nip.io
   nats:
     address: nats.default.svc.cluster.local:4222
+  nodeSelector: ~
+  tolerations: ~
 
 localWorker:
   image:
@@ -93,6 +105,8 @@ tpsWatcher:
     repository: ghcr.io/cloudfoundry/k8s/tps-watcher
     tag: ~
     imagePullPolicy: IfNotPresent
+  nodeSelector: ~
+  tolerations: ~
 
 dbPassword: ~
 oauthClientsSecret: ~

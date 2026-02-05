@@ -158,8 +158,14 @@ spec:
           volumeMounts:
             - name: trafficcontroller
               mountPath: /etc/ssl/certs/trafficcontroller
+      {{- if .Values.trafficcontroller.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.trafficcontroller.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.trafficcontroller.tolerations }}
+      tolerations:
+        {{- toYaml .Values.trafficcontroller.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
         - name: tmp
           emptyDir: {}

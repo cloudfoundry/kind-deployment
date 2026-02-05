@@ -84,8 +84,14 @@ spec:
               mountPath: /etc/ssl/certs/ssh-proxy
             - name: ssh-proxy-config
               mountPath: /ssh-proxy
+      {{- if .Values.sshProxy.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.sshProxy.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.sshProxy.tolerations }}
+      tolerations:
+        {{- toYaml .Values.sshProxy.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
         - name: ssh-proxy
           secret:

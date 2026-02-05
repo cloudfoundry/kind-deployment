@@ -12,6 +12,8 @@ policyServer:
   dbPassword: ~
   nats:
     address: nats.default.svc.cluster.local:4222
+  nodeSelector: ~
+  tolerations: ~
 
 serviceDiscoveryController:
   enabled: true
@@ -26,6 +28,8 @@ serviceDiscoveryController:
   nats:
     host: nats.default.svc.cluster.local
     port: 4222
+  nodeSelector: ~
+  tolerations: ~
 
 boshDnsAdapter:
   enabled: true
@@ -44,6 +48,8 @@ boshDns:
     # renovate: depName=bosh-dns-release image=ghcr.io/cloudfoundry/k8s/bosh-dns
     tag: "1.39.18"
     imagePullPolicy: IfNotPresent
+  nodeSelector: ~
+  tolerations: ~
 
 
 routeRegistrar:

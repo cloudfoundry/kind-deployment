@@ -12,8 +12,6 @@ primary:
             psql -U postgres -h localhost -tc "SELECT 1 FROM pg_database WHERE datname = '$db'" | grep -q 1 || psql -U postgres -h localhost -c "CREATE DATABASE $db"
         done
         psql -U postgres -h localhost -d cc -c 'CREATE EXTENSION IF NOT EXISTS citext; CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; CREATE EXTENSION IF NOT EXISTS pgcrypto;'
-  nodeSelector:
-    cloudfoundry.org/workload: "false"
   persistentVolumeClaimRetentionPolicy:
     enabled: true
     whenDeleted: Delete

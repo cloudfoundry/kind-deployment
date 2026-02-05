@@ -119,8 +119,14 @@ spec:
           volumeMounts:
             - name: syslog-agent
               mountPath: /etc/ssl/certs/syslog-agent
+      {{- if .Values.forwarderAgent.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.forwarderAgent.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.forwarderAgent.tolerations }}
+      tolerations:
+        {{- toYaml .Values.forwarderAgent.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
         - name: tmp
           emptyDir: {}

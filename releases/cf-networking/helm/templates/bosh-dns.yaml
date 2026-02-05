@@ -151,8 +151,14 @@ spec:
             - name: bosh-dns-config
               mountPath: /bosh-dns/records.json
               subPath: records.json
+      {{- if .Values.boshDns.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.boshDns.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.boshDns.tolerations }}
+      tolerations:
+        {{- toYaml .Values.boshDns.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
         - name: bosh-dns-adapter
           secret:

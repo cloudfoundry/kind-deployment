@@ -70,8 +70,14 @@ spec:
               mountPath: /etc/ssl/certs/postgres
             - name: locket-config
               mountPath: /locket
+      {{- if .Values.locket.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.locket.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.locket.tolerations }}
+      tolerations:
+        {{- toYaml .Values.locket.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
         - name: locket
           secret:

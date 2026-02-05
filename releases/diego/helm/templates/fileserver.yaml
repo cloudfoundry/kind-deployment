@@ -57,8 +57,14 @@ spec:
           resources:
             {{- toYaml .Values.fileserver.resources | nindent 12 }}
           {{- end }}
+      {{- if .Values.fileserver.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.fileserver.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.fileserver.tolerations }}
+      tolerations:
+        {{- toYaml .Values.fileserver.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
         - name: nginx-config
           configMap:

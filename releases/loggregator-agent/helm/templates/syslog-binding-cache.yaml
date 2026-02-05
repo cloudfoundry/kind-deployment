@@ -81,8 +81,14 @@ spec:
             - name: aggregate-drains
               mountPath: /etc/aggregate-drains
               readOnly: true
+      {{- if .Values.syslogBindingCache.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.syslogBindingCache.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.syslogBindingCache.tolerations }}
+      tolerations:
+        {{- toYaml .Values.syslogBindingCache.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
       - name: syslog-binding-cache
         secret:

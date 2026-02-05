@@ -108,8 +108,14 @@ spec:
             - name: blobstore
               mountPath: /etc/ssl/certs/blobstore
               readOnly: true
+      {{- if .Values.blobstore.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.blobstore.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.blobstore.tolerations }}
+      tolerations:
+        {{- toYaml .Values.blobstore.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
         - name: nginx-config
           configMap:

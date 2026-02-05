@@ -6,6 +6,8 @@ auctioneer:
     repository: ghcr.io/cloudfoundry/k8s/auctioneer
     tag: ~
     imagePullPolicy: IfNotPresent
+  nodeSelector: ~
+  tolerations: ~
 
 bbs:
   enabled: false
@@ -15,6 +17,8 @@ bbs:
     repository: ghcr.io/cloudfoundry/k8s/bbs
     tag: ~
     imagePullPolicy: IfNotPresent
+  nodeSelector: ~
+  tolerations: ~
   
 fileserver:
   # renovate: depName=cf-deployment image=ghcr.io/cloudfoundry/k8s/fileserver
@@ -25,6 +29,8 @@ fileserver:
     repository: ghcr.io/cloudfoundry/k8s/fileserver
     tag: ~
     imagePullPolicy: IfNotPresent
+  nodeSelector: ~
+  tolerations: ~
   
 locket:
   enabled: false
@@ -34,6 +40,8 @@ locket:
     repository: ghcr.io/cloudfoundry/k8s/locket
     tag: ~
     imagePullPolicy: IfNotPresent
+  nodeSelector: ~
+  tolerations: ~
   
 sshProxy:
   enabled: false
@@ -43,6 +51,8 @@ sshProxy:
     repository: ghcr.io/cloudfoundry/k8s/ssh-proxy
     tag: ~
     imagePullPolicy: IfNotPresent
+  nodeSelector: ~
+  tolerations: ~
   
 routeEmitter:
   enabled: false
@@ -54,6 +64,13 @@ routeEmitter:
     repository: ghcr.io/cloudfoundry/k8s/route-emitter
     tag: ~
     imagePullPolicy: IfNotPresent
+  nodeSelector:
+    cloudfoundry.org/cell: "true"
+  tolerations:
+    - key: cloudfoundry.org/cell
+      operator: Equal
+      value: "true"
+      effect: NoSchedule
 
 dbPassword: ~
 sshProxyHostKey: ~

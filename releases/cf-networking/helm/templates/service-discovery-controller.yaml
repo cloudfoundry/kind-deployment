@@ -66,8 +66,14 @@ spec:
               mountPath: /etc/ssl/certs/service-discovery-controller
             - name: service-discovery-controller-config
               mountPath: /service-discovery-controller
+      {{- if .Values.serviceDiscoveryController.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.serviceDiscoveryController.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.serviceDiscoveryController.tolerations }}
+      tolerations:
+        {{- toYaml .Values.serviceDiscoveryController.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
         - name: service-discovery-controller
           secret:

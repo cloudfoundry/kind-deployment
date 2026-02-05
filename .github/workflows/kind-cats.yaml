@@ -33,7 +33,7 @@ jobs:
         run: |
           echo '- role: worker
             labels:
-              cloudfoundry.org/workload: "true"
+              cloudfoundry.org/cell: "true"
               cloudfoundry.org/zone: z2' >> kind.yaml
           make create-kind
           kubectl annotate node -l cloudfoundry.org/zone=z2 "cloudfoundry.org/placement-tags=isolated"

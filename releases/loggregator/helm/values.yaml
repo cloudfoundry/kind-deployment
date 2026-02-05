@@ -9,6 +9,8 @@ doppler:
     repository: ghcr.io/cloudfoundry/k8s/doppler
     tag: ~
     imagePullPolicy: IfNotPresent
+  nodeSelector: ~
+  tolerations: ~
 
 logStream:
   address: "log-stream.127-0-0-1.nip.io"
@@ -40,5 +42,7 @@ trafficcontroller:
     repository: ghcr.io/cloudfoundry/k8s/traffic-controller
     tag: ~
     imagePullPolicy: IfNotPresent
+  nodeSelector: ~
+  tolerations: ~
 
 oauthClientsSecret: ~
