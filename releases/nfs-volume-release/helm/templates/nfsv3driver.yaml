@@ -1,0 +1,56 @@
+{{- if .Values.nfsv3driver.enabled }}
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: nfsv3driver
+  labels:
+    app: nfsv3driver
+spec:
+  selector:
+    matchLabels:
+      app: nfsv3driver
+  template:
+    metadata:
+      labels:
+        app: nfsv3driver
+    spec:
+      containers:
+        - name: nfsv3driver
+          image: {{ .Values.nfsv3driver.image.repository }}:{{ default .Chart.AppVersion .Values.nfsv3driver.image.tag }}
+          imagePullPolicy: {{ .Values.nfsv3driver.image.imagePullPolicy }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          ports:
+            - containerPort: 7589
+          args:
+            - --listenAddr=$(POD_IP):7589
+            - --transport=tcp-json
+            - --debugAddr=127.0.0.1:7689
+            - --adminAddr=127.0.0.1:7590
+            - --driversPath=/var/lib/rep/voldrivers
+            - --mountDir=/var/lib/rep/volumes/nfs
+            - --logLevel=info
+            - --timeFormat=rfc3339
+            - --mapfsPath=/usr/local/bin/mapfs
+          volumeMounts:
+            - name: voldrivers
+              mountPath: /var/lib/rep/voldrivers
+              mountPropagation: Bidirectional
+            - name: nfs-mounts
+              mountPath: /var/lib/rep/volumes/nfs
+              mountPropagation: Bidirectional
+          securityContext:
+            privileged: true
+      nodeSelector:
+        cloudfoundry.org/workload: "true"
+      volumes:
+        - name: voldrivers
+          hostPath:
+            path: /var/lib/rep/voldrivers
+        - name: nfs-mounts
+          hostPath:
+            path: /var/lib/rep/volumes/nfs
+{{- end }}

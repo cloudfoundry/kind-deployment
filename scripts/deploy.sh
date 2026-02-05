@@ -52,7 +52,6 @@ helm upgrade --install uaa releases/uaa/helm --set ccAdminPassword=$CC_ADMIN_PAS
 
 helm upgrade --install credhub releases/credhub/helm --set dbPassword=$DB_PASSWORD
 helm upgrade --install locket releases/diego/helm --set dbPassword=$DB_PASSWORD --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set "locket.enabled=true" --wait
-
 helm upgrade --install diego releases/diego/helm --set dbPassword=$DB_PASSWORD --set diegoSSHCredentials=$DIEGO_SSH_CREDENTIALS --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set-file sshProxyHostKey="$CERTS_DIR/ssh_key" --set "auctioneer.enabled=true" --set "bbs.enabled=true" --set "fileserver.enabled=true" --set "sshProxy.enabled=true"
 helm upgrade --install tps-watcher releases/capi/helm --set "tpsWatcher.enabled=true"
 helm upgrade --install route-emitter releases/diego/helm --set "routeEmitter.enabled=true"

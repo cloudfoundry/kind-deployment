@@ -29,6 +29,15 @@ security:
       operations:
       - read
       path: "/*"
+    - actors:
+      - uaa-client:nfs-broker-credhub-client
+      operations:
+      - read
+      - write
+      - delete
+      - read_acl
+      - write_acl
+      path: /nfsbroker/*
   oauth2:
     enabled: true
 server:
