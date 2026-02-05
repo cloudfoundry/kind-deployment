@@ -92,7 +92,7 @@ spec:
       volumes:
       - name: syslog-binding-cache
         secret:
-          secretName: {{ default .Values.syslogBindingCache.certificateSecret "syslog-binding-cache" }}
+          secretName: {{ default "syslog-binding-cache" .Values.syslogBindingCache.certificateSecret }}
       - name: aggregate-drains
         secret:
           secretName: aggregate-drains
@@ -124,8 +124,8 @@ spec:
     - backendRefs:
       - name: syslog-binding-cache
         port: 9000
+{{- if not .Values.syslogBindingCache.certificateSecret }}
 ---
-{{ if not .Values.syslogBindingCache.certificateSecret }}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -148,5 +148,5 @@ spec:
     - client auth
   privateKey:
     rotationPolicy: Always
-{{end }}
+{{- end }}
 {{- end }}

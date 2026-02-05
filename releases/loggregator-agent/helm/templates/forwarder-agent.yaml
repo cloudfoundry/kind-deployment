@@ -132,13 +132,13 @@ spec:
           emptyDir: {}
         - name: syslog-agent
           secret:
-            secretName: {{ default "syslog-agent" .Values.forwarderAgent.syslogAgentCertificateSecret }}
+            secretName: {{ default "syslog-agent" .Values.syslogAgent.certificateSecret }}
         - name: forwarder-agent
           secret:
-            secretName: {{ default "forwarder-agent" .Values.forwarderAgent.forwarderAgentCertificateSecret }}
+            secretName: {{ default "forwarder-agent" .Values.forwarderAgent.certificateSecret }}
         - name: loggregator-agent
           secret:
-            secretName: {{ default "loggregator-agent" .Values.forwarderAgent.loggregatorAgentCertificateSecret }}
+            secretName: {{ default "loggregator-agent" .Values.loggregatorAgent.certificateSecret }}
 ---
 kind: Service
 apiVersion: v1
@@ -153,8 +153,8 @@ spec:
       protocol: TCP
   selector:
     app: forwarder-agent
+{{- if not .Values.syslogAgent.certificateSecret }}
 ---
-{{ if not .Values.syslogAgent.certificateSecret }}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -177,9 +177,9 @@ spec:
     - client auth
   privateKey:
     rotationPolicy: Always
-{{end }}
+{{- end }}
+{{- if not .Values.forwarderAgent.certificateSecret }}
 ---
-{{ if not .Values.forwarderAgent.certificateSecret }}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -202,9 +202,9 @@ spec:
     - client auth
   privateKey:
     rotationPolicy: Always
-{{end }}
+{{- end }}
+{{- if not .Values.loggregatorAgent.certificateSecret }}
 ---
-{{ if not .Values.loggregatorAgent.certificateSecret }}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -227,5 +227,5 @@ spec:
     - client auth
   privateKey:
     rotationPolicy: Always
-{{end }}
+{{- end }}
 {{- end }}

@@ -106,7 +106,7 @@ spec:
             name: nfsbroker-configmap
         - name: server-certs
           secret:
-            secretName: {{ default .Values.nfsbroker.certificateSecret "nfsbroker" }}
+            secretName: {{ default "nfsbroker" .Values.nfsbroker.certificateSecret }}
 ---
 kind: Service
 apiVersion: v1

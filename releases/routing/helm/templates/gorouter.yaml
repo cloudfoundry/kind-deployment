@@ -257,7 +257,7 @@ spec:
             name: gorouter-configmap
         - name: udp-forwarder
           secret:
-            secretName: {{ default .Values.udpForwarder.certificateSecret "udp-forwarder" }}
+            secretName: {{ default "udp-forwarder" .Values.udpForwarder.certificateSecret }}
 ---
 kind: Service
 apiVersion: v1
