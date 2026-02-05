@@ -1,5 +1,5 @@
 # Build image
-FROM --platform=$BUILDPLATFORM bellsoft/liberica-runtime-container:jdk-25-glibc AS builder
+FROM --platform=$BUILDPLATFORM bellsoft/liberica-runtime-container:jdk-25.0.1_11-glibc AS builder
 
 ARG UAA_RELEASE_VERSION
 
@@ -9,7 +9,7 @@ COPY --from=src . .
 RUN ./gradlew clean assemble -Pversion=${UAA_RELEASE_VERSION} -x test
 
 # Runtime image
-FROM bellsoft/liberica-runtime-container:jre-25-slim-glibc
+FROM bellsoft/liberica-runtime-container:jre-25.0.1_11-slim-glibc
 
 ARG UAA_RELEASE_VERSION
 
