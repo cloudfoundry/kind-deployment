@@ -59,7 +59,7 @@ jobs:
           CONFIG: "${{ github.workspace }}/.github/cats-config.json"
           GINKGO_NO_COLOR: "true"
         run: |
-          ./cf-acceptance-tests/bin/test --no-color --github-output --timeout=180m --procs=2 --flake-attempts=2 --json-report report.json
+          ./cf-acceptance-tests/bin/test --no-color --github-output --timeout=180m --procs=4 --flake-attempts=2 --json-report report.json
       - name: debug info
         if: failure()
         run: kubectl get events -A --sort-by='.lastTimestamp'

@@ -85,7 +85,7 @@ jobs:
           CONFIG: "${{ github.workspace }}/.github/smoke-config.json"
           GINKGO_NO_COLOR: "true"
         run: |
-          ./cf-smoke-tests/bin/test --no-color --github-output --timeout=90m --procs=2 --json-report report.json
+          ./cf-smoke-tests/bin/test --no-color --github-output --timeout=30m --procs=4 --json-report report.json
       - name: debug events
         if: failure()
         run: kubectl get events -A --sort-by='.lastTimestamp'
