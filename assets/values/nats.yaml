@@ -1,3 +1,6 @@
+global:
+  image:
+    registry: docker.io
 config:
   merge:
     write_deadline: 2s
