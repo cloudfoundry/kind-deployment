@@ -155,56 +155,52 @@ quota_definitions:
     total_services: -1
 default_quota_definition: default
 resource_pool:
-  blobstore_type: webdav
-  webdav_config:
-    blobstore_timeout: 5
-    public_endpoint: {{ .Values.cloudController.webdavConfig.publicUrl }}
-    private_endpoint: {{ .Values.cloudController.webdavConfig.privateUrl }}
-    username: blobstore-user
-    password: {{ .Values.blobstorePassword | quote}}
   minimum_size: 65536
   maximum_size: 536870912
   resource_directory_key: cc-resources
-  fog_connection: {}
+  fog_connection:
+    provider: AWS
+    endpoint:  {{ .Values.cloudController.blobstore.endpoint }}
+    aws_access_key_id: admin
+    aws_secret_access_key: {{ .Values.cloudController.blobstore.password | quote}}
+    aws_signature_version: 2
+    path_style: true
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}
 packages:
-  blobstore_type: webdav
-  webdav_config:
-    blobstore_timeout: 5
-    public_endpoint: {{ .Values.cloudController.webdavConfig.publicUrl }}
-    private_endpoint: {{ .Values.cloudController.webdavConfig.privateUrl }}
-    username: blobstore-user
-    password: {{ .Values.blobstorePassword | quote}}
   app_package_directory_key: cc-packages
   max_valid_packages_stored: 5
   max_package_size: 1073741824
-  fog_connection: {}
+  fog_connection:
+    provider: AWS
+    endpoint:  {{ .Values.cloudController.blobstore.endpoint }}
+    aws_access_key_id: admin
+    aws_secret_access_key: {{ .Values.cloudController.blobstore.password | quote}}
+    aws_signature_version: 2
+    path_style: true
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}
 droplets:
-  blobstore_type: webdav
-  webdav_config:
-    blobstore_timeout: 5
-    public_endpoint: {{ .Values.cloudController.webdavConfig.publicUrl }}
-    private_endpoint: {{ .Values.cloudController.webdavConfig.privateUrl }}
-    username: blobstore-user
-    password: {{ .Values.blobstorePassword | quote}}
   droplet_directory_key: cc-droplets
-  fog_connection: {}
+  fog_connection:
+    provider: AWS
+    endpoint:  {{ .Values.cloudController.blobstore.endpoint }}
+    aws_access_key_id: admin
+    aws_secret_access_key: {{ .Values.cloudController.blobstore.password | quote}}
+    aws_signature_version: 2
+    path_style: true
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}
   max_staged_droplets_stored: 5
 buildpacks:
-  blobstore_type: webdav
-  webdav_config:
-    blobstore_timeout: 5
-    public_endpoint: {{ .Values.cloudController.webdavConfig.publicUrl }}
-    private_endpoint: {{ .Values.cloudController.webdavConfig.privateUrl }}
-    username: blobstore-user
-    password: {{ .Values.blobstorePassword | quote}}
   buildpack_directory_key: cc-buildpacks
-  fog_connection: {}
+  fog_connection:
+    provider: AWS
+    endpoint:  {{ .Values.cloudController.blobstore.endpoint }}
+    aws_access_key_id: admin
+    aws_secret_access_key: {{ .Values.cloudController.blobstore.password | quote}}
+    aws_signature_version: 2
+    path_style: true
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}
 db_encryption_key: "asdfasdfasdf"
