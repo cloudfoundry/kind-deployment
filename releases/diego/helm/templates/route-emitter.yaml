@@ -31,72 +31,14 @@ subjects:
   name: route-emitter
   namespace: default
 ---
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: route-emitter-configmap
-data:
-  route-emitter.json: |-
-    {
-      "nats_addresses": "{{ .Values.routeEmitter.natsAddress }}",
-      "nats_tls_enabled": true,
-      "nats_ca_cert_file": "/etc/ssl/certs/route-emitter/ca.crt",
-      "nats_client_cert_file": "/etc/ssl/certs/route-emitter/tls.crt",
-      "nats_client_key_file": "/etc/ssl/certs/route-emitter/tls.key",
-      "communication_timeout": "30s",
-      "sync_interval": "60s",
-      "debug_address": "127.0.0.1:17009",
-      "log_level": "info",
-      "lock_retry_interval": "5s",
-      "lock_ttl": "15s",
-      "healthcheck_address": "127.0.0.1:17011",
-      "register_direct_instance_routes": false,
-      "route_emitting_workers": 20,
-      "tcp_route_ttl": "2m",
-      "unregistration_interval": "30s",
-      "unregistration_send_count": 20,
-      "jitter_factor": 0.8,
-      "time_format": "rfc3339",
-      "locket_enabled": true,
-      "locket_session_name": "route-emitter",
-      "locket_address": "{{ .Values.routeEmitter.locketAddress }}",
-      "uuid": "$NODE_UID",
-      "locket_ca_cert_file": "/etc/ssl/certs/route-emitter/ca.crt",
-      "locket_client_cert_file": "/etc/ssl/certs/route-emitter/tls.crt",
-      "locket_client_key_file": "/etc/ssl/certs/route-emitter/tls.key",
-      "bbs_ca_cert_file": "/etc/ssl/certs/route-emitter/ca.crt",
-      "bbs_client_cert_file": "/etc/ssl/certs/route-emitter/tls.crt",
-      "bbs_client_key_file": "/etc/ssl/certs/route-emitter/tls.key",
-      "bbs_address": "{{ .Values.routeEmitter.bbsAddress }}",
-      "cell_id": "$NODE_UID",
-      "enable_internal_emitter": true,
-      "enable_tcp_emitter": false,
-      "tcp_enable_tls": true,
-      "routing_api": {
-          "url": "http://routing-api.service.cf.internal",
-          "port": 3000,
-          "auth_enabled": true
-      },
-      "loggregator": {
-        "loggregator_use_v2_api": true,
-        "loggregator_api_port": 3458,
-        "loggregator_api_host": "forwarder-agent.{{ .Release.Namespace }}.svc.cluster.local",
-        "loggregator_ca_path": "/etc/ssl/certs/route-emitter/ca.crt",
-        "loggregator_cert_path": "/etc/ssl/certs/route-emitter/tls.crt",
-        "loggregator_key_path": "/etc/ssl/certs/route-emitter/tls.key",
-        "loggregator_job_deployment": "cf",
-        "loggregator_job_name": "route-emitter",
-        "loggregator_job_origin": "route-emitter",
-        "loggregator_source_id": "route-emitter"
-      }
-    }
----
 kind: DaemonSet
 apiVersion: apps/v1
 metadata:
   name: route-emitter
   labels:
     app: route-emitter
+  annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/route-emitter-configmap.yaml") . | sha256sum }}
 spec:
   selector:
     matchLabels:
@@ -105,6 +47,8 @@ spec:
     metadata:
       labels:
         app: route-emitter
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/route-emitter-configmap.yaml") . | sha256sum }}
     spec:
       serviceAccountName: route-emitter
       initContainers:

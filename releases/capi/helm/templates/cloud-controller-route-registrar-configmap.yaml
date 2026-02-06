@@ -1,0 +1,37 @@
+{{ if .Values.cloudController.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloud-controller-route-registrar-configmap
+data:
+  route-registrar.json: |-
+    {
+      "message_bus_servers": [
+        {
+          "host": "{{ .Values.cloudController.nats.address }}"
+        }
+      ],
+      "nats_mtls_config": {
+        "enabled": true,
+        "cert_path": "/etc/ssl/certs/cloud-controller/tls.crt",
+        "key_path": "/etc/ssl/certs/cloud-controller/tls.key",
+        "ca_path": "/etc/ssl/certs/cloud-controller/ca.crt"
+      },
+      "host": "",
+      "routes": [
+        {
+          "name": "api",
+          "port": 9022,
+          "registration_interval": "10s",
+          "server_cert_domain_san": "{{ .Values.cloudController.externalDomain }}",
+          "tags": {
+            "component": "CloudController"
+          },
+          "uris": [
+            "{{ .Values.cloudController.externalDomain }}"
+          ]
+        }
+      ]
+    }
+{{ end }}

@@ -1,0 +1,20 @@
+{{ if .Values.cloudController.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-configmap
+data:
+  nginx.conf: |-
+    {{- tpl (.Files.Get "files/nginx/nginx.conf") . | nindent 4 }}
+  nginx_external_endpoints.conf: |-
+    {{- tpl (.Files.Get "files/nginx/nginx_external_endpoints.conf") . | nindent 4 }}
+  nginx_server_mtls.conf: |-
+    {{- tpl (.Files.Get "files/nginx/nginx_server_mtls.conf") . | nindent 4 }}
+  public_upload.conf: |-
+    {{- tpl (.Files.Get "files/nginx/public_upload.conf") . | nindent 4 }}
+  mime.types: |-
+    {{- tpl (.Files.Get "files/nginx/mime.types") . | nindent 4 }}
+  nginx_server_public_tls.conf: |-
+    {{- tpl (.Files.Get "files/nginx/nginx_server_public_tls.conf") . | nindent 4 }}
+{{ end }}

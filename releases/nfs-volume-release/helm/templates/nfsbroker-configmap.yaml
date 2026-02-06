@@ -1,0 +1,48 @@
+{{- if .Values.nfsbroker.enabled }}
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nfsbroker-configmap
+data:
+  services.json: |
+    [
+      {
+        "id": "997f8f26-e10c-11e7-80c1-9a214cf093ae",
+        "name": "nfs",
+        "description": "Existing NFSv3 and v4 volumes (see: https://code.cloudfoundry.org/nfs-volume-release/)",
+        "bindable": true,
+        "plan_updateable": false,
+        "tags": [
+          "nfs"
+        ],
+        "plans": [
+          {
+            "id": "09a09260-1df5-4445-9ed7-1ba56dadbbc8",
+            "name": "Existing",
+            "description": "A preexisting filesystem",
+            "metadata": {
+              "costs": [
+                {
+                  "amount": {
+                    "usd": 0.0
+                  },
+                  "unit": "MONTHLY"
+                }
+              ],
+              "displayName": "Existing Filesystems"
+            }
+          }
+        ],
+        "requires": [
+          "volume_mount"
+        ],
+        "metadata": {
+          "displayName": "NFS V3 / V4 Volume Broker",
+          "longDescription": "Broker for existing NFSv3 and v4 volumes",
+          "providerDisplayName": "Dell / Pivotal",
+          "documentationUrl": "https://docs.cloudfoundry.org/devguide/services/using-vol-services.html"
+        }
+      }
+    ]
+{{- end }}

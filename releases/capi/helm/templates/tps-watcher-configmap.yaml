@@ -1,0 +1,32 @@
+{{ if .Values.tpsWatcher.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tps-watcher-configmap
+data:
+  tps-watcher.json: |-
+    {
+      "bbs_client_cert": "/etc/ssl/certs/tps-watcher/tls.crt",
+      "bbs_client_key": "/etc/ssl/certs/tps-watcher/tls.key",
+      "bbs_ca_cert": "/etc/ssl/certs/tps-watcher/ca.crt",
+      "bbs_api_url": "https://bbs.{{ .Release.Namespace }}.svc.cluster.local:8889",
+      "cc_base_url": "https://cloud-controller.{{ .Release.Namespace }}.svc.cluster.local:9023",
+      "cc_client_cert": "/etc/ssl/certs/tps-watcher/tls.crt",
+      "cc_client_key": "/etc/ssl/certs/tps-watcher/tls.key",
+      "cc_ca_cert": "/etc/ssl/certs/tps-watcher/ca.crt",
+      "debug_server_config": {
+        "debug_address": "127.0.0.1:17015"
+      },
+      "dropsonde_port": 3457,
+      "lager_config": {
+        "log_level": "info",
+        "time_format": "rfc3339"
+      },
+      "locket_client_cert_file": "/etc/ssl/certs/tps-watcher/tls.crt",
+      "locket_client_key_file": "/etc/ssl/certs/tps-watcher/tls.key",
+      "locket_ca_cert_file": "/etc/ssl/certs/tps-watcher/ca.crt",
+      "locket_address": "locket.{{ .Release.Namespace }}.svc.cluster.local:8891",
+      "instance_id": "62bcb8b5-ee8a-4dd9-bec0-3788beb13855"
+    }
+{{ end }}

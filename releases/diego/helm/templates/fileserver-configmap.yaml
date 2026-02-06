@@ -1,0 +1,10 @@
+{{- if .Values.fileserver.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fileserver-configmap
+data:
+  nginx.conf: |-
+    {{- tpl (.Files.Get "fileserver/nginx.conf") . | nindent 4 }}
+{{- end }}
