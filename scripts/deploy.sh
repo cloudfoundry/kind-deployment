@@ -42,27 +42,55 @@ helm upgrade --hide-notes --install istiod --repo https://istio-release.storage.
 
 kubectl apply --filename assets/gateway.yaml
 
-helm upgrade --hide-notes --install postgresql --repo https://charts.bitnami.com/bitnami postgresql --set auth.password=$DB_PASSWORD --values assets/values/postgresql.yaml --wait
+helm upgrade --hide-notes --install postgresql --repo https://charts.bitnami.com/bitnami postgresql --set auth.password=$DB_PASSWORD --values assets/values/postgresql.yaml
+
+helm upgrade -i minio oci://docker.io/bitnamicharts/minio --set rootUser=rootuser,rootPassword=rootpass123 --set console.enabled=false --set resourcesPreset=small --set auth.rootPassword=$BLOBSTORE_PASSWORD --set image.repository=bitnamilegacy/minio --set global.security.allowInsecureImages=true --hide-notes
 
 kubectl rollout status statefulset nats
+kubectl rollout status statefulset postgresql
+kubectl rollout status deployment minio
 
-helm upgrade -i minio oci://registry-1.docker.io/bitnamicharts/minio --set rootUser=rootuser,rootPassword=rootpass123 --set console.enabled=false --set resourcesPreset=small --set auth.rootPassword=$BLOBSTORE_PASSWORD --set image.repository=bitnamilegacy/minio --set global.security.allowInsecureImages=true --hide-notes --wait
+## end of mandatory dependencies, start of CF components
 
-helm upgrade --install loggregator-agent releases/loggregator-agent/helm --set "syslogBindingCache.enabled=true" --set "forwarderAgent.enabled=true"
-helm upgrade --install routing releases/routing/helm
-helm upgrade --install loggregator releases/loggregator/helm --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET
-helm upgrade --install log-cache releases/log-cache/helm
-helm upgrade --install uaa releases/uaa/helm --set ccAdminPassword=$CC_ADMIN_PASSWORD --set dbPassword=$DB_PASSWORD --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set uaaAdminSecret=$UAA_ADMIN_SECRET --wait
+## components without dependencies
+helm upgrade --install uaa releases/uaa/helm --set ccAdminPassword=$CC_ADMIN_PASSWORD --set dbPassword=$DB_PASSWORD --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set uaaAdminSecret=$UAA_ADMIN_SECRET --wait # no dependencies
+helm upgrade --install loggregator-agent releases/loggregator-agent/helm --set "syslogBindingCache.enabled=true" --set "forwarderAgent.enabled=true" # no dependencies
+helm upgrade --install loggregator releases/loggregator/helm --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET # no dependencies, optional component
 
-helm upgrade --install credhub releases/credhub/helm --set dbPassword=$DB_PASSWORD
-helm upgrade --install locket releases/diego/helm --set dbPassword=$DB_PASSWORD --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set "locket.enabled=true" --wait
-helm upgrade --install diego releases/diego/helm --set dbPassword=$DB_PASSWORD --set diegoSSHCredentials=$DIEGO_SSH_CREDENTIALS --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set-file sshProxyHostKey="$CERTS_DIR/ssh_key" --set "auctioneer.enabled=true" --set "bbs.enabled=true" --set "fileserver.enabled=true" --set "sshProxy.enabled=true"
-helm upgrade --install tps-watcher releases/capi/helm --set "tpsWatcher.enabled=true"
-helm upgrade --install route-emitter releases/diego/helm --set "routeEmitter.enabled=true"
-helm upgrade --install k8s-rep oci://ghcr.io/cloudfoundry/helm/k8s-rep:$K8S_REP_VERSION --set-file caCertificate="$CERTS_DIR/ca.crt" --set "stacks.cflinuxfs4=ghcr.io/cloudfoundry/k8s/cflinuxfs4:$CFLINUXFS4_VERSION"
-helm upgrade --install api releases/capi/helm --set cloudController.blobstore.password=$BLOBSTORE_PASSWORD --set dbPassword=$DB_PASSWORD --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set cloudController.sshProxyKeyFingerprint=$SSH_PROXY_KEY_FINGERPRINT --set "cloudController.enabled=true" --wait
-helm upgrade --install cf-networking releases/cf-networking/helm --set policyServer.dbPassword=$DB_PASSWORD --set policyServer.oauthClientsSecret=$OAUTH_CLIENTS_SECRET
-helm upgrade --install policy-agent oci://ghcr.io/cloudfoundry/helm/policy-agent:$POLICY_AGENT_VERSION
+kubectl rollout status deployment forwarder-agent
+
+## depending on forwarder-agent (loggregator-agent)
+helm upgrade --install routing releases/routing/helm # connects to forwarder-agent (loggregator-agent), does not exit if it is missing
+helm upgrade --install locket releases/diego/helm --set dbPassword=$DB_PASSWORD --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set "locket.enabled=true" --wait # depends on forwarder-agent (loggregator-agent), does not become ready without it
+helm upgrade --install diego releases/diego/helm --set dbPassword=$DB_PASSWORD --set diegoSSHCredentials=$DIEGO_SSH_CREDENTIALS --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set-file sshProxyHostKey="$CERTS_DIR/ssh_key" --set "auctioneer.enabled=true" --set "bbs.enabled=true" --set "fileserver.enabled=true" --set "sshProxy.enabled=true" # depends on forwarder-agent (loggregator-agent), does not become ready without it
+
+kubectl rollout status deployment uaa
+
+## depending on uaa
+helm upgrade --install log-cache releases/log-cache/helm # depends on uaa (uaa), does not become ready without it
+helm upgrade --install credhub releases/credhub/helm --set dbPassword=$DB_PASSWORD # depends on uaa (uaa), does not become ready without it
+
+kubectl rollout status deployment auctioneer
+kubectl rollout status deployment bbs
+kubectl rollout status deployment locket
+kubectl rollout status deployment file-server
+kubectl rollout status deployment credhub
+
+## depending on diego
+helm upgrade --install api releases/capi/helm --set cloudController.blobstore.password=$BLOBSTORE_PASSWORD --set dbPassword=$DB_PASSWORD --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set cloudController.sshProxyKeyFingerprint=$SSH_PROXY_KEY_FINGERPRINT --set "cloudController.enabled=true" --wait # depends on bbs, locket, does not become ready without them
+helm upgrade --install k8s-rep oci://ghcr.io/cloudfoundry/helm/k8s-rep:$K8S_REP_VERSION --set-file caCertificate="$CERTS_DIR/ca.crt" --set "stacks.cflinuxfs4=ghcr.io/cloudfoundry/k8s/cflinuxfs4:$CFLINUXFS4_VERSION" # depends on bbs and locket does not become ready without them
+
+kubectl rollout status deployment cc-deployment-updater
+kubectl rollout status deployment cc-uploader
+kubectl rollout status deployment cc-worker
+kubectl rollout status deployment cc-worker-clock
+kubectl rollout status deployment cloud-controller
+
+## depending on capi
+helm upgrade --install tps-watcher releases/capi/helm --set "tpsWatcher.enabled=true" # depends on bbs, cc, locket does not become ready without them
+helm upgrade --install route-emitter releases/diego/helm --set "routeEmitter.enabled=true" --set "routeEmitter.enableInternalEmitter=true" # depends on bbs and locket does not become ready without them
+helm upgrade --install cf-networking releases/cf-networking/helm --set policyServer.dbPassword=$DB_PASSWORD --set policyServer.oauthClientsSecret=$OAUTH_CLIENTS_SECRET # depends on cc, uaa, locket, forwarder-agent (loggregator-agent), does not become ready without them
+helm upgrade --install policy-agent oci://ghcr.io/cloudfoundry/helm/policy-agent:$POLICY_AGENT_VERSION # depends on policy-server (cf-networking), does not exit if it is missing
 
 kubectl get configmap coredns -n kube-system -o jsonpath='{.data.Corefile}' | grep -q "apps.internal:53" || {
   echo "Patching CoreDNS to forward apps.internal to bosh-dns"
@@ -75,33 +103,11 @@ kubectl get configmap coredns -n kube-system -o jsonpath='{.data.Corefile}' | gr
   kubectl rollout restart deployment coredns -n kube-system
 }
 
-kubectl rollout status deployment auctioneer
-kubectl rollout status deployment bbs
-kubectl rollout status deployment cc-deployment-updater
-kubectl rollout status deployment cc-uploader
-kubectl rollout status deployment cc-worker
-kubectl rollout status deployment cc-worker-clock
-kubectl rollout status deployment cloud-controller
-kubectl rollout status deployment credhub
-kubectl rollout status deployment doppler
-kubectl rollout status deployment file-server
-kubectl rollout status deployment forwarder-agent
-kubectl rollout status deployment gorouter
-kubectl rollout status deployment istio-gateway-istio
-kubectl rollout status deployment locket
-kubectl rollout status deployment log-api
-kubectl rollout status deployment log-cache-api
-kubectl rollout status deployment log-cache-backend
-kubectl rollout status deployment ssh-proxy
-kubectl rollout status deployment syslog-binding-cache
-kubectl rollout status deployment tps-watcher
-kubectl rollout status deployment uaa
 kubectl rollout status deployment policy-server
 kubectl rollout status deployment policy-agent
 kubectl rollout status deployment bosh-dns
 kubectl rollout status deployment service-discovery-controller
 
 kubectl rollout status daemonset k8s-rep
-kubectl rollout status daemonset route-emitter
 
 echo "All deployments and daemonsets are successfully rolled out."
