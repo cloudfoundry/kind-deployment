@@ -77,3 +77,6 @@ jobs:
         body-path: changelog.txt
         commit-message: "${{ env.PR_TITLE }}\n\nlist-of-updated-charts:${{ env.CHANGED_CHARTS }}"
         base: main
+        author: ${{ secrets.SERVICE_USER_AUTHOR_EMAIL }}
+        committer: ${{ secrets.SERVICE_USER_AUTHOR_EMAIL }}
+        token: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}

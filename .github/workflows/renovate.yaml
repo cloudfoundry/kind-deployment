@@ -18,3 +18,5 @@ jobs:
       with:
         token: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
         configurationFile: .github/renovate-config.js
+      env:
+        RENOVATE_GIT_AUTHOR: ${{ secrets.SERVICE_USER_AUTHOR_EMAIL }}
