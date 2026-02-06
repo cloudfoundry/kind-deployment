@@ -46,7 +46,7 @@ helm upgrade --hide-notes --install postgresql --repo https://charts.bitnami.com
 
 kubectl rollout status statefulset nats
 
-helm upgrade -i minio oci://registry-1.docker.io/bitnamicharts/minio --set rootUser=rootuser,rootPassword=rootpass123 --set console.enabled=false --set resourcesPreset=small --set auth.rootPassword=$BLOBSTORE_PASSWORD --set image.repository=bitnamilegacy/minio --set global.security.allowInsecureImages=true --hide-notes --wait
+helm upgrade -i minio oci://registry-1.docker.io/bitnamicharts/minio --set console.enabled=false --set resourcesPreset=small --set auth.rootPassword=$BLOBSTORE_PASSWORD --set image.repository=bitnamilegacy/minio --set global.security.allowInsecureImages=true --hide-notes --wait
 
 helm upgrade --install loggregator-agent releases/loggregator-agent/helm --set "syslogBindingCache.enabled=true" --set "forwarderAgent.enabled=true"
 helm upgrade --install routing releases/routing/helm
