@@ -45,8 +45,15 @@ cloudController:
   uaa:
     url: https://uaa.127-0-0-1.nip.io
   blobstore:
-    password: ~
-    endpoint: http://blobstore.127-0-0-1.nip.io
+    resource_directory_key: cc-resources
+    app_package_directory_key: cc-packages
+    droplet_directory_key: cc-droplets
+    buildpack_directory_key: cc-buildpacks
+    fog_connection:
+      provider: AWS
+      endpoint:  http://blobstore.127-0-0-1.nip.io
+      aws_access_key_id: admin
+      aws_secret_access_key: ~
   diego:
     fileServerUrl: https://file-server.127-0-0-1.nip.io
     ccUploaderUrl: http://cc-uploader.default.svc.cluster.local:9090
