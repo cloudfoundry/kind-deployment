@@ -88,3 +88,4 @@ jobs:
       with:
         tag_name: ${{ env.NEW_VERSION }}
         body_path: changelog.txt
+        token: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
