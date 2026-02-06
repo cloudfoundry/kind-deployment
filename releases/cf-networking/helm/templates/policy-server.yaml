@@ -1,161 +1,13 @@
 {{- if .Values.policyServer.enabled }}
 ---
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: policy-server-configmap
-data:
-  policy-server.json: |-
-    {
-      "listen_host": "0.0.0.0",
-      "listen_port": 4002,
-      "log_prefix": "cfnetworking",
-      "debug_server_host": "127.0.0.1",
-      "enable_tls": false,
-      "ca_cert_file": "/etc/ssl/certs/policy-server/ca.crt",
-      "server_cert_file": "/etc/ssl/certs/policy-server/tls.crt",
-      "server_key_file": "/etc/ssl/certs/policy-server/tls.key",
-      "debug_server_port": 31821,
-      "uaa_client": "network-policy",
-      "uaa_client_secret": {{ .Values.policyServer.oauthClientsSecret | quote }},
-      "uaa_url": "https://uaa.{{ .Release.Namespace }}.svc.cluster.local",
-      "uaa_port": 443,
-      "cc_url": "https://cloud-controller.{{ .Release.Namespace }}.svc.cluster.local:9024",
-      "cc_ca_cert": "/etc/ssl/certs/policy-server/ca.crt",
-      "skip_ssl_validation": false,
-      "database": {
-        "type": "postgres",
-        "user": "postgres",
-        "password": "{{ .Values.policyServer.dbPassword }}",
-        "host": "postgresql",
-        "port": 5432,
-        "timeout": 120,
-        "database_name": "network_policy",
-        "require_ssl": true,
-        "ca_cert": "/etc/ssl/certs/policy-server/ca.crt",
-        "skip_hostname_validation": false
-      },
-      "database_migration_timeout": 600,
-      "max_idle_connections": 10,
-      "max_open_connections": 200,
-      "connections_max_lifetime_seconds": 3600,
-      "tag_length": 2,
-      "metron_address": "forwarder-agent.{{ .Release.Namespace }}.svc.cluster.local:3458",
-      "log_level": "info",
-      "cleanup_interval": 3600,
-      "max_policies": 150,
-      "enable_space_developer_self_service": true,
-      "allowed_cors_domains": [],
-      "uaa_ca": "/etc/ssl/certs/policy-server/ca.crt",
-      "request_timeout": 5
-    }
-  policy-server-internal.json: |-
-    {
-      "listen_host": "0.0.0.0",
-      "log_prefix": "cfnetworking",
-      "debug_server_host": "127.0.0.1",
-      "debug_server_port": 31945,
-      "health_check_port": 31946,
-      "internal_listen_port": 4003,
-      "database": {
-        "type": "postgres",
-        "user": "postgres",
-        "password": "{{ .Values.policyServer.dbPassword }}",
-        "host": "postgresql",
-        "port": 5432,
-        "timeout": 120,
-        "database_name": "network_policy",
-        "require_ssl": true,
-        "ca_cert": "/etc/ssl/certs/policy-server/ca.crt",
-        "skip_hostname_validation": false
-      },
-      "max_idle_connections": 10,
-      "max_open_connections": 200,
-      "connections_max_lifetime_seconds": 3600,
-      "tag_length": 2,
-      "metron_address": "forwarder-agent.{{ .Release.Namespace }}.svc.cluster.local:3458",
-      "log_level": "debug",
-      "ca_cert_file": "/etc/ssl/certs/policy-server/ca.crt",
-      "server_cert_file": "/etc/ssl/certs/policy-server/tls.crt",
-      "server_key_file": "/etc/ssl/certs/policy-server/tls.key",
-      "request_timeout": 5
-      }
-  policy-server-asg-syncer.json: |-
-    {
-      "uuid": "07c65e06-b676-4f4a-a37f-96df62d387d7",
-      "database": {
-          "type": "postgres",
-          "user": "postgres",
-          "password": "{{ .Values.policyServer.dbPassword }}",
-          "host": "postgresql",
-          "port": 5432,
-          "timeout": 120,
-          "database_name": "network_policy",
-          "require_ssl": true,
-          "ca_cert": "/etc/ssl/certs/policy-server/ca.crt",
-          "skip_hostname_validation": false
-      },
-      "uaa_client": "network-policy",
-      "uaa_client_secret": {{ .Values.policyServer.oauthClientsSecret | quote }},
-      "uaa_url": "https://uaa.{{ .Release.Namespace }}.svc.cluster.local",
-      "uaa_port": 443,
-      "uaa_ca": "/etc/ssl/certs/policy-server/ca.crt",
-      "cc_url": "https://cloud-controller.{{ .Release.Namespace }}.svc.cluster.local:9024",
-      "cc_ca_cert": "/etc/ssl/certs/policy-server/ca.crt",
-      "cc_internal_url": "https://cloud-controller.{{ .Release.Namespace }}.svc.cluster.local:9023",
-      "cc_internal_ca_cert": "/etc/ssl/certs/policy-server/ca.crt",
-      "cc_internal_client_cert": "/etc/ssl/certs/policy-server/tls.crt",
-      "cc_internal_client_key": "/etc/ssl/certs/policy-server/tls.key",
-      "log_prefix": "cfnetworking",
-      "log_level": "debug",
-      "metron_address": "forwarder-agent.{{ .Release.Namespace }}.svc.cluster.local:3458",
-      "skip_ssl_validation": false,
-      "asg_poll_interval_seconds": 60,
-      "retry_deadline_seconds": 300,
-      "locket_address": "locket.{{ .Release.Namespace }}.svc.cluster.local:8891",
-      "locket_ca_cert_file": "/etc/ssl/certs/policy-server/ca.crt",
-      "locket_client_cert_file": "/etc/ssl/certs/policy-server/tls.crt",
-      "locket_client_key_file": "/etc/ssl/certs/policy-server/tls.key"
-    }
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: policy-server-route-registrar-configmap
-data:
-  route-registrar.json: |-
-    {
-      "message_bus_servers": [
-        {
-          "host": "nats.{{ .Release.Namespace }}.svc.cluster.local:4222"
-        }
-      ],
-      "nats_mtls_config": {
-        "enabled": true,
-        "cert_path": "/etc/ssl/certs/policy-server/tls.crt",
-        "key_path": "/etc/ssl/certs/policy-server/tls.key",
-        "ca_path": "/etc/ssl/certs/policy-server/ca.crt"
-      },
-      "host": "",
-      "routes": [
-        {
-          "name": "policy-server",
-          "port": 4002,
-          "registration_interval": "10s",
-          "server_cert_domain_san": "{{ .Values.policyServer.externalDomain }}",
-          "uris": [
-            "{{ .Values.policyServer.externalDomain }}/networking"
-          ]
-        }
-      ]
-    }
----
 kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: policy-server
   labels:
     app: policy-server
+  annotations:
+    checksum/config: {{ cat (include (print $.Template.BasePath "/policy-server-configmap.yaml") .) (include (print $.Template.BasePath "/policy-server-route-registrar-configmap.yaml") .) | sha256sum }}
 spec:
   replicas: 1
   selector:
@@ -165,6 +17,8 @@ spec:
     metadata:
       labels:
         app: policy-server
+      annotations:
+        checksum/config: {{ cat (include (print $.Template.BasePath "/policy-server-configmap.yaml") .) (include (print $.Template.BasePath "/policy-server-route-registrar-configmap.yaml") .) | sha256sum }}
     spec:
       containers:
         - name: policy-server

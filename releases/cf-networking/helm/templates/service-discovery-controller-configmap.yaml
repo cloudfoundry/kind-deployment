@@ -1,0 +1,38 @@
+{{- if .Values.serviceDiscoveryController.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: service-discovery-controller-configmap
+data:
+  service-discovery-controller.json: |-
+    {
+      "address": "0.0.0.0",
+      "port": "{{ .Values.serviceDiscoveryController.port }}",
+      "index": "0",
+      "log_level_address": "127.0.0.1",
+      "log_level_port": 8055,
+      "server_cert": "/etc/ssl/certs/service-discovery-controller/tls.crt",
+      "server_key": "/etc/ssl/certs/service-discovery-controller/tls.key",
+      "ca_cert": "/etc/ssl/certs/service-discovery-controller/ca.crt",
+      "metron_port": 3457,
+      "staleness_threshold_seconds": 180,
+      "pruning_interval_seconds": 60,
+      "metrics_emit_seconds": 10,
+      "resume_pruning_delay_seconds": 60,
+      "warm_duration_seconds": 60,
+      "read_header_timeout": "30s",
+      "nats": {
+        "tls_enabled": true,
+        "ca_certs": "/etc/ssl/certs/service-discovery-controller/ca.crt",
+        "cert_chain": "/etc/ssl/certs/service-discovery-controller/tls.crt",
+        "private_key": "/etc/ssl/certs/service-discovery-controller/tls.key",
+        "hosts": [
+          {
+            "hostname": "{{ .Values.serviceDiscoveryController.nats.host }}",
+            "port": {{ .Values.serviceDiscoveryController.nats.port }}
+          }
+        ]
+      }
+    }
+{{- end }}

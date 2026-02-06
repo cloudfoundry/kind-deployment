@@ -1,154 +1,12 @@
 ---
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: gorouter-configmap
-data:
-  gorouter.yaml: |-
-    port: 8080
-    ssl_port: 443
-    index: 0
-    go_max_procs: -1
-    secure_cookies: false
-    sticky_session_cookie_names:
-    - JSESSIONID
-    sticky_sessions_for_auth_negotiate: false
-    access_log:
-      file: "/dev/stdout"
-    status:
-      port: 9001
-      pass: router
-      user: status
-    publish_start_message_interval: 30s
-    prune_stale_droplets_interval: 30s
-    droplet_stale_threshold: 120s
-    publish_active_apps_interval: 0s
-    suspend_pruning_if_nats_unavailable: true
-    route_latency_metric_muzzle_duration: 30s
-    frontend_idle_timeout: 900s
-    read_header_timeout: 0s
-    drain_wait: 20s
-    drain_timeout: 900s
-    healthcheck_user_agent: HTTP-Monitor/1.1
-    routing_table_sharding_mode: all
-    route_services_timeout: 60s
-    route_services_secret_decrypt_only: ''
-    route_services_recommend_https: true
-    route_services_hairpinning: false
-    route_services_internal_server_port: 7070
-    route_services_hairpinning_allowlist: []
-    route_services_secret: router_route_services_secret
-    endpoint_timeout: 900s
-    http_1_endpoint_timeout: 0s
-    http_2_endpoint_timeout: 0s
-    endpoint_dial_timeout: 5s
-    websocket_dial_timeout: 5s
-    tls_handshake_timeout: 10s
-    load_balancer_healthy_threshold: 20s
-    balancing_algorithm: round-robin
-    balancing_algorithm_az_preference: none
-    extra_headers_to_log: []
-    max_request_header_bytes: 1048576
-    max_request_headers: 0
-    max_response_headers: 0
-    token_fetcher_max_retries: 3
-    token_fetcher_retry_interval: 5s
-    token_fetcher_expiration_buffer_time: 30
-    nats:
-      tls_enabled: true
-      ca_certs: |-
-        $CA_CRT
-      cert_chain: |-
-        $TLS_CRT
-      private_key: |-
-        $TLS_KEY
-      hosts:
-      - hostname: nats.{{ .Release.Namespace }}.svc.cluster.local
-        port: 4222
-    force_forwarded_proto_https: false
-    sanitize_forwarded_proto: false
-    hop_by_hop_headers_to_filter:
-    - X-Forwarded-For
-    - X-Forwarded-Proto
-    - B3
-    - X-B3
-    - X-B3-SpanID
-    - X-B3-TraceID
-    - X-Request-Start
-    - X-Forwarded-Client-Cert
-    enable_proxy: false
-    enable_ssl: true
-    cipher_suites: ECDHE-RSA-AES128-GCM-SHA256:TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-    forwarded_client_cert: always_forward
-    isolation_segments: []
-    ip_local_port_range: 1024 65535
-    empty_pool_response_code_503: true
-    enable_envelope_v1_metrics: true
-    per_request_metrics_reporting: true
-    per_app_prometheus_http_metrics_reporting: false
-    send_http_start_stop_server_event: true
-    send_http_start_stop_client_event: true
-    empty_pool_timeout: 0s
-    disable_keep_alives: false
-    max_idle_conns: 100
-    max_idle_conns_per_host: 100
-    endpoint_keep_alive_probe_interval: 1s
-    keep_alive_100_continue_requests: false
-    tls_pem:
-    - cert_chain: |-
-        $TLS_CRT
-      private_key: |-
-        $TLS_KEY
-    client_cert_validation: request
-    ca_certs:
-    - $CA_CRT
-    client_ca_certs: |-
-      $CA_CRT
-    disable_http: false
-    enable_http2: true
-    min_tls_version: TLSv1.2
-    max_tls_version: TLSv1.2
-    start_response_delay_interval: 20s
-    enable_http1_concurrent_read_write: false
-    backends:
-      max_conns: 500
-      max_attempts: 3
-      cert_chain: |-
-        $TLS_CRT
-      private_key: |-
-        $TLS_KEY
-    route_services:
-      max_attempts: 3
-      cert_chain: ''
-      private_key: ''
-      strict_signature_validation: false
-    logging:
-      syslog: vcap.gorouter
-      syslog_truncate: 0
-      syslog_addr: localhost:514
-      syslog_network: udp
-      level: info
-      extra_access_log_fields: []
-      loggregator_enabled: true
-      metron_address: localhost:3457
-      disable_log_forwarded_for: false
-      disable_log_source_ip: false
-      redact_query_params: none
-    tracing:
-      enable_zipkin: true
-    debug_addr: localhost:9003
-    http_rewrite:
-      responses:
-        add_headers_if_not_present:
-        remove_headers:
-    html_error_template_file:
----
 kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: gorouter
   labels:
     app: gorouter
+  annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/gorouter-configmap.yaml") . | sha256sum }}
 spec:
   replicas: 1
   selector:
@@ -158,6 +16,8 @@ spec:
     metadata:
       labels:
         app: gorouter
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/gorouter-configmap.yaml") . | sha256sum }}
     spec:
       initContainers:
       - name: gorouter-init

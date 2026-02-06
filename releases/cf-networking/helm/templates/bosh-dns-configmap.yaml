@@ -1,0 +1,95 @@
+{{- if .Values.boshDnsAdapter.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bosh-dns-configmap
+data:
+  handlers.json: |-
+    [
+      {
+        "domain": "apps.internal.",
+        "cache": {
+          "enabled": false
+        },
+        "source": {
+          "type": "http",
+          "url": "http://127.0.0.1:8053"
+        }
+      }
+    ]
+  bosh-dns-adapter.json: |-
+    {
+      "address": "0.0.0.0",
+      "port": "8053",
+      "service_discovery_controller_address": "{{ .Values.serviceDiscoveryController.hostname }}",
+      "service_discovery_controller_port": "{{ .Values.serviceDiscoveryController.port }}",
+      "client_cert": "/etc/ssl/certs/bosh-dns-adapter/tls.crt",
+      "client_key": "/etc/ssl/certs/bosh-dns-adapter/tls.key",
+      "ca_cert": "/etc/ssl/certs/bosh-dns-adapter/ca.crt",
+      "metron_port": 3457,
+      "metrics_emit_seconds": 10,
+      "log_level_address": "127.0.0.1",
+      "log_level_port": 8066,
+      "internal_service_mesh_domains": []
+    }
+  bosh-dns.json: |-
+    {
+      "address": "0.0.0.0",
+      "port": 53,
+      "log_level": "INFO",
+      "disable_recursors": false,
+      "configure_systemd_resolved": false,
+      "recursors": [],
+      "excluded_recursors": [],
+      "records_file": "/bosh-dns/records.json",
+      "upcheck_domains": [
+        "upcheck.bosh-dns."
+      ],
+      "recursor_timeout": "2s",
+      "recursor_max_retries": 0,
+      "request_timeout": "5s",
+      "recursor_selection": "smart",
+      "jobs_dir": "/",
+      "api": {
+        "port": 53080,
+        "certificate_file": "/etc/ssl/certs/bosh-dns/tls.crt",
+        "private_key_file": "/etc/ssl/certs/bosh-dns/tls.key",
+        "ca_file": "/etc/ssl/certs/bosh-dns/ca.crt"
+      },
+      "health": {
+        "enabled": true,
+        "port": 8853,
+        "certificate_file": "/etc/ssl/certs/bosh-dns/tls.crt",
+        "private_key_file": "/etc/ssl/certs/bosh-dns/tls.key",
+        "ca_file": "/etc/ssl/certs/bosh-dns/ca.crt",
+        "check_interval": "20s",
+        "max_tracked_queries": 2000,
+        "synchronous_check_timeout": "1s"
+      },
+      "metrics": {
+        "enabled": false,
+        "port": 53088,
+        "address": "127.0.0.1"
+      },
+      "cache": {
+        "enabled": true
+      },
+      "handlers_files_glob": "/bosh-dns/handlers.json",
+      "internal_upcheck_domain": {
+        "enabled": false,
+        "dns_query": "q-i0.diego-cell.*.cf.bosh."
+      },
+      "logging": {
+        "format": {
+          "timestamp": "rfc3339"
+        },
+        "tags": []
+      }
+    }
+  records.json: |-
+    {
+      "records": [],
+      "aliases": {}
+    }
+{{- end }}

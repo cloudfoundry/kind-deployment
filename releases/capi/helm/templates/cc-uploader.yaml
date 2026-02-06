@@ -1,40 +1,13 @@
 {{ if .Values.cloudController.enabled }}
 ---
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: cc-uploader-configmap
-data:
-  cc-uploader.json: |-
-    {
-      "log_level": "debug",
-      "dropsonde_port": 3457,
-      "lager_config": {
-        "log_level": "debug",
-        "time_format": "rfc3339"
-      },
-      "listen_addr": "0.0.0.0:9090",
-      "debug_server_config": {
-        "debug_address": "127.0.0.1:17018"
-      },
-      "cc_ca_cert": "/etc/ssl/certs/cc-uploader/ca.crt",
-      "cc_client_cert": "/etc/ssl/certs/cc-uploader/tls.crt",
-      "cc_client_key": "/etc/ssl/certs/cc-uploader/tls.key",
-      "mutual_tls": {
-        "listen_addr": "0.0.0.0:9091",
-        "ca_cert": "/etc/ssl/certs/cc-uploader/ca.crt",
-        "server_cert": "/etc/ssl/certs/cc-uploader/tls.crt",
-        "server_key": "/etc/ssl/certs/cc-uploader/tls.key"
-      },
-      "disable_non_tls": false
-    }
----
 kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: cc-uploader
   labels:
     app: cc-uploader
+  annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/cc-uploader-configmap.yaml") . | sha256sum }}
 spec:
   replicas: 1
   selector:
@@ -44,6 +17,8 @@ spec:
     metadata:
       labels:
         app: cc-uploader
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/cc-uploader-configmap.yaml") . | sha256sum }}
     spec:
       containers:
         - name: cc-uploader

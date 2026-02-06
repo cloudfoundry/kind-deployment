@@ -1,76 +1,6 @@
 {{ if .Values.cloudController.enabled }}
 ---
 apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: cloud-controller-configmap
-  annotations:
-    "helm.sh/hook": pre-install,pre-upgrade
-    "helm.sh/hook-weight": "-1"
-data:
-  config.yaml: |-
-    {{- tpl (.Files.Get "files/cloud_controller_ng.yaml") . | nindent 4 }}
-  stacks.yaml: |-
-    default: cflinuxfs4
-    stacks:
-    - description: Cloud Foundry Linux-based filesystem (Ubuntu 22.04)
-      name: cflinuxfs4
-    deprecated_stacks:  []
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: nginx-configmap
-data:
-  nginx.conf: |-
-    {{- tpl (.Files.Get "files/nginx/nginx.conf") . | nindent 4 }}
-  nginx_external_endpoints.conf: |-
-    {{- tpl (.Files.Get "files/nginx/nginx_external_endpoints.conf") . | nindent 4 }}
-  nginx_server_mtls.conf: |-
-    {{- tpl (.Files.Get "files/nginx/nginx_server_mtls.conf") . | nindent 4 }}
-  public_upload.conf: |-
-    {{- tpl (.Files.Get "files/nginx/public_upload.conf") . | nindent 4 }}
-  mime.types: |-
-    {{- tpl (.Files.Get "files/nginx/mime.types") . | nindent 4 }}
-  nginx_server_public_tls.conf: |-
-    {{- tpl (.Files.Get "files/nginx/nginx_server_public_tls.conf") . | nindent 4 }}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: cloud-controller-route-registrar-configmap
-data:
-  route-registrar.json: |-
-    {
-      "message_bus_servers": [
-        {
-          "host": "{{ .Values.cloudController.nats.address }}"
-        }
-      ],
-      "nats_mtls_config": {
-        "enabled": true,
-        "cert_path": "/etc/ssl/certs/cloud-controller/tls.crt",
-        "key_path": "/etc/ssl/certs/cloud-controller/tls.key",
-        "ca_path": "/etc/ssl/certs/cloud-controller/ca.crt"
-      },
-      "host": "",
-      "routes": [
-        {
-          "name": "api",
-          "port": 9022,
-          "registration_interval": "10s",
-          "server_cert_domain_san": "{{ .Values.cloudController.externalDomain }}",
-          "tags": {
-            "component": "CloudController"
-          },
-          "uris": [
-            "{{ .Values.cloudController.externalDomain }}"
-          ]
-        }
-      ]
-    }
----
-apiVersion: v1
 kind: Secret
 metadata:
   name: cc-shared
@@ -120,6 +50,8 @@ metadata:
   name: cloud-controller
   labels:
     app.kubernetes.io/name: cloud-controller
+  annotations:
+    checksum/config: {{ cat (include (print $.Template.BasePath "/cloud-controller-configmap.yaml") .) (include (print $.Template.BasePath "/cloud-controller-route-registrar-configmap.yaml") .) (include (print $.Template.BasePath "/nginx-configmap.yaml") .) | sha256sum }}
 spec:
   # This is a singleton.
   replicas: 1
@@ -132,6 +64,8 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: cloud-controller
+      annotations:
+        checksum/config: {{ cat (include (print $.Template.BasePath "/cloud-controller-configmap.yaml") .) (include (print $.Template.BasePath "/cloud-controller-route-registrar-configmap.yaml") .) (include (print $.Template.BasePath "/nginx-configmap.yaml") .) | sha256sum }}
     spec:
       containers:
         - name: cloud-controller
