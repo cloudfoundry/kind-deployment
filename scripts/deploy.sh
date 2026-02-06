@@ -13,6 +13,9 @@ POLICY_AGENT_VERSION="0.1.0"
 # renovate: depName=cloudfoundry/cflinuxfs4-release image=ghcr.io/cloudfoundry/k8s/cflinuxfs4
 CFLINUXFS4_VERSION="1.304.0"
 
+ENABLE_DOPPLER="${ENABLE_DOPPLER:-false}"
+ENABLE_POLICY_SERVER="${ENABLE_POLICY_SERVER:-false}"
+
 source "$DEPLOY_DIR/secrets.sh"
 
 kubectl create namespace cf-workloads --dry-run=client -o yaml | kubectl apply -f -
@@ -55,7 +58,10 @@ kubectl rollout status deployment minio
 ## components without dependencies
 helm upgrade --install uaa releases/uaa/helm --set ccAdminPassword=$CC_ADMIN_PASSWORD --set dbPassword=$DB_PASSWORD --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set uaaAdminSecret=$UAA_ADMIN_SECRET --wait # no dependencies
 helm upgrade --install loggregator-agent releases/loggregator-agent/helm --set "syslogBindingCache.enabled=true" --set "forwarderAgent.enabled=true" # no dependencies
-helm upgrade --install loggregator releases/loggregator/helm --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET # no dependencies, optional component
+
+if [[ "$ENABLE_DOPPLER" == "true" ]]; then
+  helm upgrade --install loggregator releases/loggregator/helm --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET # no dependencies, optional component
+fi
 
 kubectl rollout status deployment forwarder-agent
 
@@ -88,25 +94,31 @@ kubectl rollout status deployment cloud-controller
 
 ## depending on capi
 helm upgrade --install tps-watcher releases/capi/helm --set "tpsWatcher.enabled=true" # depends on bbs, cc, locket does not become ready without them
-helm upgrade --install route-emitter releases/diego/helm --set "routeEmitter.enabled=true" --set "routeEmitter.enableInternalEmitter=true" # depends on bbs and locket does not become ready without them
-helm upgrade --install cf-networking releases/cf-networking/helm --set policyServer.dbPassword=$DB_PASSWORD --set policyServer.oauthClientsSecret=$OAUTH_CLIENTS_SECRET # depends on cc, uaa, locket, forwarder-agent (loggregator-agent), does not become ready without them
-helm upgrade --install policy-agent oci://ghcr.io/cloudfoundry/helm/policy-agent:$POLICY_AGENT_VERSION # depends on policy-server (cf-networking), does not exit if it is missing
 
-kubectl get configmap coredns -n kube-system -o jsonpath='{.data.Corefile}' | grep -q "apps.internal:53" || {
-  echo "Patching CoreDNS to forward apps.internal to bosh-dns"
-  BOSH_DNS_IP=$(kubectl get svc bosh-dns -n default -o jsonpath='{.spec.clusterIP}')
-  COREFILE=$(kubectl get configmap coredns -n kube-system -o jsonpath='{.data.Corefile}')
-  printf '%s\n\n%s' "apps.internal:53 {
-    errors
-    forward . ${BOSH_DNS_IP}
-}" "$COREFILE" | kubectl create configmap coredns -n kube-system --from-file=Corefile=/dev/stdin --dry-run=client -o yaml | kubectl apply -f -
-  kubectl rollout restart deployment coredns -n kube-system
-}
+if [[ "$ENABLE_POLICY_SERVER" == "true" ]]; then
+  helm upgrade --install route-emitter releases/diego/helm --set "routeEmitter.enabled=true" --set "routeEmitter.enableInternalEmitter=true" # depends on bbs and locket does not become ready without them
+  helm upgrade --install cf-networking releases/cf-networking/helm --set policyServer.dbPassword=$DB_PASSWORD --set policyServer.oauthClientsSecret=$OAUTH_CLIENTS_SECRET # depends on cc, uaa, locket, forwarder-agent (loggregator-agent), does not become ready without them
+  helm upgrade --install policy-agent oci://ghcr.io/cloudfoundry/helm/policy-agent:$POLICY_AGENT_VERSION # depends on policy-server (cf-networking), does not exit if it is missing
 
-kubectl rollout status deployment policy-server
-kubectl rollout status deployment policy-agent
-kubectl rollout status deployment bosh-dns
-kubectl rollout status deployment service-discovery-controller
+  kubectl get configmap coredns -n kube-system -o jsonpath='{.data.Corefile}' | grep -q "apps.internal:53" || {
+    echo "Patching CoreDNS to forward apps.internal to bosh-dns"
+    BOSH_DNS_IP=$(kubectl get svc bosh-dns -n default -o jsonpath='{.spec.clusterIP}')
+    COREFILE=$(kubectl get configmap coredns -n kube-system -o jsonpath='{.data.Corefile}')
+    printf '%s\n\n%s' "apps.internal:53 {
+      errors
+      forward . ${BOSH_DNS_IP}
+  }" "$COREFILE" | kubectl create configmap coredns -n kube-system --from-file=Corefile=/dev/stdin --dry-run=client -o yaml | kubectl apply -f -
+    kubectl rollout restart deployment coredns -n kube-system
+  }
+
+  kubectl rollout status deployment policy-server
+  kubectl rollout status deployment policy-agent
+  kubectl rollout status deployment bosh-dns
+  kubectl rollout status deployment service-discovery-controller
+  else
+    helm upgrade --install route-emitter releases/diego/helm --set "routeEmitter.enabled=true" # depends on bbs and locket does not become ready without them
+    helm upgrade --install cf-networking releases/cf-networking/helm --set policyServer.dbPassword=$DB_PASSWORD --set policyServer.oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set policyServer.enabled=false --set serviceDiscoveryController.enabled=false --set boshDnsAdapter.enabled=false
+fi
 
 kubectl rollout status daemonset k8s-rep
 
