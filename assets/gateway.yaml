@@ -8,6 +8,7 @@ spec:
   dnsNames:
   - '*.127-0-0-1.nip.io'
   - '*.apps.127-0-0-1.nip.io'
+  - '*.blobstore.127-0-0-1.nip.io'
   issuerRef:
     kind: ClusterIssuer
     name: ca-issuer
@@ -226,6 +227,7 @@ spec:
     - name: istio-gateway
   hostnames:
     - blobstore.127-0-0-1.nip.io
+    - "*.blobstore.127-0-0-1.nip.io"
   rules:
     - backendRefs:
         - name: minio

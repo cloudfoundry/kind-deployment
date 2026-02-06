@@ -155,52 +155,36 @@ quota_definitions:
     total_services: -1
 default_quota_definition: default
 resource_pool:
+  blobstore_type: fog
   minimum_size: 65536
   maximum_size: 536870912
-  resource_directory_key: cc-resources
+  resource_directory_key: {{ .Values.cloudController.blobstore.resource_directory_key }}
   fog_connection:
-    provider: AWS
-    endpoint:  {{ .Values.cloudController.blobstore.endpoint }}
-    aws_access_key_id: admin
-    aws_secret_access_key: {{ .Values.cloudController.blobstore.password | quote}}
-    aws_signature_version: 2
-    path_style: true
+  {{- toYaml .Values.cloudController.blobstore.fog_connection | nindent 4 }}
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}
 packages:
-  app_package_directory_key: cc-packages
+  blobstore_type: fog
+  app_package_directory_key: {{ .Values.cloudController.blobstore.app_package_directory_key }}
   max_valid_packages_stored: 5
   max_package_size: 1073741824
   fog_connection:
-    provider: AWS
-    endpoint:  {{ .Values.cloudController.blobstore.endpoint }}
-    aws_access_key_id: admin
-    aws_secret_access_key: {{ .Values.cloudController.blobstore.password | quote}}
-    aws_signature_version: 2
-    path_style: true
+  {{- toYaml .Values.cloudController.blobstore.fog_connection | nindent 4 }}
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}
 droplets:
-  droplet_directory_key: cc-droplets
+  blobstore_type: fog
+  droplet_directory_key: {{ .Values.cloudController.blobstore.droplet_directory_key }}
   fog_connection:
-    provider: AWS
-    endpoint:  {{ .Values.cloudController.blobstore.endpoint }}
-    aws_access_key_id: admin
-    aws_secret_access_key: {{ .Values.cloudController.blobstore.password | quote}}
-    aws_signature_version: 2
-    path_style: true
+  {{- toYaml .Values.cloudController.blobstore.fog_connection | nindent 4 }}
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}
   max_staged_droplets_stored: 5
 buildpacks:
-  buildpack_directory_key: cc-buildpacks
+  blobstore_type: fog
+  buildpack_directory_key: {{ .Values.cloudController.blobstore.buildpack_directory_key }}
   fog_connection:
-    provider: AWS
-    endpoint:  {{ .Values.cloudController.blobstore.endpoint }}
-    aws_access_key_id: admin
-    aws_secret_access_key: {{ .Values.cloudController.blobstore.password | quote}}
-    aws_signature_version: 2
-    path_style: true
+  {{- toYaml .Values.cloudController.blobstore.fog_connection | nindent 4 }}
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}
 db_encryption_key: "asdfasdfasdf"
