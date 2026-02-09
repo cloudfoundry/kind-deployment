@@ -3,7 +3,7 @@ variable "REGISTRY_PREFIX" {
 }
 
 group "all" {
-  targets = ["routing", "cf-networking", "capi", "diego", "loggregator", "loggregator-agent", "log-cache", "fileserver", "bosh-dns", "uaa", "cflinuxfs4", "nfs-volume", "misc"]
+  targets = ["routing", "cf-networking", "capi", "diego", "loggregator", "loggregator-agent", "log-cache", "fileserver", "bosh-dns", "uaa", "cflinuxfs4", "nfs-volume"]
 }
 
 group "default" {
@@ -79,7 +79,7 @@ target "capi" {
   name = component
   
   matrix = {
-    "component" = [ "cloud-controller", "cc-uploader", "tps-watcher" ]
+    "component" = [ "cloud-controller", "cc-uploader", "cc-nginx", "tps-watcher" ]
   }
 
   contexts = {
@@ -244,19 +244,5 @@ target "nfs-volume" {
 
   contexts = {
     "src" = "https://github.com/cloudfoundry/nfs-volume-release.git#v${NFS_VOLUME_RELEASE_VERSION}:src"
-  }
-}
-
-target "misc" {
-  dockerfile = "releases/capi/${component}.Dockerfile"
-  tags = [  "${REGISTRY_PREFIX}${component}:latest" ]
-  name = component
-
-  matrix = {
-    "component" = [ "cc-nginx" ]
-  }
-
-  contexts = {
-    "files" = "releases/capi/files"
   }
 }

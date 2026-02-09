@@ -136,7 +136,7 @@ spec:
             - name: tmpdir
               mountPath: /tmp
         - name: nginx
-          image: {{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}
+          image: {{ .Values.nginx.image.repository }}:{{ default .Chart.AppVersion .Values.nginx.image.tag }}
           imagePullPolicy: {{ .Values.nginx.image.imagePullPolicy }}
           ports:
             - name: http

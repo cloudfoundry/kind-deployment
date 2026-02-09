@@ -81,8 +81,8 @@ routeRegistrar:
 nginx:
   image:
     repository: ghcr.io/cloudfoundry/k8s/cc-nginx
-    tag: "latest"
-    imagePullPolicy: Always
+    tag: ~
+    imagePullPolicy: IfNotPresent
 
 udpForwarder:
   image:
