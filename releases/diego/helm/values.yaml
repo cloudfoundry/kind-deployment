@@ -59,6 +59,7 @@ routeEmitter:
   natsAddress: "nats.default.svc.cluster.local:4222"
   locketAddress: "locket.default.svc.cluster.local:8891"
   bbsAddress: "https://bbs.default.svc.cluster.local:8889"
+  enableInternalEmitter: true
   image:
     repository: ghcr.io/cloudfoundry/k8s/route-emitter
     tag: ~

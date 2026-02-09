@@ -38,7 +38,7 @@ data:
       "bbs_client_key_file": "/etc/ssl/certs/route-emitter/tls.key",
       "bbs_address": "{{ .Values.routeEmitter.bbsAddress }}",
       "cell_id": "$NODE_UID",
-      "enable_internal_emitter": true,
+      "enable_internal_emitter": {{ .Values.routeEmitter.enableInternalEmitter }},
       "enable_tcp_emitter": false,
       "tcp_enable_tls": true,
       "routing_api": {

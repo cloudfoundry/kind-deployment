@@ -193,5 +193,5 @@ jobs:
       - uses: actions/upload-artifact@v6
         if: always()
         with:
-          name: report
+          name: report-minimal
           path: ./cf-smoke-tests/report.json
