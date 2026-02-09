@@ -14,6 +14,7 @@ POLICY_AGENT_VERSION="0.1.0"
 CFLINUXFS4_VERSION="1.304.0"
 
 ENABLE_LOGGREGATOR="${ENABLE_LOGGREGATOR:-true}"
+ENABLE_POLICY_SUPPORT="${ENABLE_POLICY_SUPPORT:-true}"
 
 source "$DEPLOY_DIR/secrets.sh"
 
@@ -52,7 +53,9 @@ helm upgrade -i minio oci://registry-1.docker.io/bitnamicharts/minio --set 'extr
 
 helm upgrade --install loggregator-agent releases/loggregator-agent/helm --set "syslogBindingCache.enabled=true" --set "forwarderAgent.enabled=true"
 helm upgrade --install routing releases/routing/helm
-helm upgrade --install loggregator releases/loggregator/helm --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set loggregator.enabled=${ENABLE_LOGGREGATOR}
+if [[ "$ENABLE_LOGGREGATOR" == "true" ]]; then
+  helm upgrade --install loggregator releases/loggregator/helm --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET
+fi
 helm upgrade --install log-cache releases/log-cache/helm
 helm upgrade --install uaa releases/uaa/helm --set ccAdminPassword=$CC_ADMIN_PASSWORD --set dbPassword=$DB_PASSWORD --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set uaaAdminSecret=$UAA_ADMIN_SECRET --wait
 
@@ -63,19 +66,28 @@ helm upgrade --install tps-watcher releases/capi/helm --set "tpsWatcher.enabled=
 helm upgrade --install route-emitter releases/diego/helm --set "routeEmitter.enabled=true"
 helm upgrade --install k8s-rep oci://ghcr.io/cloudfoundry/helm/k8s-rep:$K8S_REP_VERSION --set-file caCertificate="$CERTS_DIR/ca.crt" --set "stacks.cflinuxfs4=ghcr.io/cloudfoundry/k8s/cflinuxfs4:$CFLINUXFS4_VERSION"
 helm upgrade --install api releases/capi/helm --set cloudController.blobstore.fog_connection.aws_secret_access_key=$BLOBSTORE_PASSWORD --set dbPassword=$DB_PASSWORD --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set cloudController.sshProxyKeyFingerprint=$SSH_PROXY_KEY_FINGERPRINT --set "cloudController.enabled=true" --wait
-helm upgrade --install cf-networking releases/cf-networking/helm --set policyServer.dbPassword=$DB_PASSWORD --set policyServer.oauthClientsSecret=$OAUTH_CLIENTS_SECRET
-helm upgrade --install policy-agent oci://ghcr.io/cloudfoundry/helm/policy-agent:$POLICY_AGENT_VERSION
+if [[ "$ENABLE_POLICY_SUPPORT" == "true" ]]; then
+  helm upgrade --install cf-networking releases/cf-networking/helm --set policyServer.dbPassword=$DB_PASSWORD --set policyServer.oauthClientsSecret=$OAUTH_CLIENTS_SECRET
+  helm upgrade --install policy-agent oci://ghcr.io/cloudfoundry/helm/policy-agent:$POLICY_AGENT_VERSION
 
-kubectl get configmap coredns -n kube-system -o jsonpath='{.data.Corefile}' | grep -q "apps.internal:53" || {
-  echo "Patching CoreDNS to forward apps.internal to bosh-dns"
-  BOSH_DNS_IP=$(kubectl get svc bosh-dns -n default -o jsonpath='{.spec.clusterIP}')
-  COREFILE=$(kubectl get configmap coredns -n kube-system -o jsonpath='{.data.Corefile}')
-  printf '%s\n\n%s' "apps.internal:53 {
-    errors
-    forward . ${BOSH_DNS_IP}
-}" "$COREFILE" | kubectl create configmap coredns -n kube-system --from-file=Corefile=/dev/stdin --dry-run=client -o yaml | kubectl apply -f -
-  kubectl rollout restart deployment coredns -n kube-system
-}
+  kubectl get configmap coredns -n kube-system -o jsonpath='{.data.Corefile}' | grep -q "apps.internal:53" || {
+    echo "Patching CoreDNS to forward apps.internal to bosh-dns"
+    BOSH_DNS_IP=$(kubectl get svc bosh-dns -n default -o jsonpath='{.spec.clusterIP}')
+    COREFILE=$(kubectl get configmap coredns -n kube-system -o jsonpath='{.data.Corefile}')
+    printf '%s\n\n%s' "apps.internal:53 {
+      errors
+      forward . ${BOSH_DNS_IP}
+  }" "$COREFILE" | kubectl create configmap coredns -n kube-system --from-file=Corefile=/dev/stdin --dry-run=client -o yaml | kubectl apply -f -
+    kubectl rollout restart deployment coredns -n kube-system
+  }
+
+  kubectl rollout status deployment log-api
+  kubectl rollout status deployment policy-server
+  kubectl rollout status deployment policy-agent
+  kubectl rollout status deployment bosh-dns
+  kubectl rollout status deployment service-discovery-controller  
+fi
+
 
 kubectl rollout status deployment auctioneer
 kubectl rollout status deployment bbs
@@ -85,23 +97,17 @@ kubectl rollout status deployment cc-worker
 kubectl rollout status deployment cc-worker-clock
 kubectl rollout status deployment cloud-controller
 kubectl rollout status deployment credhub
-kubectl rollout status deployment doppler
 kubectl rollout status deployment file-server
 kubectl rollout status deployment forwarder-agent
 kubectl rollout status deployment gorouter
 kubectl rollout status deployment istio-gateway-istio
 kubectl rollout status deployment locket
-kubectl rollout status deployment log-api
 kubectl rollout status deployment log-cache-api
 kubectl rollout status deployment log-cache-backend
 kubectl rollout status deployment ssh-proxy
 kubectl rollout status deployment syslog-binding-cache
 kubectl rollout status deployment tps-watcher
 kubectl rollout status deployment uaa
-kubectl rollout status deployment policy-server
-kubectl rollout status deployment policy-agent
-kubectl rollout status deployment bosh-dns
-kubectl rollout status deployment service-discovery-controller
 
 kubectl rollout status daemonset k8s-rep
 kubectl rollout status daemonset route-emitter

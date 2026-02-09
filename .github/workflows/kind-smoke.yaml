@@ -146,6 +146,7 @@ jobs:
         if: steps.check_changes.outputs.skip != 'true'
         env:
           ENABLE_LOGGREGATOR: "false"
+          ENABLE_POLICY_SUPPORT: "false"
         run: make up
       - name: Login
         if: steps.check_changes.outputs.skip != 'true'
