@@ -1,0 +1,224 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "forwarderAgent": {
+      "additionalProperties": false,
+      "properties": {
+        "aggregateDrain": {
+          "type": "boolean"
+        },
+        "certificateSecret": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "imagePullPolicy": {
+              "type": "string"
+            },
+            "repository": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "nodeSelector": {
+          "type": ["object", "null"]
+        },
+        "resources": {
+          "type": "null"
+        },
+        "tolerations": {
+          "type": ["array", "null"],
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "effect": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "effect",
+              "key",
+              "operator",
+              "value"
+            ],
+            "type": "object"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "global": {
+      "type": "object"
+    },
+    "loggregatorAgent": {
+      "additionalProperties": false,
+      "properties": {
+        "aggregateDrain": {
+          "type": "boolean"
+        },
+        "certificateSecret": {
+          "type": "string"
+        },
+        "doppler": {
+          "additionalProperties": false,
+          "properties": {
+            "address": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "imagePullPolicy": {
+              "type": "string"
+            },
+            "repository": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "resources": {
+          "type": "null"
+        }
+      },
+      "type": "object"
+    },
+    "syslogAgent": {
+      "additionalProperties": false,
+      "properties": {
+        "aggregateDrain": {
+          "type": "boolean"
+        },
+        "certificateSecret": {
+          "type": "string"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "imagePullPolicy": {
+              "type": "string"
+            },
+            "repository": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "logCacheSyslog": {
+          "additionalProperties": false,
+          "properties": {
+            "address": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "resources": {
+          "type": "null"
+        },
+        "syslogBindingCache": {
+          "additionalProperties": false,
+          "properties": {
+            "address": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "syslogBindingCache": {
+      "additionalProperties": false,
+      "properties": {
+        "certificateSecret": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "hostname": {
+          "type": "string"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "imagePullPolicy": {
+              "type": "string"
+            },
+            "repository": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "nodeSelector": {
+          "type": ["object", "null"]
+        },
+        "resources": {
+          "type": "null"
+        },
+        "tolerations": {
+          "type": ["array", "null"],
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "effect": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "effect",
+              "key",
+              "operator",
+              "value"
+            ],
+            "type": "object"
+          }
+        }
+      },
+
+      "type": "object"
+    }
+  },
+  "type": "object"
+}

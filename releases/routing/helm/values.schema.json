@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "global": {
+      "type": "object"
+    },
+    "gorouter": {
+      "additionalProperties": false,
+      "properties": {
+        "appsDomain": {
+          "type": "string"
+        },
+        "certificateSecret": {
+          "type": "string"
+        },
+        "hostname": {
+          "type": "string"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "repository": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "imagePullPolicy": {
+          "type": "string"
+        },
+        "nodeSelector": {
+          "type": ["object", "null"]
+        },
+        "tolerations": {
+          "type": ["array", "null"],
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "effect": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "effect",
+              "key",
+              "operator",
+              "value"
+            ],
+            "type": "object"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "udpForwarder": {
+      "additionalProperties": false,
+      "properties": {
+        "certificateSecret": {
+          "type": "string"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "imagePullPolicy": {
+              "type": "string"
+            },
+            "repository": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}

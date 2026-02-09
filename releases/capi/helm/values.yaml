@@ -7,11 +7,11 @@ ccWorker:
   tolerations: ~
 
 ccUploader:
-  certificateSecret: ~
+  certificateSecret: ""
   hostname: "cc-uploader.default.svc.cluster.local"
   image:
     repository: ghcr.io/cloudfoundry/k8s/cc-uploader
-    tag: ~
+    tag: ""
     imagePullPolicy: IfNotPresent
   nodeSelector: ~
   tolerations: ~
@@ -23,18 +23,18 @@ ccWorkerClock:
 
 cloudController:
   enabled: false
-  certificateSecret: ~
+  certificateSecret: ""
   appDomain: apps.127-0-0-1.nip.io
   externalDomain: api.127-0-0-1.nip.io
   internalDomain: cloud-controller.default.svc.cluster.local
   internalServiceHostname: cloud-controller.default.svc.cluster.local
   systemDomain: system.127-0-0-1.nip.io
   appSSHEndpoint: ssh.127-0-0-1.nip.io:2222
-  sshProxyKeyFingerprint: ~
+  sshProxyKeyFingerprint: ""
   loginUrl: https://uaa.127-0-0-1.nip.io
   image:
     repository: ghcr.io/cloudfoundry/k8s/cloud-controller
-    tag: ~
+    tag: ""
     imagePullPolicy: IfNotPresent
   doppler:
     url: wss://doppler.127-0-0-1.nip.io:443
@@ -68,7 +68,7 @@ cloudController:
 localWorker:
   image:
     repository: ghcr.io/cloudfoundry/k8s/cloud-controller
-    tag: ~
+    tag: ""
     imagePullPolicy: IfNotPresent
 
 routeRegistrar:
@@ -93,14 +93,14 @@ udpForwarder:
 
 tpsWatcher:
   enabled: false
-  certificateSecret: ~
+  certificateSecret: ""
   hostname: tps.default.svc.cluster.local
   image:
     repository: ghcr.io/cloudfoundry/k8s/tps-watcher
-    tag: ~
+    tag: ""
     imagePullPolicy: IfNotPresent
   nodeSelector: ~
   tolerations: ~
 
-dbPassword: ~
-oauthClientsSecret: ~
+dbPassword: ""
+oauthClientsSecret: ""

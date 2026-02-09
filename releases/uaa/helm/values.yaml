@@ -1,15 +1,16 @@
-certificateSecret: ~
+certificateSecret: ""
 hostname: "uaa.127-0-0-1.nip.io"
 address: "https://uaa.127-0-0-1.nip.io"
 
 image:
   repository: ghcr.io/cloudfoundry/k8s/uaa
-  tag: ~
+  tag: ""
   imagePullPolicy: IfNotPresent
 
 nodeSelector: ~
 tolerations: ~
 
-uaaAdminSecret: ~
-oauthClientsSecret: ~
-dbPassword: ~
+uaaAdminSecret: ""
+ccAdminPassword: ""
+oauthClientsSecret: ""
+dbPassword: ""

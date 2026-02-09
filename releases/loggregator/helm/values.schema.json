@@ -1,0 +1,214 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "doppler": {
+      "additionalProperties": false,
+      "properties": {
+        "certificateSecret": {
+          "type": "string"
+        },
+        "hostname": {
+          "type": "string"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "imagePullPolicy": {
+              "type": "string"
+            },
+            "repository": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "nodeSelector": {
+          "type": ["object", "null"]
+        },
+        "resources": {
+          "type": "null"
+        },
+        "tolerations": {
+          "type": ["array", "null"],
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "effect": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "effect",
+              "key",
+              "operator",
+              "value"
+            ],
+            "type": "object"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "global": {
+      "type": "object"
+    },
+    "logStream": {
+      "additionalProperties": false,
+      "properties": {
+        "address": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "loggregator": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "oauthClientsSecret": {
+      "type": "string"
+    },
+    "reverseLogProxy": {
+      "additionalProperties": false,
+      "properties": {
+        "certificateSecret": {
+          "type": "string"
+        },
+        "hostname": {
+          "type": "string"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "imagePullPolicy": {
+              "type": "string"
+            },
+            "repository": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "resources": {
+          "type": "null"
+        }
+      },
+      "type": "object"
+    },
+    "reverseLogProxyGateway": {
+      "additionalProperties": false,
+      "properties": {
+        "certificateSecret": {
+          "type": "string"
+        },
+        "hostname": {
+          "type": "string"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "imagePullPolicy": {
+              "type": "string"
+            },
+            "repository": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "resources": {
+          "type": "null"
+        }
+      },
+      "type": "object"
+    },
+    "trafficcontroller": {
+      "additionalProperties": false,
+      "properties": {
+        "certificateSecret": {
+          "type": "string"
+        },
+        "hostname": {
+          "type": "string"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "repository": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "imagePullPolicy": {
+          "type": "string"
+        },
+        "nodeSelector": {
+          "type": ["object", "null"]
+        },
+        "resources": {
+          "type": "null"
+        },
+        "systemDomain": {
+          "type": "string"
+        },
+        "tolerations": {
+          "type": ["array", "null"],
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "effect": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "effect",
+              "key",
+              "operator",
+              "value"
+            ],
+            "type": "object"
+          }
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}

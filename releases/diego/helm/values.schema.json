@@ -1,0 +1,390 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "auctioneer": {
+      "additionalProperties": false,
+      "properties": {
+        "certificateSecret": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "hostname": {
+          "type": "string"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "imagePullPolicy": {
+              "type": "string"
+            },
+            "repository": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "nodeSelector": {
+          "type": ["object", "null"]
+        },
+        "tolerations": {
+          "type": ["array", "null"],
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "effect": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "effect",
+              "key",
+              "operator",
+              "value"
+            ],
+            "type": "object"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "bbs": {
+      "additionalProperties": false,
+      "properties": {
+        "certificateSecret": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "hostname": {
+          "type": "string"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "imagePullPolicy": {
+              "type": "string"
+            },
+            "repository": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "nodeSelector": {
+          "type": ["object", "null"]
+        },
+        "tolerations": {
+          "type": ["array", "null"],
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "effect": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "effect",
+              "key",
+              "operator",
+              "value"
+            ],
+            "type": "object"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "dbPassword": {
+      "type": "string"
+    },
+    "diegoSSHCredentials": {
+      "type": "string"
+    },
+    "fileserver": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "hostname": {
+          "type": "string"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "imagePullPolicy": {
+              "type": "string"
+            },
+            "repository": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "nodeSelector": {
+          "type": ["object", "null"]
+        },
+        "tolerations": {
+          "type": ["array", "null"],
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "effect": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "effect",
+              "key",
+              "operator",
+              "value"
+            ],
+            "type": "object"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "global": {
+      "type": "object"
+    },
+    "locket": {
+      "additionalProperties": false,
+      "properties": {
+        "certificateSecret": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "hostname": {
+          "type": "string"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "imagePullPolicy": {
+              "type": "string"
+            },
+            "repository": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "nodeSelector": {
+          "type": ["object", "null"]
+        },
+        "tolerations": {
+          "type": ["array", "null"],
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "effect": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "effect",
+              "key",
+              "operator",
+              "value"
+            ],
+            "type": "object"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "oauthClientsSecret": {
+      "type": "string"
+    },
+    "routeEmitter": {
+      "additionalProperties": false,
+      "properties": {
+        "bbsAddress": {
+          "type": "string"
+        },
+        "certificateSecret": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "imagePullPolicy": {
+              "type": "string"
+            },
+            "repository": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "locketAddress": {
+          "type": "string"
+        },
+        "natsAddress": {
+          "type": "string"
+        },
+        "nodeSelector": {
+          "additionalProperties": false,
+          "properties": {
+            "cloudfoundry.org/cell": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "tolerations": {
+          "items": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "effect": {
+                    "type": "string"
+                  },
+                  "key": {
+                    "type": "string"
+                  },
+                  "operator": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            ],
+            "required": []
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "sshProxy": {
+      "additionalProperties": false,
+      "properties": {
+        "certificateSecret": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "hostname": {
+          "type": "string"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "imagePullPolicy": {
+              "type": "string"
+            },
+            "repository": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "nodeSelector": {
+          "type": ["object", "null"]
+        },
+        "tolerations": {
+          "type": ["array", "null"],
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "effect": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "effect",
+              "key",
+              "operator",
+              "value"
+            ],
+            "type": "object"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "sshProxyHostKey": {
+      "type": "string"
+    }
+  },
+  "type": "object"
+}

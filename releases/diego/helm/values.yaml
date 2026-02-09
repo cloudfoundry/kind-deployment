@@ -1,21 +1,21 @@
 auctioneer:
   enabled: false
-  certificateSecret: ~
+  certificateSecret: ""
   hostname: "auctioneer.default.svc.cluster.local"
   image:
     repository: ghcr.io/cloudfoundry/k8s/auctioneer
-    tag: ~
+    tag: ""
     imagePullPolicy: IfNotPresent
   nodeSelector: ~
   tolerations: ~
 
 bbs:
   enabled: false
-  certificateSecret: ~
+  certificateSecret: ""
   hostname: "bbs.default.svc.cluster.local"
   image:
     repository: ghcr.io/cloudfoundry/k8s/bbs
-    tag: ~
+    tag: ""
     imagePullPolicy: IfNotPresent
   nodeSelector: ~
   tolerations: ~
@@ -33,36 +33,36 @@ fileserver:
   
 locket:
   enabled: false
-  certificateSecret: ~
+  certificateSecret: ""
   hostname: "locket.default.svc.cluster.local"
   image:
     repository: ghcr.io/cloudfoundry/k8s/locket
-    tag: ~
+    tag: ""
     imagePullPolicy: IfNotPresent
   nodeSelector: ~
   tolerations: ~
   
 sshProxy:
   enabled: false
-  certificateSecret: ~
+  certificateSecret: ""
   hostname: "ssh-proxy.127-0-0-1.nip.io"
   image:
     repository: ghcr.io/cloudfoundry/k8s/ssh-proxy
-    tag: ~
+    tag: ""
     imagePullPolicy: IfNotPresent
   nodeSelector: ~
   tolerations: ~
   
 routeEmitter:
   enabled: false
-  certificateSecret: ~
+  certificateSecret: ""
   natsAddress: "nats.default.svc.cluster.local:4222"
   locketAddress: "locket.default.svc.cluster.local:8891"
   bbsAddress: "https://bbs.default.svc.cluster.local:8889"
   enableInternalEmitter: true
   image:
     repository: ghcr.io/cloudfoundry/k8s/route-emitter
-    tag: ~
+    tag: ""
     imagePullPolicy: IfNotPresent
   nodeSelector:
     cloudfoundry.org/cell: "true"
@@ -72,7 +72,7 @@ routeEmitter:
       value: "true"
       effect: NoSchedule
 
-dbPassword: ~
-sshProxyHostKey: ~
-diegoSSHCredentials: ~
-oauthClientsSecret: ~
+dbPassword: ""
+sshProxyHostKey: ""
+diegoSSHCredentials: ""
+oauthClientsSecret: ""

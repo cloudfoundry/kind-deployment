@@ -35,6 +35,10 @@ spec:
             - --logLevel=info
             - --timeFormat=rfc3339
             - --mapfsPath=/usr/local/bin/mapfs
+          {{- if .Values.nfsv3driver.resources }}
+          resources:
+            {{- toYaml .Values.nfsv3driver.resources | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - name: voldrivers
               mountPath: /var/lib/rep/voldrivers

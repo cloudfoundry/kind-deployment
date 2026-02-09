@@ -1,15 +1,15 @@
 policyServer:
   enabled: true
   resources: ~
-  certificateSecret: ~
+  certificateSecret: ""
   hostname: "policy-server.127-0-0-1.nip.io"
   externalDomain: api.127-0-0-1.nip.io
   image:
     repository: ghcr.io/cloudfoundry/k8s/policy-server
-    tag: ~
+    tag: ""
     imagePullPolicy: IfNotPresent
-  oauthClientsSecret: ~
-  dbPassword: ~
+  oauthClientsSecret: ""
+  dbPassword: ""
   nats:
     address: nats.default.svc.cluster.local:4222
   nodeSelector: ~
@@ -18,12 +18,12 @@ policyServer:
 serviceDiscoveryController:
   enabled: true
   resources: ~
-  certificateSecret: ~
+  certificateSecret: ""
   hostname: service-discovery-controller.default.svc.cluster.local
   port: 8054
   image:
     repository: ghcr.io/cloudfoundry/k8s/service-discovery-controller
-    tag: ~
+    tag: ""
     imagePullPolicy: IfNotPresent
   nats:
     host: nats.default.svc.cluster.local
@@ -34,15 +34,15 @@ serviceDiscoveryController:
 boshDnsAdapter:
   enabled: true
   resources: ~
-  certificateSecret: ~
+  certificateSecret: ""
   image:
     repository: ghcr.io/cloudfoundry/k8s/bosh-dns-adapter
-    tag: ~
+    tag: ""
     imagePullPolicy: IfNotPresent
 
 boshDns:
   resources: ~
-  certificateSecret: ~
+  certificateSecret: ""
   image:
     repository: ghcr.io/cloudfoundry/k8s/bosh-dns
     # renovate: dataSource=docker depName=bosh-dns-release packageName=ghcr.io/cloudfoundry/k8s/bosh-dns

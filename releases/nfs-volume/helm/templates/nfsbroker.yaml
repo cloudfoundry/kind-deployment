@@ -49,6 +49,10 @@ spec:
             - --logLevel=info
             - --timeFormat=rfc3339
             - --allowedOptions=source,uid,gid,auto_cache,readonly,version,mount,cache
+          {{- if .Values.nfsbroker.resources }}
+          resources:
+            {{- toYaml .Values.nfsbroker.resources | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - name: server-certs
               mountPath: /ssl

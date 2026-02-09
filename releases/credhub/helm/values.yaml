@@ -4,12 +4,12 @@ uaa:
 
 image:
   repository: ghcr.io/cloudfoundry/k8s/credhub
-  tag: ~
+  tag: ""
   imagePullPolicy: IfNotPresent
 
 nodeSelector: ~
 tolerations: ~
 
-dbPassword: ~
+dbPassword: ""
 
 caCertificateSecret: root-ca
