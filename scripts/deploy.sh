@@ -13,6 +13,8 @@ POLICY_AGENT_VERSION="0.1.0"
 # renovate: depName=cloudfoundry/cflinuxfs4-release image=ghcr.io/cloudfoundry/k8s/cflinuxfs4
 CFLINUXFS4_VERSION="1.304.0"
 
+ENABLE_LOGGREGATOR="${ENABLE_LOGGREGATOR:-true}"
+
 source "$DEPLOY_DIR/secrets.sh"
 
 kubectl create namespace cf-workloads --dry-run=client -o yaml | kubectl apply -f -
@@ -50,7 +52,7 @@ helm upgrade -i minio oci://registry-1.docker.io/bitnamicharts/minio --set 'extr
 
 helm upgrade --install loggregator-agent releases/loggregator-agent/helm --set "syslogBindingCache.enabled=true" --set "forwarderAgent.enabled=true"
 helm upgrade --install routing releases/routing/helm
-helm upgrade --install loggregator releases/loggregator/helm --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET
+helm upgrade --install loggregator releases/loggregator/helm --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set loggregator.enabled=${ENABLE_LOGGREGATOR}
 helm upgrade --install log-cache releases/log-cache/helm
 helm upgrade --install uaa releases/uaa/helm --set ccAdminPassword=$CC_ADMIN_PASSWORD --set dbPassword=$DB_PASSWORD --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set uaaAdminSecret=$UAA_ADMIN_SECRET --wait
 
