@@ -15,6 +15,7 @@ CFLINUXFS4_VERSION="1.304.0"
 
 ENABLE_LOGGREGATOR="${ENABLE_LOGGREGATOR:-true}"
 ENABLE_POLICY_SUPPORT="${ENABLE_POLICY_SUPPORT:-true}"
+ENABLE_NFS_VOLUME="${ENABLE_NFS_VOLUME:-false}"
 
 source "$DEPLOY_DIR/secrets.sh"
 
@@ -66,6 +67,10 @@ helm upgrade --install tps-watcher releases/capi/helm --set "tpsWatcher.enabled=
 helm upgrade --install route-emitter releases/diego/helm --set "routeEmitter.enabled=true" --set "routeEmitter.enableInternalEmitter=${ENABLE_LOGGREGATOR}"
 helm upgrade --install k8s-rep oci://ghcr.io/cloudfoundry/helm/k8s-rep:$K8S_REP_VERSION --set-file caCertificate="$CERTS_DIR/ca.crt" --set "stacks.cflinuxfs4=ghcr.io/cloudfoundry/k8s/cflinuxfs4:$CFLINUXFS4_VERSION"
 helm upgrade --install api releases/capi/helm --set cloudController.blobstore.fog_connection.aws_secret_access_key=$BLOBSTORE_PASSWORD --set dbPassword=$DB_PASSWORD --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set cloudController.sshProxyKeyFingerprint=$SSH_PROXY_KEY_FINGERPRINT --set "cloudController.enabled=true" --wait
+if [[ "$ENABLE_NFS_VOLUME" == "true" ]]; then
+  helm upgrade --install nfs-volume releases/nfs-volume/helm
+fi
+
 if [[ "$ENABLE_POLICY_SUPPORT" == "true" ]]; then
   helm upgrade --install cf-networking releases/cf-networking/helm --set policyServer.dbPassword=$DB_PASSWORD --set policyServer.oauthClientsSecret=$OAUTH_CLIENTS_SECRET
   helm upgrade --install policy-agent oci://ghcr.io/cloudfoundry/helm/policy-agent:$POLICY_AGENT_VERSION
