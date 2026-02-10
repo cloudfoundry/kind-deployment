@@ -112,5 +112,5 @@ tpsWatcher:
   nodeSelector: ~
   tolerations: ~
 
-dbPassword: ""
-oauthClientsSecret: ""
+dbPassword: ~
+oauthClientsSecret: ~

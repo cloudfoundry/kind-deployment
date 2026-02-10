@@ -390,5 +390,6 @@
       "type": "string"
     }
   },
-  "type": "object"
+  "type": "object",
+  "required": ["oauthClientsSecret", "diegoSSHCredentials", "dbPassword", "sshProxyHostKey"]
 }

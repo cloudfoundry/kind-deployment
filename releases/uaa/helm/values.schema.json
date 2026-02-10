@@ -72,5 +72,6 @@
       "type": "string"
     }
   },
-  "type": "object"
+  "type": "object",
+  "required": ["dbPassword", "oauthClientsSecret", "ccAdminPassword", "uaaAdminSecret"]
 }

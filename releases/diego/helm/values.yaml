@@ -72,7 +72,7 @@ routeEmitter:
       value: "true"
       effect: NoSchedule
 
-dbPassword: ""
-sshProxyHostKey: ""
-diegoSSHCredentials: ""
-oauthClientsSecret: ""
+dbPassword: ~
+sshProxyHostKey: ~
+diegoSSHCredentials: ~
+oauthClientsSecret: ~

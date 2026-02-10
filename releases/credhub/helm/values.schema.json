@@ -69,5 +69,6 @@
       "type": "object"
     }
   },
-  "type": "object"
+  "type": "object",
+  "required": ["dbPassword"]
 }

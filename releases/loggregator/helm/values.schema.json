@@ -210,5 +210,6 @@
       "type": "object"
     }
   },
-  "type": "object"
+  "type": "object",
+  "required": ["oauthClientsSecret"]
 }

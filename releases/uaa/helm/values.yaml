@@ -10,7 +10,7 @@ image:
 nodeSelector: ~
 tolerations: ~
 
-uaaAdminSecret: ""
-ccAdminPassword: ""
-oauthClientsSecret: ""
-dbPassword: ""
+uaaAdminSecret: ~
+ccAdminPassword: ~
+oauthClientsSecret: ~
+dbPassword: ~

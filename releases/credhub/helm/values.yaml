@@ -10,6 +10,6 @@ image:
 nodeSelector: ~
 tolerations: ~
 
-dbPassword: ""
+dbPassword: ~
 
 caCertificateSecret: root-ca
