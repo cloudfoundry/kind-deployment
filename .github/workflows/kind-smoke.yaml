@@ -12,19 +12,6 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    strategy:
-      matrix:
-        include:
-          - name: full
-            enable_loggregator: "true"
-            enable_policy_support: "true"
-            enable_nfs_volume: "true"
-            artifact_name: report
-          - name: minimal
-            enable_loggregator: "false"
-            enable_policy_support: "false"
-            enable_nfs_volume: "false"
-            artifact_name: report-minimal
     steps:
       - uses: actions/checkout@v6
         with:
@@ -57,17 +44,16 @@ jobs:
           mkdir -p $HOME/.local/bin && echo "$HOME/.local/bin" >> "$GITHUB_PATH"
           curl -L https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64 -o $HOME/.local/bin/kind
           chmod +x $HOME/.local/bin/kind
+          curl -L https://github.com/helmfile/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz | tar -zx
+          mv helmfile $HOME/.local/bin/helmfile
           curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=${CF_CLI_VERSION}&source=github" | tar -zx
           mv cf8 $HOME/.local/bin/cf
         env:
           CF_CLI_VERSION: '8.14.1'
           KIND_VERSION: '0.30.0'
+          HELMFILE_VERSION: '1.2.3'
       - name: Run make up
         if: steps.check_changes.outputs.skip != 'true'
-        env:
-          ENABLE_LOGGREGATOR: ${{ matrix.enable_loggregator }}
-          ENABLE_POLICY_SUPPORT: ${{ matrix.enable_policy_support }}
-          ENABLE_NFS_VOLUME: ${{ matrix.enable_nfs_volume }}
         run: make up
       - name: Login
         if: steps.check_changes.outputs.skip != 'true'
@@ -114,5 +100,5 @@ jobs:
       - uses: actions/upload-artifact@v6
         if: always()
         with:
-          name: ${{ matrix.artifact_name }}
+          name: report.json
           path: ./cf-smoke-tests/report.json

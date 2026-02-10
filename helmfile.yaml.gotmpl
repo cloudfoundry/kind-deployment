@@ -1,0 +1,348 @@
+---
+helmDefaults:
+  wait: true
+  timeout: 600
+  recreatePods: false
+  force: false
+  createNamespace: true
+
+environments:
+  default:
+    values:
+      - ./values.yaml.gotmpl
+
+---
+
+repositories:
+  - name: jetstack
+    oci: true
+    url: quay.io/jetstack/charts
+  - name: nats
+    url: https://nats-io.github.io/k8s/helm/charts
+  - name: istio
+    url: https://istio-release.storage.googleapis.com/charts
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+  - name: minio
+    oci: true
+    url: registry-1.docker.io/bitnamicharts
+  - name: cloudfoundry-k8s
+    oci: true
+    url: ghcr.io/cloudfoundry/helm
+
+releases:
+  - name: cert-manager
+    namespace: cert-manager
+    chart: jetstack/cert-manager
+    version: v1.19.2
+    wait: true
+    installed: true
+    values:
+      - crds:
+          enabled: true
+    hooks:
+      - events: ["presync"]
+        showlogs: true
+        command: "/bin/sh"
+        args:
+          - "-c"
+          - |
+            kubectl create namespace cert-manager --dry-run=client -o yaml | kubectl apply -f -
+            kubectl create namespace cf-workloads --dry-run=client -o yaml | kubectl apply -f -
+            kubectl create namespace istio-system --dry-run=client -o yaml | kubectl apply -f -
+            kubectl create configmap ca --namespace default --from-file {{ .Values.certsDir }}/ca.crt --dry-run=client -o yaml | kubectl apply -f -
+            kubectl create configmap trusted-system-certs --namespace cf-workloads --from-file=trusted-ca-1.crt={{ .Values.certsDir }}/ca.crt --dry-run=client -o yaml | kubectl apply -f -
+            kubectl create secret generic instance-identity --namespace default --from-file=tls.crt={{ .Values.certsDir }}/ca.crt --from-file=tls.key={{ .Values.certsDir }}/ca.key --dry-run=client -o yaml | kubectl apply -f -
+            kubectl create secret generic root-ca --namespace default --from-file=tls.crt={{ .Values.certsDir }}/ca.crt --from-file=tls.key={{ .Values.certsDir }}/ca.key --dry-run=client -o yaml | kubectl apply -f -
+            kubectl create secret generic root-ca --namespace cert-manager --from-file=tls.crt={{ .Values.certsDir }}/ca.crt --from-file=tls.key={{ .Values.certsDir }}/ca.key --dry-run=client -o yaml | kubectl apply -f -
+      - events: ["postsync"]
+        showlogs: true
+        command: "/bin/sh"
+        args:
+          - "-c"
+          - |
+            kubectl apply --filename assets/network-policy.yaml
+            kubectl apply --filename assets/cluster-issuer.yaml
+            kubectl apply --filename assets/nats-certificate.yaml
+            kubectl apply --filename assets/postgres-tls.yaml
+
+  - name: nats
+    namespace: default
+    chart: nats/nats
+    installed: true
+    needs:
+      - cert-manager/cert-manager
+    values:
+      - ./assets/values/nats.yaml
+
+  - name: istio-base
+    namespace: istio-system
+    chart: istio/base
+    version: 1.28.3
+    installed: true
+    needs:
+      - cert-manager/cert-manager
+    values:
+      - ./assets/values/istio-base.yaml
+    hooks:
+      - events: ["postsync"]
+        showlogs: true
+        command: "/bin/sh"
+        args:
+          - "-c"
+          - |
+            kubectl apply --server-side --filename assets/gateway-api.yaml
+
+  - name: istiod
+    namespace: istio-system
+    chart: istio/istiod
+    version: 1.28.3
+    installed: true
+    needs:
+      - istio-base
+    values:
+      - ./assets/values/istiod.yaml
+    hooks:
+      - events: ["presync"]
+        showlogs: true
+        command: "/bin/sh"
+        args:
+          - "-c"
+          - |
+            kubectl delete validatingwebhookconfiguration istio-validator-istio-system --ignore-not-found=true
+      - events: ["postsync"]
+        showlogs: true
+        command: "/bin/sh"
+        args:
+          - "-c"
+          - |
+            kubectl apply --filename assets/gateway.yaml
+
+  - name: postgresql
+    namespace: default
+    chart: bitnami/postgresql
+    installed: true
+    needs:
+      - cert-manager/cert-manager
+    wait: true
+    values:
+      - ./assets/values/postgresql.yaml
+      - auth:
+          password: {{ .Values.secrets.dbPassword }}
+
+  - name: minio
+    namespace: default
+    chart: minio/minio
+    installed: true
+    wait: true
+    values:
+      - extraEnvVars:
+          - name: MINIO_DOMAIN
+            value: blobstore.127-0-0-1.nip.io
+      - console:
+          enabled: false
+      - resourcesPreset: small
+      - auth:
+          rootPassword: {{ .Values.secrets.blobstorePassword }}
+      - image:
+          repository: bitnamilegacy/minio
+      - global:
+          security:
+            allowInsecureImages: true
+
+  - name: loggregator-agent
+    namespace: default
+    chart: ./releases/loggregator-agent/helm
+    installed: true
+    needs:
+      - nats
+    values:
+      - syslogBindingCache:
+          enabled: true
+      - forwarderAgent:
+          enabled: true
+
+  - name: routing
+    namespace: default
+    chart: ./releases/routing/helm
+    installed: true
+    needs:
+      - nats
+      - istio-system/istiod
+
+  - name: loggregator
+    namespace: default
+    chart: ./releases/loggregator/helm
+    installed: {{ .Values.optionalComponents.enableLoggregator }}
+    needs:
+      - nats
+      - loggregator-agent
+    values:
+      - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
+
+  - name: log-cache
+    namespace: default
+    chart: ./releases/log-cache/helm
+    installed: true
+    needs:
+      - nats
+
+  - name: uaa
+    namespace: default
+    chart: ./releases/uaa/helm
+    installed: true
+    wait: true
+    needs:
+      - postgresql
+    values:
+      - ccAdminPassword: {{ .Values.secrets.ccAdminPassword }}
+      - dbPassword: {{ .Values.secrets.dbPassword }}
+      - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
+      - uaaAdminSecret: {{ .Values.secrets.uaaAdminSecret }}
+
+  - name: credhub
+    namespace: default
+    chart: ./releases/credhub/helm
+    installed: true
+    needs:
+      - postgresql
+      - uaa
+    values:
+      - dbPassword: {{ .Values.secrets.dbPassword }}
+
+  - name: locket
+    namespace: default
+    chart: ./releases/diego/helm
+    installed: true
+    wait: true
+    needs:
+      - postgresql
+      - uaa
+    values:
+      - dbPassword: {{ .Values.secrets.dbPassword }}
+      - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
+      - locket:
+          enabled: true
+
+  - name: diego
+    namespace: default
+    chart: ./releases/diego/helm
+    installed: true
+    needs:
+      - locket
+      - credhub
+    values:
+      - dbPassword: {{ .Values.secrets.dbPassword }}
+      - diegoSSHCredentials: {{ .Values.secrets.diegoSSHCredentials }}
+      - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
+      - sshProxyHostKey: |
+{{ readFile (printf "%s/ssh_key" .Values.certsDir) | indent 10 }}
+      - auctioneer:
+          enabled: true
+      - bbs:
+          enabled: true
+      - fileserver:
+          enabled: true
+      - sshProxy:
+          enabled: true
+
+  - name: tps-watcher
+    namespace: default
+    chart: ./releases/capi/helm
+    installed: true
+    needs:
+      - diego
+    values:
+      - tpsWatcher:
+          enabled: true
+
+  - name: route-emitter
+    namespace: default
+    chart: ./releases/diego/helm
+    installed: true
+    needs:
+      - diego
+      - routing
+    values:
+      - routeEmitter:
+          enabled: true
+          enableInternalEmitter: {{ .Values.optionalComponents.enableLoggregator }}
+
+  - name: k8s-rep
+    namespace: default
+    chart: cloudfoundry-k8s/k8s-rep
+    version: "{{ .Values.versions.k8sRep }}"
+    installed: true
+    needs:
+      - diego
+    values:
+      - caCertificate: |
+{{ readFile (printf "%s/ca.crt" .Values.certsDir) | indent 10 }}
+      - stacks:
+          cflinuxfs4: ghcr.io/cloudfoundry/k8s/cflinuxfs4:{{ .Values.versions.cflinuxfs4 }}
+
+  - name: api
+    namespace: default
+    chart: ./releases/capi/helm
+    installed: true
+    wait: true
+    needs:
+      - postgresql
+      - uaa
+      - minio
+      - diego
+    values:
+      - cloudController:
+          enabled: true
+          blobstore:
+            fog_connection:
+              aws_secret_access_key: {{ .Values.secrets.blobstorePassword }}
+          sshProxyKeyFingerprint: {{ .Values.secrets.sshProxyKeyFingerprint | quote }}
+      - dbPassword: {{ .Values.secrets.dbPassword }}
+      - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
+
+  - name: nfs-volume
+    namespace: default
+    chart: ./releases/nfs-volume/helm
+    installed: {{ .Values.optionalComponents.enableNfsVolume }}
+    needs:
+      - api
+
+  - name: cf-networking
+    namespace: default
+    chart: ./releases/cf-networking/helm
+    installed: {{ .Values.optionalComponents.enablePolicySupport }}
+    needs:
+      - postgresql
+      - uaa
+    values:
+      - policyServer:
+          dbPassword: {{ .Values.secrets.dbPassword }}
+          oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
+
+  - name: policy-agent
+    namespace: default
+    chart: cloudfoundry-k8s/policy-agent
+    version: "{{ .Values.versions.policyAgent }}"
+    installed: {{ .Values.optionalComponents.enablePolicySupport }}
+    needs:
+      - cf-networking
+    hooks:
+      - events: ["postsync"]
+        showlogs: true
+        command: "/bin/sh"
+        args:
+          - "-c"
+          - |
+            {{ if .Values.optionalComponents.enablePolicySupport }}
+            kubectl get configmap coredns -n kube-system -o jsonpath='{.data.Corefile}' | grep -q "apps.internal:53" || {
+              echo "Patching CoreDNS to forward apps.internal to bosh-dns"
+              BOSH_DNS_IP=$(kubectl get svc bosh-dns -n default -o jsonpath='{.spec.clusterIP}')
+              COREFILE=$(kubectl get configmap coredns -n kube-system -o jsonpath='{.data.Corefile}')
+              printf '%s\n\n%s' "apps.internal:53 {
+                errors
+                forward . ${BOSH_DNS_IP}
+              }" "$COREFILE" | kubectl create configmap coredns -n kube-system --from-file=Corefile=/dev/stdin --dry-run=client -o yaml | kubectl apply -f -
+              kubectl rollout restart deployment coredns -n kube-system
+            }
+            {{ end }}
