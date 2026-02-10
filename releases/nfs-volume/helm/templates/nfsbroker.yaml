@@ -56,8 +56,14 @@ spec:
             - name: services-config
               mountPath: /services.json
               subPath: services.json
+      {{- if .Values.nfsbroker.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "false"
+        {{- toYaml .Values.nfsbroker.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.nfsbroker.tolerations }}
+      tolerations:
+        {{- toYaml .Values.nfsbroker.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
         - name: services-config
           configMap:

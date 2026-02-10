@@ -44,8 +44,14 @@ spec:
               mountPropagation: Bidirectional
           securityContext:
             privileged: true
+      {{- if .Values.nfsv3driver.nodeSelector }}
       nodeSelector:
-        cloudfoundry.org/workload: "true"
+        {{- toYaml .Values.nfsv3driver.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.nfsv3driver.tolerations }}
+      tolerations:
+        {{- toYaml .Values.nfsv3driver.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
         - name: voldrivers
           hostPath:

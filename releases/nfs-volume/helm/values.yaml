@@ -7,6 +7,8 @@ nfsbroker:
     repository: ghcr.io/cloudfoundry/k8s/nfsbroker
     tag: ~
     imagePullPolicy: IfNotPresent
+  nodeSelector: ~
+  tolerations: ~
 
 
 nfsv3driver:
@@ -15,3 +17,5 @@ nfsv3driver:
     repository: ghcr.io/cloudfoundry/k8s/nfsv3driver
     tag: ~
     imagePullPolicy: IfNotPresent
+  nodeSelector: ~
+  tolerations: ~
