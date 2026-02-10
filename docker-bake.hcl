@@ -234,7 +234,7 @@ variable "NFS_VOLUME_RELEASE_VERSION" {
 }
 
 target "nfs-volume" {
-  dockerfile = "releases/nfs-volume-release/${component}.Dockerfile"
+  dockerfile = "releases/nfs-volume/${component}.Dockerfile"
   tags = [ "${REGISTRY_PREFIX}${component}:latest", "${REGISTRY_PREFIX}${component}:${NFS_VOLUME_RELEASE_VERSION}" ]
   name = component
 
