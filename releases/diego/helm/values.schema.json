@@ -294,30 +294,31 @@
           "type": "object"
         },
         "tolerations": {
+          "type": ["array", "null"],
           "items": {
-            "anyOf": [
-              {
-                "additionalProperties": false,
-                "properties": {
-                  "effect": {
-                    "type": "string"
-                  },
-                  "key": {
-                    "type": "string"
-                  },
-                  "operator": {
-                    "type": "string"
-                  },
-                  "value": {
-                    "type": "string"
-                  }
-                },
-                "type": "object"
+            "additionalProperties": false,
+            "properties": {
+              "effect": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
               }
+            },
+            "required": [
+              "effect",
+              "key",
+              "operator",
+              "value"
             ],
-            "required": []
-          },
-          "type": "array"
+            "type": "object"
+          }
         }
       },
       "type": "object"
