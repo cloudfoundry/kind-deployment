@@ -192,6 +192,8 @@ releases:
     values:
       - dbPassword: {{ .Values.secrets.dbPassword }}
       - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
+      - diegoSSHCredentials: ""
+      - sshProxyHostKey: ""
       - locket:
           enabled: true
 
@@ -223,6 +225,9 @@ releases:
     values:
       - tpsWatcher:
           enabled: true
+      - dbPassword: ""
+      - oauthClientsSecret: ""
+
 
   - name: route-emitter
     namespace: default
@@ -231,6 +236,10 @@ releases:
       - diego
       - nats
     values:
+      - diegoSSHCredentials: ""
+      - sshProxyHostKey: ""
+      - dbPassword: ""
+      - oauthClientsSecret: ""
       - routeEmitter:
           enabled: true
           enableInternalEmitter: {{ .Values.optionalComponents.enableLoggregator }}
