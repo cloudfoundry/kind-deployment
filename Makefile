@@ -7,7 +7,8 @@ temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub te
 	@ ./scripts/init.sh
 
 install:
-	@ ./scripts/deploy.sh
+	@ . temp/secrets.sh; \
+	helmfile sync
 
 login:
 	@ . temp/secrets.sh; \

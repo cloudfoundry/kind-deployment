@@ -19,10 +19,10 @@
     {
       "customType": "regex",
       "managerFilePatterns": [
-        "/^scripts/deploy.sh$/"
+        "/^values.yaml.gotmpl$/"
       ],
       "matchStrings": [
-        "# renovate: depName=(?<depName>.*?)( registryUrl=(?<registryUrl>.*?))?\\s+.+_VERSION=\"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+        "# renovate: depName=(?<depName>.*?)( registryUrl=(?<registryUrl>.*?))?\\s+.+: \"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
       ],
       "datasourceTemplate": "github-releases",
       "extractVersionTemplate": "^v?(?<version>.*)$"
@@ -32,15 +32,22 @@
       "managerFilePatterns": [
         "/^releases/.*/Chart.yaml$/",
         "/^releases/.*/values.yaml$/",
-        "/^scripts/deploy.sh$/"
+        "/^values.yaml.gotmpl$/"
       ],
       "matchStrings": [
         "# renovate: depName=(?<depName>.*?) image=(?<packageName>.*?)\\s+appVersion: (?<currentValue>\\d+\\.\\d+\\.\\d+)",
         "# renovate: depName=(?<depName>.*?) image=(?<packageName>.*?)\\s+tag: \"(?<currentValue>\\d+\\.\\d+\\.\\d+)\"",
-        "# renovate: depName=(?<depName>.*?) image=(?<packageName>.*?)\\s+.+_VERSION=\"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+        "# renovate: depName=(?<depName>.*?) image=(?<packageName>.*?)\\s+.+: \"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
       ],
       "datasourceTemplate": "docker",
       "extractVersionTemplate": "^v?(?<version>.*)$"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchManagers": ["helmfile"],
+      "matchFileNames": ["helmfile.yaml.gotmpl"],
+      "enabled": true
     }
   ]
 }

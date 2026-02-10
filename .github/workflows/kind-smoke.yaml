@@ -44,11 +44,14 @@ jobs:
           mkdir -p $HOME/.local/bin && echo "$HOME/.local/bin" >> "$GITHUB_PATH"
           curl -L https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64 -o $HOME/.local/bin/kind
           chmod +x $HOME/.local/bin/kind
+          curl -L https://github.com/helmfile/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz | tar -zx
+          mv helmfile $HOME/.local/bin/helmfile
           curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=${CF_CLI_VERSION}&source=github" | tar -zx
           mv cf8 $HOME/.local/bin/cf
         env:
           CF_CLI_VERSION: '8.14.1'
           KIND_VERSION: '0.30.0'
+          HELMFILE_VERSION: '1.2.3'
       - name: Run make up
         if: steps.check_changes.outputs.skip != 'true'
         run: make up
@@ -97,5 +100,5 @@ jobs:
       - uses: actions/upload-artifact@v6
         if: always()
         with:
-          name: report
+          name: report.json
           path: ./cf-smoke-tests/report.json

@@ -1,0 +1,24 @@
+---
+certsDir: "./temp/certs"
+
+versions:
+  # renovate: depName=cloudfoundry/k8s-garden-client
+  k8sRep: "0.2.2"
+  # renovate: depName=cloudfoundry/k8s-policy-agent
+  policyAgent: "0.1.0"
+  # renovate: depName=cloudfoundry/cflinuxfs4-release image=ghcr.io/cloudfoundry/k8s/cflinuxfs4
+  cflinuxfs4: "1.304.0"
+
+optionalComponents:
+  enableLoggregator: {{ env "ENABLE_LOGGREGATOR" | default "true" }}
+  enablePolicySupport: {{ env "ENABLE_POLICY_SUPPORT" | default "true" }}
+  enableNfsVolume: {{ env "ENABLE_NFS_VOLUME" | default "false" }}
+
+secrets:
+  dbPassword: {{ requiredEnv "DB_PASSWORD" }}
+  blobstorePassword: {{ requiredEnv "BLOBSTORE_PASSWORD" }}
+  oauthClientsSecret: {{ requiredEnv "OAUTH_CLIENTS_SECRET" }}
+  ccAdminPassword: {{ requiredEnv "CC_ADMIN_PASSWORD" }}
+  uaaAdminSecret: {{ requiredEnv "UAA_ADMIN_SECRET" }}
+  diegoSSHCredentials: {{ requiredEnv "DIEGO_SSH_CREDENTIALS" }}
+  sshProxyKeyFingerprint: {{ requiredEnv "SSH_PROXY_KEY_FINGERPRINT" }}

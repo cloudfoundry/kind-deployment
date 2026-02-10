@@ -9,6 +9,7 @@ You need to install following tools:
 - kind: <https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries>
 - kubectl: <https://kubernetes.io/docs/tasks/tools/#kubectl>
 - helm: <https://helm.sh/docs/intro/install#through-package-managers>
+- helmfile: <https://helmfile.readthedocs.io/en/latest/#installation>
 - make:
   - It should be alreay installed on MacOS and Linux.
   - For Windows installation see: <https://gnuwin32.sourceforge.net/packages/make.htm>
@@ -41,6 +42,17 @@ cf push -f examples/hello-js/manifest.yaml
 ```bash
 make down
 ```
+
+## Configuration
+
+You can configure the installation by setting following environment variables:
+
+| environment variable | default | component(s) to be installed |
+|---------------------|---------|---------------------------|
+| ENABLE_LOGGREGATOR  | true    | Loggregator |
+| ENABLE_POLICY_SUPPORT | true  | policy-serverver, policy-agent, bosh-dns, service-discovery-controller |
+| ENABLE_NFS_VOLUME | false | nfsbroker |
+
 
 ## Read More Documentation
 
