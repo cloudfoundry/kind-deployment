@@ -155,7 +155,7 @@ releases:
     chart: ./releases/loggregator-agent/helm
     installed: true
     needs:
-      - nats
+      - capi
     values:
       - syslogBindingCache:
           enabled: true
@@ -167,16 +167,14 @@ releases:
     chart: ./releases/routing/helm
     installed: true
     needs:
-      - nats
-      - istio-system/istiod
+      - uaa
 
   - name: loggregator
     namespace: default
     chart: ./releases/loggregator/helm
     installed: {{ .Values.optionalComponents.enableLoggregator }}
     needs:
-      - nats
-      - loggregator-agent
+      - istio-system/istiod
     values:
       - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
 
@@ -185,7 +183,7 @@ releases:
     chart: ./releases/log-cache/helm
     installed: true
     needs:
-      - nats
+      - capi
 
   - name: uaa
     namespace: default
@@ -194,6 +192,7 @@ releases:
     wait: true
     needs:
       - postgresql
+      - istio-system/istiod
     values:
       - ccAdminPassword: {{ .Values.secrets.ccAdminPassword }}
       - dbPassword: {{ .Values.secrets.dbPassword }}
@@ -205,7 +204,6 @@ releases:
     chart: ./releases/credhub/helm
     installed: true
     needs:
-      - postgresql
       - uaa
     values:
       - dbPassword: {{ .Values.secrets.dbPassword }}
@@ -216,8 +214,7 @@ releases:
     installed: true
     wait: true
     needs:
-      - postgresql
-      - uaa
+      - loggregator-agent
     values:
       - dbPassword: {{ .Values.secrets.dbPassword }}
       - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
@@ -230,7 +227,6 @@ releases:
     installed: true
     needs:
       - locket
-      - credhub
     values:
       - dbPassword: {{ .Values.secrets.dbPassword }}
       - diegoSSHCredentials: {{ .Values.secrets.diegoSSHCredentials }}
@@ -251,7 +247,7 @@ releases:
     chart: ./releases/capi/helm
     installed: true
     needs:
-      - diego
+      - locket
     values:
       - tpsWatcher:
           enabled: true
@@ -262,7 +258,7 @@ releases:
     installed: true
     needs:
       - diego
-      - routing
+      - nats
     values:
       - routeEmitter:
           enabled: true
@@ -274,23 +270,21 @@ releases:
     version: "{{ .Values.versions.k8sRep }}"
     installed: true
     needs:
-      - diego
+      - locket
     values:
       - caCertificate: |
 {{ readFile (printf "%s/ca.crt" .Values.certsDir) | indent 10 }}
       - stacks:
           cflinuxfs4: ghcr.io/cloudfoundry/k8s/cflinuxfs4:{{ .Values.versions.cflinuxfs4 }}
 
-  - name: api
+  - name: capi
     namespace: default
     chart: ./releases/capi/helm
     installed: true
     wait: true
     needs:
-      - postgresql
-      - uaa
       - minio
-      - diego
+      - routing
     values:
       - cloudController:
           enabled: true
@@ -306,15 +300,14 @@ releases:
     chart: ./releases/nfs-volume/helm
     installed: {{ .Values.optionalComponents.enableNfsVolume }}
     needs:
-      - api
+      - uaa
 
   - name: cf-networking
     namespace: default
     chart: ./releases/cf-networking/helm
     installed: {{ .Values.optionalComponents.enablePolicySupport }}
     needs:
-      - postgresql
-      - uaa
+      - capi
     values:
       - policyServer:
           dbPassword: {{ .Values.secrets.dbPassword }}
