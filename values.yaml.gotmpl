@@ -3,8 +3,11 @@ certsDir: "./temp/certs"
 deployDir: "./temp"
 
 versions:
+  # renovate: depName=cloudfoundry/k8s-garden-client
   k8sRep: "0.2.2"
+  # renovate: depName=cloudfoundry/k8s-policy-agent
   policyAgent: "0.1.0"
+  # renovate: depName=cloudfoundry/cflinuxfs4-release image=ghcr.io/cloudfoundry/k8s/cflinuxfs4
   cflinuxfs4: "1.304.0"
 
 optionalComponents:
