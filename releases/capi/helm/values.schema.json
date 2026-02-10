@@ -5,6 +5,9 @@
     "ccDeploymentUpdater": {
       "additionalProperties": false,
       "properties": {
+        "resources": {
+          "type": ["object", "null"]
+        },
         "nodeSelector": {
           "type": ["object", "null"]
         },
@@ -62,6 +65,9 @@
           },
           "type": "object"
         },
+        "resources": {
+          "type": ["object", "null"]
+        },
         "nodeSelector": {
           "type": ["object", "null"]
         },
@@ -98,6 +104,9 @@
     "ccWorker": {
       "additionalProperties": false,
       "properties": {
+        "resources": {
+          "type": ["object", "null"]
+        },
         "nodeSelector": {
           "type": ["object", "null"]
         },
@@ -134,6 +143,9 @@
     "ccWorkerClock": {
       "additionalProperties": false,
       "properties": {
+        "resources": {
+          "type": ["object", "null"]
+        },
         "nodeSelector": {
           "type": ["object", "null"]
         },
@@ -293,6 +305,9 @@
         "nodeSelector": {
           "type": ["object", "null"]
         },
+        "resources": {
+          "type": ["object", "null"]
+        },
         "sshProxyKeyFingerprint": {
           "type": "string"
         },
@@ -362,6 +377,39 @@
             }
           },
           "type": "object"
+        },
+        "resources": {
+          "type": ["object", "null"]
+        },
+        "nodeSelector": {
+          "type": ["object", "null"]
+        },
+        "tolerations": {
+          "type": ["array", "null"],
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "effect": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "effect",
+              "key",
+              "operator",
+              "value"
+            ],
+            "type": "object"
+          }
         }
       },
       "type": "object"
@@ -383,6 +431,39 @@
             }
           },
           "type": "object"
+        },
+        "resources": {
+          "type": ["object", "null"]
+        },
+        "nodeSelector": {
+          "type": ["object", "null"]
+        },
+        "tolerations": {
+          "type": ["array", "null"],
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "effect": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "effect",
+              "key",
+              "operator",
+              "value"
+            ],
+            "type": "object"
+          }
         }
       },
       "type": "object"
@@ -407,6 +488,39 @@
             }
           },
           "type": "object"
+        },
+        "resources": {
+          "type": ["object", "null"]
+        },
+        "nodeSelector": {
+          "type": ["object", "null"]
+        },
+        "tolerations": {
+          "type": ["array", "null"],
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "effect": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "effect",
+              "key",
+              "operator",
+              "value"
+            ],
+            "type": "object"
+          }
         }
       },
       "type": "object"
@@ -441,7 +555,10 @@
         "nodeSelector": {
           "type": "null"
         },
-       "tolerations": {
+        "resources": {
+          "type": ["object", "null"]
+        },
+        "tolerations": {
           "type": ["array", "null"],
           "items": {
             "additionalProperties": false,
@@ -487,6 +604,39 @@
             }
           },
           "type": "object"
+        },
+        "resources": {
+          "type": ["object", "null"]
+        },
+        "nodeSelector": {
+          "type": ["object", "null"]
+        },
+        "tolerations": {
+          "type": ["array", "null"],
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "effect": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "effect",
+              "key",
+              "operator",
+              "value"
+            ],
+            "type": "object"
+          }
         }
       },
       "type": "object"

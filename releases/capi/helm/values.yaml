@@ -1,12 +1,15 @@
 ccDeploymentUpdater:
+  resources: ~
   nodeSelector: ~
   tolerations: ~
 
 ccWorker:
+  resources: ~
   nodeSelector: ~
   tolerations: ~
 
 ccUploader:
+  resources: ~
   certificateSecret: ""
   hostname: "cc-uploader.default.svc.cluster.local"
   image:
@@ -18,11 +21,13 @@ ccUploader:
 
 
 ccWorkerClock:
+  resources: ~
   nodeSelector: ~
   tolerations: ~
 
 cloudController:
   enabled: false
+  resources: ~ 
   certificateSecret: ""
   appDomain: apps.127-0-0-1.nip.io
   externalDomain: api.127-0-0-1.nip.io
@@ -70,6 +75,7 @@ localWorker:
     repository: ghcr.io/cloudfoundry/k8s/cloud-controller
     tag: ""
     imagePullPolicy: IfNotPresent
+  resources: ~
 
 routeRegistrar:
   image:
@@ -77,12 +83,14 @@ routeRegistrar:
     # renovate: dataSource=docker depName=routing-release packageName=ghcr.io/cloudfoundry/k8s/route-registrar
     tag: "0.364.0"
     imagePullPolicy: IfNotPresent
+  resources: ~
 
 nginx:
   image:
     repository: ghcr.io/cloudfoundry/k8s/cc-nginx
     tag: ""
     imagePullPolicy: IfNotPresent
+  resources: ~
 
 udpForwarder:
   image:
@@ -90,9 +98,11 @@ udpForwarder:
     # renovate: dataSource=docker depName=loggregator-agent-release packageName=ghcr.io/cloudfoundry/k8s/udp-forwarder
     tag: "8.3.13"
     imagePullPolicy: IfNotPresent
+  resources: ~
 
 tpsWatcher:
   enabled: false
+  resources: ~
   certificateSecret: ""
   hostname: tps.default.svc.cluster.local
   image:

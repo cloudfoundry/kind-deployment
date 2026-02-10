@@ -263,6 +263,9 @@
         "enabled": {
           "type": "boolean"
         },
+        "enableInternalEmitter": {
+          "type": "boolean"
+        },
         "image": {
           "additionalProperties": false,
           "properties": {

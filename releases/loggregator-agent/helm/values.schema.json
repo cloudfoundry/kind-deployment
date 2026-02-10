@@ -33,7 +33,7 @@
           "type": ["object", "null"]
         },
         "resources": {
-          "type": "null"
+          "type": ["object", "null"]
         },
         "tolerations": {
           "type": ["array", "null"],
@@ -102,7 +102,7 @@
           "type": "object"
         },
         "resources": {
-          "type": "null"
+          "type": ["object", "null"]
         }
       },
       "type": "object"
@@ -141,7 +141,7 @@
           "type": "object"
         },
         "resources": {
-          "type": "null"
+          "type": ["object", "null"]
         },
         "syslogBindingCache": {
           "additionalProperties": false,
@@ -186,7 +186,7 @@
           "type": ["object", "null"]
         },
         "resources": {
-          "type": "null"
+          "type": ["object", "null"]
         },
         "tolerations": {
           "type": ["array", "null"],
