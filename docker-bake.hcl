@@ -220,7 +220,7 @@ variable "CFLINUXFS4_VERSION" {
 }
 
 target "cflinuxfs4" {
-  dockerfile = "releases/cflinuxfs4/Dockerfile"
+  dockerfile = "releases/cflinuxfs4/cflinuxfs4.Dockerfile"
   tags = [ "${REGISTRY_PREFIX}cflinuxfs4:${CFLINUXFS4_VERSION}" ]
 
   args = {
