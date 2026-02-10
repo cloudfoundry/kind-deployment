@@ -25,7 +25,7 @@ fileserver:
   hostname: "file-server.127-0-0-1.nip.io"
   image:
     repository: ghcr.io/cloudfoundry/k8s/fileserver
-    # renovate: depName=cf-deployment image=ghcr.io/cloudfoundry/k8s/fileserver
+    # renovate: image=ghcr.io/cloudfoundry/k8s/fileserver depName=cf-deployment
     tag: "54.6.0"
     imagePullPolicy: IfNotPresent
   nodeSelector: ~

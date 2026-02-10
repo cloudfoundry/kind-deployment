@@ -3,5 +3,5 @@ version: 0.11.0
 description: Helm chart for Diego components
 type: application
 apiVersion: v2
-# renovate: depName=diego-release image=ghcr.io/cloudfoundry/k8s/bbs
+# renovate: image=ghcr.io/cloudfoundry/k8s/bbs depName=diego-release
 appVersion: 2.128.0

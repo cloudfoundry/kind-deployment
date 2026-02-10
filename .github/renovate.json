@@ -35,9 +35,9 @@
         "/^values.yaml.gotmpl$/"
       ],
       "matchStrings": [
-        "# renovate: depName=(?<depName>.*?) image=(?<packageName>.*?)\\s+appVersion: (?<currentValue>\\d+\\.\\d+\\.\\d+)",
-        "# renovate: depName=(?<depName>.*?) image=(?<packageName>.*?)\\s+tag: \"(?<currentValue>\\d+\\.\\d+\\.\\d+)\"",
-        "# renovate: depName=(?<depName>.*?) image=(?<packageName>.*?)\\s+.+: \"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+        "# renovate: image=(?<packageName>.*?) depName=(?<depName>.*?)\\s+appVersion: (?<currentValue>\\d+\\.\\d+\\.\\d+)",
+        "# renovate: image=(?<packageName>.*?) depName=(?<depName>.*?)\\s+tag: \"(?<currentValue>\\d+\\.\\d+\\.\\d+)\"",
+        "# renovate: image=(?<packageName>.*?) depName=(?<depName>.*?)\\s+.+: \"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
       ],
       "datasourceTemplate": "docker",
       "extractVersionTemplate": "^v?(?<version>.*)$"
@@ -46,8 +46,15 @@
   "packageRules": [
     {
       "matchManagers": ["helmfile"],
-      "matchFileNames": ["helmfile.yaml.gotmpl"],
-      "enabled": true
+      "enabled": true,
+      "registryAliases": {
+        "cloudfoundry-k8s": "ghcr.io/cloudfoundry/helm",
+        "minio": "registry-1.docker.io/bitnamicharts",
+        "bitnami": "https://charts.bitnami.com/bitnami",
+        "istio": "https://istio-release.storage.googleapis.com/charts",
+        "nats": "https://nats-io.github.io/k8s/helm/charts",
+        "jetstack": "quay.io/jetstack/charts"
+      }
     }
   ]
 }

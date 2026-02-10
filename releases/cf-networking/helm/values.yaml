@@ -45,7 +45,7 @@ boshDns:
   certificateSecret: ~
   image:
     repository: ghcr.io/cloudfoundry/k8s/bosh-dns
-    # renovate: depName=bosh-dns-release image=ghcr.io/cloudfoundry/k8s/bosh-dns
+    # renovate: image=ghcr.io/cloudfoundry/k8s/bosh-dns depName=bosh-dns-release
     tag: "1.39.18"
     imagePullPolicy: IfNotPresent
   nodeSelector: ~
@@ -55,6 +55,6 @@ boshDns:
 routeRegistrar:
   image:
     repository: ghcr.io/cloudfoundry/k8s/route-registrar
-    # renovate: depName=routing-release image=ghcr.io/cloudfoundry/k8s/route-registrar
+    # renovate: image=ghcr.io/cloudfoundry/k8s/route-registrar depName=routing-release
     tag: "0.362.0"
     imagePullPolicy: IfNotPresent

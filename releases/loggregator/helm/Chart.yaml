@@ -3,5 +3,5 @@ version: 0.7.0
 description: Helm chart for Loggregator components
 type: application
 apiVersion: v2
-# renovate: depName=loggregator-release image=ghcr.io/cloudfoundry/k8s/doppler
+# renovate: image=ghcr.io/cloudfoundry/k8s/doppler depName=loggregator-release
 appVersion: 107.0.24
