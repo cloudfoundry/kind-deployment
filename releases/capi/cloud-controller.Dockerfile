@@ -1,4 +1,4 @@
-FROM ruby:3.2.9-slim
+FROM ruby:3.4.8-slim
 
 RUN apt update && apt install -y postgresql-client libpq-dev default-libmysqlclient-dev libyaml-dev build-essential zip git procps && useradd -u 1000 -d /nonexistent -s /sbin/nologin --no-create-home vcap && \
     rm -rf /var/lib/apt/lists/* 
