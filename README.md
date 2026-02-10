@@ -49,8 +49,8 @@ You can configure the installation by setting following environment variables:
 | environment variable | default | component(s) to be installed |
 |---------------------|---------|---------------------------|
 | ENABLE_LOGGREGATOR  | true    | Loggregator |
-| ENABLE_POLICY_SUPPORT | true  | poicy-serverver, policay-agent, bosh-dns, discovery-service |
-| ENABLE_NFS_VOLUME | false | NFS volume service |
+| ENABLE_POLICY_SUPPORT | true  | poicy-serverver, policay-agent, bosh-dns, service-discovery-controller |
+| ENABLE_NFS_VOLUME | false | nfsbroker |
 
 
 ## Read More Documentation

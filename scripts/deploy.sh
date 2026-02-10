@@ -69,6 +69,7 @@ helm upgrade --install k8s-rep oci://ghcr.io/cloudfoundry/helm/k8s-rep:$K8S_REP_
 helm upgrade --install api releases/capi/helm --set cloudController.blobstore.fog_connection.aws_secret_access_key=$BLOBSTORE_PASSWORD --set dbPassword=$DB_PASSWORD --set oauthClientsSecret=$OAUTH_CLIENTS_SECRET --set cloudController.sshProxyKeyFingerprint=$SSH_PROXY_KEY_FINGERPRINT --set "cloudController.enabled=true" --wait
 if [[ "$ENABLE_NFS_VOLUME" == "true" ]]; then
   helm upgrade --install nfs-volume releases/nfs-volume/helm
+  kubectl rollout status deployment nfsbroker
 fi
 
 if [[ "$ENABLE_POLICY_SUPPORT" == "true" ]]; then
