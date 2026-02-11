@@ -55,6 +55,7 @@ releases:
   - name: nats
     namespace: default
     chart: nats/nats
+    version: 2.12.4
     needs:
       - cert-manager/cert-manager
     values:
@@ -104,6 +105,7 @@ releases:
   - name: postgresql
     namespace: default
     chart: bitnami/postgresql
+    version: 16.7.27
     needs:
       - cert-manager/cert-manager
     values:
@@ -114,6 +116,7 @@ releases:
   - name: minio
     namespace: default
     chart: bitnami/minio
+    version: 17.0.21
     values:
       - extraEnvVars:
           - name: MINIO_DOMAIN
