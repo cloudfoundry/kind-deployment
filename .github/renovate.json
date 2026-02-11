@@ -19,18 +19,7 @@
       "extractVersionTemplate": "^v?(?<version>.*)$"
     }
   ],
-  "packageRules": [
-    {
-      "matchManagers": ["helmfile"],
-      "enabled": true,
-      "registryAliases": {
-        "cloudfoundry-k8s": "ghcr.io/cloudfoundry/helm",
-        "minio": "registry-1.docker.io/bitnamicharts",
-        "bitnami": "https://charts.bitnami.com/bitnami",
-        "istio": "https://istio-release.storage.googleapis.com/charts",
-        "nats": "https://nats-io.github.io/k8s/helm/charts",
-        "jetstack": "quay.io/jetstack/charts"
-      }
-    }
-  ]
+  "helmfile": {
+    "enabled": true
+  }
 }
