@@ -1,5 +1,5 @@
 name: capi
-version: 0.10.0
+version: 0.11.0
 description: Helm chart for CF API components
 type: application
 apiVersion: v2
