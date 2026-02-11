@@ -3,5 +3,5 @@ version: 0.8.0
 description: Helm chart for CredHub components
 type: application
 apiVersion: v2
-# renovate: dataSource=docker depName=credhub-release packageName=europe-west3-docker.pkg.dev/sap-se-gcp-istio-dev/public/cf/credhub
+# renovate: dataSource=docker depName=credhub-release packageName=ghcr.io/cloudfoundry/k8s/credhub
 appVersion: 2.14.17

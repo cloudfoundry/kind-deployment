@@ -3,6 +3,18 @@ on:
   schedule:
     - cron: "30 4 * * *"
   workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Renovate log level"
+        required: false
+        default: "info"
+        type: choice
+        options:
+          - debug
+          - info
+          - warn
+          - error
+          - fatal
 
 jobs:
   renovate:
@@ -20,3 +32,4 @@ jobs:
         configurationFile: .github/renovate-config.js
       env:
         RENOVATE_GIT_AUTHOR: ${{ secrets.SERVICE_USER_AUTHOR_EMAIL }}
+        LOG_LEVEL: ${{ github.event.inputs.logLevel || 'info' }}
