@@ -26,7 +26,7 @@ fileserver:
   image:
     repository: ghcr.io/cloudfoundry/k8s/fileserver
     # renovate: dataSource=docker depName=cf-deployment packageName=ghcr.io/cloudfoundry/k8s/fileserver
-    tag: "54.6.0"
+    tag: "54.7.0"
     imagePullPolicy: IfNotPresent
   nodeSelector: ~
   tolerations: ~
