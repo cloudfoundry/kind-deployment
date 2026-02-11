@@ -21,5 +21,8 @@
   ],
   "helmfile": {
     "enabled": true
+  },
+  "helm-values": {
+    "enabled": false
   }
 }
