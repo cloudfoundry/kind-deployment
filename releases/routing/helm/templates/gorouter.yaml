@@ -76,7 +76,6 @@ spec:
         - name: udp-forwarder
           image: {{ .Values.udpForwarder.image.repository }}:{{ .Values.udpForwarder.image.tag }}
           imagePullPolicy: {{ .Values.udpForwarder.image.imagePullPolicy }}
-          imagePullPolicy: IfNotPresent
           {{- if .Values.udpForwarder.resources }}
           resources:
             {{- toYaml .Values.udpForwarder.resources | nindent 12 }}

@@ -24,7 +24,6 @@ spec:
         - name: locket
           image: {{ .Values.locket.image.repository }}:{{ default .Chart.AppVersion .Values.locket.image.tag }}
           imagePullPolicy: {{ .Values.locket.image.imagePullPolicy }}
-          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8891
           {{- if .Values.locket.resources }}
