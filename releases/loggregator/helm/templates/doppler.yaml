@@ -20,7 +20,6 @@ spec:
         - name: doppler
           image: {{ .Values.doppler.image.repository }}:{{ default .Chart.AppVersion .Values.doppler.image.tag }}
           imagePullPolicy: {{ .Values.doppler.image.imagePullPolicy }}
-          imagePullPolicy: IfNotPresent
           {{- if .Values.doppler.resources }}
           resources:
             {{- toYaml .Values.doppler.resources | nindent 12 }}

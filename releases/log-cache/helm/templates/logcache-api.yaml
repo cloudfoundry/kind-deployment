@@ -19,7 +19,6 @@ spec:
         - name: cf-auth-proxy
           image: {{ .Values.logCacheApi.cfAuthProxy.image.repository }}:{{ default .Chart.AppVersion .Values.logCacheApi.cfAuthProxy.image.tag }}
           imagePullPolicy: {{ .Values.logCacheApi.cfAuthProxy.image.imagePullPolicy }}
-          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8083
           readinessProbe:
@@ -54,7 +53,6 @@ spec:
         - name: gateway
           image: {{ .Values.logCacheApi.gateway.image.repository }}:{{ default .Chart.AppVersion .Values.logCacheApi.gateway.image.tag }}
           imagePullPolicy: {{ .Values.logCacheApi.gateway.image.imagePullPolicy }}
-          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8081
           env:
@@ -131,7 +129,7 @@ spec:
     - log-cache-api
     - log-cache-api.{{ .Release.Namespace }}.svc
     - log-cache-api.{{ .Release.Namespace }}.svc.cluster.local
-    - "{{ .Values.logCacheApi.hostnmame }}"
+    - "{{ .Values.logCacheApi.hostname }}"
   issuerRef:
     name: ca-issuer
     kind: ClusterIssuer
