@@ -5,6 +5,8 @@ helmDefaults:
   recreatePods: false
   force: false
   createNamespace: true
+  args:
+    - --hide-notes
 
 environments:
   default:
@@ -35,32 +37,20 @@ releases:
     namespace: cert-manager
     chart: jetstack/cert-manager
     version: v1.19.2
-    wait: true
-    installed: true
     values:
       - crds:
           enabled: true
     hooks:
-      - events: ["presync"]
-        showlogs: true
-        command: "/bin/sh"
-        args:
-          - "-c"
-          - |
-            kubectl create namespace cert-manager --dry-run=client -o yaml | kubectl apply -f -
-            kubectl create namespace cf-workloads --dry-run=client -o yaml | kubectl apply -f -
-            kubectl create namespace istio-system --dry-run=client -o yaml | kubectl apply -f -
-            kubectl create configmap ca --namespace default --from-file {{ .Values.certsDir }}/ca.crt --dry-run=client -o yaml | kubectl apply -f -
-            kubectl create configmap trusted-system-certs --namespace cf-workloads --from-file=trusted-ca-1.crt={{ .Values.certsDir }}/ca.crt --dry-run=client -o yaml | kubectl apply -f -
-            kubectl create secret generic instance-identity --namespace default --from-file=tls.crt={{ .Values.certsDir }}/ca.crt --from-file=tls.key={{ .Values.certsDir }}/ca.key --dry-run=client -o yaml | kubectl apply -f -
-            kubectl create secret generic root-ca --namespace default --from-file=tls.crt={{ .Values.certsDir }}/ca.crt --from-file=tls.key={{ .Values.certsDir }}/ca.key --dry-run=client -o yaml | kubectl apply -f -
-            kubectl create secret generic root-ca --namespace cert-manager --from-file=tls.crt={{ .Values.certsDir }}/ca.crt --from-file=tls.key={{ .Values.certsDir }}/ca.key --dry-run=client -o yaml | kubectl apply -f -
       - events: ["postsync"]
         showlogs: true
         command: "/bin/sh"
         args:
           - "-c"
           - |
+            kubectl create configmap ca --namespace default --from-file {{ .Values.certsDir }}/ca.crt --dry-run=client -o yaml | kubectl apply -f -
+            kubectl create secret generic instance-identity --namespace default --from-file=tls.crt={{ .Values.certsDir }}/ca.crt --from-file=tls.key={{ .Values.certsDir }}/ca.key --dry-run=client -o yaml | kubectl apply -f -
+            kubectl create secret generic root-ca --namespace default --from-file=tls.crt={{ .Values.certsDir }}/ca.crt --from-file=tls.key={{ .Values.certsDir }}/ca.key --dry-run=client -o yaml | kubectl apply -f -
+            kubectl create secret generic root-ca --namespace cert-manager --from-file=tls.crt={{ .Values.certsDir }}/ca.crt --from-file=tls.key={{ .Values.certsDir }}/ca.key --dry-run=client -o yaml | kubectl apply -f -
             kubectl apply --filename assets/network-policy.yaml
             kubectl apply --filename assets/cluster-issuer.yaml
             kubectl apply --filename assets/nats-certificate.yaml
@@ -69,7 +59,6 @@ releases:
   - name: nats
     namespace: default
     chart: nats/nats
-    installed: true
     needs:
       - cert-manager/cert-manager
     values:
@@ -79,11 +68,10 @@ releases:
     namespace: istio-system
     chart: istio/base
     version: 1.28.3
-    installed: true
     needs:
       - cert-manager/cert-manager
     values:
-      - ./assets/values/istio-base.yaml
+      - defaultRevision: minimal
     hooks:
       - events: ["postsync"]
         showlogs: true
@@ -97,7 +85,6 @@ releases:
     namespace: istio-system
     chart: istio/istiod
     version: 1.28.3
-    installed: true
     needs:
       - istio-base
     values:
@@ -121,10 +108,8 @@ releases:
   - name: postgresql
     namespace: default
     chart: bitnami/postgresql
-    installed: true
     needs:
       - cert-manager/cert-manager
-    wait: true
     values:
       - ./assets/values/postgresql.yaml
       - auth:
@@ -133,8 +118,6 @@ releases:
   - name: minio
     namespace: default
     chart: minio/minio
-    installed: true
-    wait: true
     values:
       - extraEnvVars:
           - name: MINIO_DOMAIN
@@ -153,7 +136,6 @@ releases:
   - name: loggregator-agent
     namespace: default
     chart: ./releases/loggregator-agent/helm
-    installed: true
     needs:
       - capi
     values:
@@ -165,7 +147,6 @@ releases:
   - name: routing
     namespace: default
     chart: ./releases/routing/helm
-    installed: true
     needs:
       - uaa
 
@@ -181,15 +162,12 @@ releases:
   - name: log-cache
     namespace: default
     chart: ./releases/log-cache/helm
-    installed: true
     needs:
       - capi
 
   - name: uaa
     namespace: default
     chart: ./releases/uaa/helm
-    installed: true
-    wait: true
     needs:
       - postgresql
       - istio-system/istiod
@@ -202,7 +180,6 @@ releases:
   - name: credhub
     namespace: default
     chart: ./releases/credhub/helm
-    installed: true
     needs:
       - uaa
     values:
@@ -211,8 +188,6 @@ releases:
   - name: locket
     namespace: default
     chart: ./releases/diego/helm
-    installed: true
-    wait: true
     needs:
       - loggregator-agent
     values:
@@ -224,7 +199,6 @@ releases:
   - name: diego
     namespace: default
     chart: ./releases/diego/helm
-    installed: true
     needs:
       - locket
     values:
@@ -245,7 +219,6 @@ releases:
   - name: tps-watcher
     namespace: default
     chart: ./releases/capi/helm
-    installed: true
     needs:
       - locket
     values:
@@ -255,7 +228,6 @@ releases:
   - name: route-emitter
     namespace: default
     chart: ./releases/diego/helm
-    installed: true
     needs:
       - diego
       - nats
@@ -268,7 +240,6 @@ releases:
     namespace: default
     chart: cloudfoundry-k8s/k8s-rep
     version: "{{ .Values.versions.k8sRep }}"
-    installed: true
     needs:
       - locket
     values:
@@ -276,12 +247,19 @@ releases:
 {{ readFile (printf "%s/ca.crt" .Values.certsDir) | indent 10 }}
       - stacks:
           cflinuxfs4: ghcr.io/cloudfoundry/k8s/cflinuxfs4:{{ .Values.versions.cflinuxfs4 }}
+    hooks:
+      - events: ["presync"]
+        showlogs: true
+        command: "/bin/sh"
+        args:
+          - "-c"
+          - |
+            kubectl create namespace cf-workloads --dry-run=client -o yaml | kubectl apply -f -
+            kubectl create configmap trusted-system-certs --namespace cf-workloads --from-file=trusted-ca-1.crt={{ .Values.certsDir }}/ca.crt --dry-run=client -o yaml | kubectl apply -f -
 
   - name: capi
     namespace: default
     chart: ./releases/capi/helm
-    installed: true
-    wait: true
     needs:
       - minio
       - routing
