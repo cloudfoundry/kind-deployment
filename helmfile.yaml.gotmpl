@@ -17,17 +17,13 @@ environments:
 
 repositories:
   - name: jetstack
-    oci: true
-    url: quay.io/jetstack/charts
+    url: https://charts.jetstack.io
   - name: nats
     url: https://nats-io.github.io/k8s/helm/charts
   - name: istio
     url: https://istio-release.storage.googleapis.com/charts
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
-  - name: minio
-    oci: true
-    url: registry-1.docker.io/bitnamicharts
   - name: cloudfoundry-k8s
     oci: true
     url: ghcr.io/cloudfoundry/helm
@@ -59,6 +55,7 @@ releases:
   - name: nats
     namespace: default
     chart: nats/nats
+    version: 2.12.4
     needs:
       - cert-manager/cert-manager
     values:
@@ -108,6 +105,7 @@ releases:
   - name: postgresql
     namespace: default
     chart: bitnami/postgresql
+    version: 16.7.27
     needs:
       - cert-manager/cert-manager
     values:
@@ -117,7 +115,8 @@ releases:
 
   - name: minio
     namespace: default
-    chart: minio/minio
+    chart: bitnami/minio
+    version: 17.0.21
     values:
       - extraEnvVars:
           - name: MINIO_DOMAIN
