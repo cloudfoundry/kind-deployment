@@ -17,5 +17,10 @@ nfsv3driver:
     repository: ghcr.io/cloudfoundry/k8s/nfsv3driver
     tag: ~
     imagePullPolicy: IfNotPresent
-  nodeSelector: ~
-  tolerations: ~
+  nodeSelector:
+    cloudfoundry.org/cell: "true"
+  tolerations:
+    - key: cloudfoundry.org/cell
+      operator: Equal
+      value: "true"
+      effect: NoSchedule

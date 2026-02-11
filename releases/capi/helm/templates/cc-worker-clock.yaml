@@ -6,6 +6,8 @@ metadata:
   name: cc-worker-clock
   labels:
     app.kubernetes.io/name: cc-worker-clock
+  annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/cloud-controller-configmap.yaml") . | sha256sum }}
 spec:
   # This is a singleton.
   replicas: 1
@@ -16,6 +18,8 @@ spec:
       app.kubernetes.io/name: cc-worker-clock
   template:
     metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/cloud-controller-configmap.yaml") . | sha256sum }}
       labels:
         app.kubernetes.io/name: cc-worker-clock
     spec:
