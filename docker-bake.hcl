@@ -11,7 +11,7 @@ group "default" {
 }
 
 variable "ROUTING_RELEASE_VERSION" {
-  # renovate: depName=cloudfoundry/routing-release
+  # renovate: dataSource=github-releases depName=cloudfoundry/routing-release
   default = "0.362.0"
 }
 
@@ -31,7 +31,7 @@ target "routing" {
 }
 
 variable "CF_NETWORKING_RELEASE_VERSION" {
-  # renovate: depName=cloudfoundry/cf-networking-release
+  # renovate: dataSource=github-releases depName=cloudfoundry/cf-networking-release
   default = "3.98.0"
 }
 
@@ -50,7 +50,7 @@ target "cf-networking" {
 }
 
 variable "BOSH_DNS_RELEASE_VERSION" {
-  # renovate: depName=cloudfoundry/bosh-dns-release
+  # renovate: dataSource=github-releases depName=cloudfoundry/bosh-dns-release
   default = "1.39.18"
 }
 
@@ -69,7 +69,7 @@ target "bosh-dns" {
 }
 
 variable "CAPI_RELEASE_VERSION" {
-  # renovate: depName=cloudfoundry/capi-release
+  # renovate: dataSource=github-releases depName=cloudfoundry/capi-release
   default = "1.225.0"
 }
 
@@ -88,7 +88,7 @@ target "capi" {
 }
 
 variable "DIEGO_RELEASE_VERSION" {
-  # renovate: depName=cloudfoundry/diego-release
+  # renovate: dataSource=github-releases depName=cloudfoundry/diego-release
   default = "2.128.0"
 }
 
@@ -107,7 +107,7 @@ target "diego" {
 }
 
 variable "LOGGREGATOR_RELEASE_VERSION" {
-  # renovate: depName=cloudfoundry/loggregator-release
+  # renovate: dataSource=github-releases depName=cloudfoundry/loggregator-release
   default = "107.0.24"
 }
 
@@ -126,7 +126,7 @@ target "loggregator" {
 }
 
 variable "LOGGREGATOR_AGENT_RELEASE_VERSION" {
-  # renovate: depName=cloudfoundry/loggregator-agent-release
+  # renovate: dataSource=github-releases depName=cloudfoundry/loggregator-agent-release
   default = "8.3.13"
 }
 
@@ -145,7 +145,7 @@ target "loggregator-agent" {
 }
 
 variable "LOG_CACHE_RELEASE_VERSION" {
-  # renovate: depName=cloudfoundry/log-cache-release
+  # renovate: dataSource=github-releases depName=cloudfoundry/log-cache-release
   default = "3.2.4"
 }
 
@@ -169,7 +169,7 @@ target "log-cache" {
 }
 
 variable "CF_DEPLOYMENT_VERSION" {
-  # renovate: depName=cloudfoundry/cf-deployment
+  # renovate: dataSource=github-releases depName=cloudfoundry/cf-deployment
   default = "54.6.0"
 }
 
@@ -186,7 +186,7 @@ target "fileserver" {
 }
 
 variable "UAA_RELEASE_VERSION" {
-  # renovate: depName=cloudfoundry/uaa-release
+  # renovate: dataSource=github-releases depName=cloudfoundry/uaa-release
   default = "78.7.0"
 }
 
@@ -204,7 +204,7 @@ target "uaa" {
 }
 
 variable "CREDHUB_RELEASE_VERSION" {
-  # renovate: depName=pivotal/credhub-release
+  # renovate: dataSource=github-releases depName=pivotal/credhub-release
   default = "2.14.17"
 }
 
@@ -215,7 +215,7 @@ target "credhub" {
 }
 
 variable "CFLINUXFS4_VERSION" {
-  # renovate: depName=cloudfoundry/cflinuxfs4-release
+  # renovate: dataSource=github-releases depName=cloudfoundry/cflinuxfs4-release
   default = "1.304.0"
 }
 
@@ -229,7 +229,7 @@ target "cflinuxfs4" {
 }
 
 variable "NFS_VOLUME_RELEASE_VERSION" {
-  # renovate: depName=cloudfoundry/nfs-volume-release
+  # renovate: dataSource=github-releases depName=cloudfoundry/nfs-volume-release
   default = "7.47.0"
 }
 

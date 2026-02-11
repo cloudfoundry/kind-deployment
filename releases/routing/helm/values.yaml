@@ -13,6 +13,6 @@ udpForwarder:
   certificateSecret: ~
   image:
     repository: ghcr.io/cloudfoundry/k8s/udp-forwarder
-    # renovate: depName=loggregator-agent-release image=ghcr.io/cloudfoundry/k8s/udp-forwarder
+    # renovate: dataSource=docker depName=loggregator-agent-release packageName=ghcr.io/cloudfoundry/k8s/udp-forwarder
     tag: "8.3.13"
     imagePullPolicy: IfNotPresent
