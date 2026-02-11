@@ -33,6 +33,7 @@ jobs:
             COMMIT_MSG=$(git log -1 --pretty=%B)
             case "$COMMIT_MSG" in
               *cloudfoundry/cf-deployment*) TARGET="fileserver" ;;
+              *pivotal/credhub-release*) TARGET="credhub" ;;
               *) TARGET=$(echo "$COMMIT_MSG" | sed -n 's/.*cloudfoundry\/\(.*\)-release.*/\1/p') ;;
             esac
           }
