@@ -14,7 +14,7 @@ FROM ubuntu:latest
 
 COPY --from=builder /usr/local/bin/mapfs /usr/local/bin
 COPY --from=builder /usr/local/bin/nfsv3driver /usr/local/bin
-ADD --chmod=0755 releases/nfs-volume-release/nfsv3driver.sh /nfsv3driver.sh
+ADD --chmod=0755 releases/nfs-volume/nfsv3driver.sh /nfsv3driver.sh
 
 RUN apt-get update && apt-get install -y nfs-common fuse
 
