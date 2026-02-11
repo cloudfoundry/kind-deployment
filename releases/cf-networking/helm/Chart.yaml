@@ -4,4 +4,4 @@ description: Helm chart for CF Networking components
 type: application
 apiVersion: v2
 # renovate: dataSource=docker depName=cf-networking-release packageName=ghcr.io/cloudfoundry/k8s/policy-server
-appVersion: 3.98.0
+appVersion: 3.100.0
