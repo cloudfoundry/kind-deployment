@@ -46,7 +46,7 @@ boshDns:
   image:
     repository: ghcr.io/cloudfoundry/k8s/bosh-dns
     # renovate: dataSource=docker depName=bosh-dns-release packageName=ghcr.io/cloudfoundry/k8s/bosh-dns
-    tag: "1.39.18"
+    tag: "1.39.21"
     imagePullPolicy: IfNotPresent
   nodeSelector: ~
   tolerations: ~
