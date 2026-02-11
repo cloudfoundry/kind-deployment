@@ -17,17 +17,13 @@ environments:
 
 repositories:
   - name: jetstack
-    oci: true
-    url: quay.io/jetstack/charts
+    url: https://charts.jetstack.io
   - name: nats
     url: https://nats-io.github.io/k8s/helm/charts
   - name: istio
     url: https://istio-release.storage.googleapis.com/charts
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
-  - name: minio
-    oci: true
-    url: registry-1.docker.io/bitnamicharts
   - name: cloudfoundry-k8s
     oci: true
     url: ghcr.io/cloudfoundry/helm
@@ -117,7 +113,7 @@ releases:
 
   - name: minio
     namespace: default
-    chart: minio/minio
+    chart: bitnami/minio
     values:
       - extraEnvVars:
           - name: MINIO_DOMAIN
