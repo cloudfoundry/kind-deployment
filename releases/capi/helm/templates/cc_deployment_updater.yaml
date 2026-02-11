@@ -4,6 +4,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cc-deployment-updater
+  annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/cloud-controller-configmap.yaml") . | sha256sum }}
   labels:
     app.kubernetes.io/name: cc-deployment-updater
 spec:
@@ -15,6 +17,8 @@ spec:
       app.kubernetes.io/name: cc-deployment-updater
   template:
     metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/cloud-controller-configmap.yaml") . | sha256sum }}
       labels:
         app.kubernetes.io/name: cc-deployment-updater
     spec:
