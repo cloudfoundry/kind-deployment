@@ -54,7 +54,8 @@ You can configure the installation by setting following environment variables:
 | ENABLE_NFS_VOLUME | false | nfsbroker |
 
 ## Supported CF Features
-The CF kind deployment aims to support all Cloud Foundry features available for CF on BOSH. Currently, the only not yet supported feature is [TCP routing](https://docs.cloudfoundry.org/adminguide/enabling-tcp-routing.html) .
+
+The CF kind deployment aims to support all Cloud Foundry features available for CF on BOSH. Currently, the only not yet supported features are [TCP routing](https://docs.cloudfoundry.org/adminguide/enabling-tcp-routing.html) and `Routing API`.
 
 ## Read More Documentation
 
