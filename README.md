@@ -53,6 +53,9 @@ You can configure the installation by setting following environment variables:
 | ENABLE_POLICY_SUPPORT | true  | policy-serverver, policy-agent, bosh-dns, service-discovery-controller |
 | ENABLE_NFS_VOLUME | false | nfsbroker |
 
+## Features
+
+`TCP routing` is the only feature to not work (yet) in the kind deployment.
 
 ## Read More Documentation
 
