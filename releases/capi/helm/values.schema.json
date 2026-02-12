@@ -355,7 +355,7 @@
       "type": "object"
     },
     "dbPassword": {
-      "type": "string"
+      "type": ["string", "null"]
     },
     "global": {
       "type": "object"
@@ -469,7 +469,7 @@
       "type": "object"
     },
     "oauthClientsSecret": {
-      "type": "string"
+      "type": ["string", "null"]
     },
     "routeRegistrar": {
       "additionalProperties": false,
@@ -642,6 +642,5 @@
       "type": "object"
     }
   },
-  "type": "object",
-  "required": ["oauthClientsSecret", "dbPassword"]
+  "type": "object"
 }

@@ -6,7 +6,7 @@
       "type": "string"
     },
     "dbPassword": {
-      "type": "string"
+      "type": ["string", "null"]
     },
     "global": {
       "type": "object"
@@ -69,6 +69,5 @@
       "type": "object"
     }
   },
-  "type": "object",
-  "required": ["dbPassword"]
+  "type": "object"
 }

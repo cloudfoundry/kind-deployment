@@ -1,4 +1,5 @@
 {{ if .Values.cloudController.enabled }}
+{{ $_ := required ".Values.dbPassword must be provided" .Values.dbPassword }}
 ---
 apiVersion: v1
 kind: Secret

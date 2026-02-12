@@ -123,10 +123,10 @@
       "type": "object"
     },
     "dbPassword": {
-      "type": "string"
+      "type": ["string", "null"]
     },
     "diegoSSHCredentials": {
-      "type": "string"
+      "type": ["string", "null"]
     },
     "fileserver": {
       "additionalProperties": false,
@@ -249,7 +249,7 @@
       "type": "object"
     },
     "oauthClientsSecret": {
-      "type": "string"
+      "type": ["string", "null"]
     },
     "routeEmitter": {
       "additionalProperties": false,
@@ -387,9 +387,8 @@
       "type": "object"
     },
     "sshProxyHostKey": {
-      "type": "string"
+      "type": ["string", "null"]
     }
   },
-  "type": "object",
-  "required": ["oauthClientsSecret", "diegoSSHCredentials", "dbPassword", "sshProxyHostKey"]
+  "type": "object"
 }

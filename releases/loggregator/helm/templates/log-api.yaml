@@ -1,5 +1,6 @@
 
 {{ if .Values.loggregator.enabled }}
+{{ $_ := required ".Values.oauthClientsSecret must be provided" .Values.oauthClientsSecret }}
 ---
 kind: Deployment
 apiVersion: apps/v1

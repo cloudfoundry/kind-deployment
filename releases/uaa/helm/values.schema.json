@@ -6,13 +6,13 @@
       "type": "string"
     },
     "ccAdminPassword": {
-      "type": "string"
+      "type": ["string", "null"]
     },
     "certificateSecret": {
       "type": "string"
     },
     "dbPassword": {
-      "type": "string"
+      "type": ["string", "null"]
     },
     "global": {
       "type": "object"
@@ -39,7 +39,7 @@
       "type": ["object", "null"]
     },
     "oauthClientsSecret": {
-      "type": "string"
+      "type": ["string", "null"]
     },
     "tolerations": {
       "type": ["array", "null"],
@@ -69,9 +69,8 @@
       }
     },
     "uaaAdminSecret": {
-      "type": "string"
+      "type": ["string", "null"]
     }
   },
-  "type": "object",
-  "required": ["dbPassword", "oauthClientsSecret", "ccAdminPassword", "uaaAdminSecret"]
+  "type": "object"
 }

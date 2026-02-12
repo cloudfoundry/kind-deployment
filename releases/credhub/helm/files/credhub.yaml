@@ -1,3 +1,4 @@
+{{ $_ := required ".Values.dbPassword must be provided" .Values.dbPassword }}
 auth-server:
   url: {{ .Values.uaa.address }}
   trust_store: /app/stores/trust_store.jks

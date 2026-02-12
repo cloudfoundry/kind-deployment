@@ -1,3 +1,4 @@
+{{ $_ := required ".Values.oauthClientsSecret must be provided" .Values.oauthClientsSecret }}
 webserver: puma
 puma:
   automatic_worker_count: false

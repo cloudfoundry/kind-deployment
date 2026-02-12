@@ -84,7 +84,7 @@
       "type": "object"
     },
     "oauthClientsSecret": {
-      "type": "string"
+      "type": ["string", "null"]
     },
     "reverseLogProxy": {
       "additionalProperties": false,
@@ -210,6 +210,5 @@
       "type": "object"
     }
   },
-  "type": "object",
-  "required": ["oauthClientsSecret"]
+  "type": "object"
 }

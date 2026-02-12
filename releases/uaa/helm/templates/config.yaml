@@ -1,3 +1,4 @@
+{{- $_ := required ".Values.uaaAdminSecret must be provided" .Values.uaaAdminSecret }}
 ---
 apiVersion: v1
 kind: ConfigMap

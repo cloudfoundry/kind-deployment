@@ -1,4 +1,7 @@
 {{- if .Values.sshProxy.enabled }}
+{{ $_ := required ".Values.oauthClientsSecret must be provided" .Values.oauthClientsSecret }}
+{{ $_ := required ".Values.sshProxyHostKey must be provided" .Values.sshProxyHostKey }}
+{{ $_ := required ".Values.diegoSSHCredentials must be provided" .Values.diegoSSHCredentials }}
 ---
 apiVersion: v1
 kind: ConfigMap
