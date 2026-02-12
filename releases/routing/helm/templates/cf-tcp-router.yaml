@@ -1,0 +1,239 @@
+{{ if .Values.tcpRouter.enabled }}
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: cf-tcp-router
+  labels:
+    app: cf-tcp-router
+  annotations:
+    checksum/cf-tcp-router-config: {{ include (print $.Template.BasePath "/cf-tcp-router-configmap.yaml") . | sha256sum }}
+    checksum/haproxy-config: {{ include (print $.Template.BasePath "/haproxy-configmap.yaml") . | sha256sum }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cf-tcp-router
+  template:
+    metadata:
+      labels:
+        app: cf-tcp-router
+      annotations:
+        checksum/cf-tcp-router-config: {{ include (print $.Template.BasePath "/cf-tcp-router-configmap.yaml") . | sha256sum }}
+        checksum/haproxy-config: {{ include (print $.Template.BasePath "/haproxy-configmap.yaml") . | sha256sum }}
+    spec:
+      shareProcessNamespace: true
+      initContainers:
+        - name: combine-certificates
+          image: busybox:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              cat /certs/tls.crt /certs/tls.key > /tmp/tls-combined.pem
+              cat /haproxy-original/haproxy.conf > /haproxy/haproxy.conf
+          volumeMounts:
+            - name: cf-tcp-router
+              mountPath: /certs
+            - name: tmp
+              mountPath: /tmp
+            - name: shared
+              mountPath: /haproxy
+            - name: haproxy-config
+              mountPath: /haproxy-original/haproxy.conf
+              subPath: haproxy.conf
+      containers:
+        - name: cf-tcp-router
+          image: {{ .Values.tcpRouter.image.repository }}:{{ default .Chart.AppVersion .Values.tcpRouter.image.tag }}
+          imagePullPolicy: {{ .Values.tcpRouter.image.imagePullPolicy }}
+          args:
+          - -logLevel=info
+          - -timeFormat=rfc3339
+          - -tcpLoadBalancerConfig=/haproxy/haproxy.conf
+          - -tcpLoadBalancerBaseConfig=/haproxy-original/haproxy.conf
+          - -tcpLoadBalancerStatsUnixSocket=/haproxy/haproxy.sock
+          - -haproxyReloader=/usr/local/bin/haproxy_reloader.sh
+          - -config=/cf-tcp-router/cf-tcp-router.yaml
+          - -statsCollectionInterval=1m
+          - -dropsondePort=3457
+          - -routingGroupCheckExit=false
+          {{- if .Values.tcpRouter.resources }}
+          resources:
+            {{- toYaml .Values.tcpRouter.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: cf-tcp-router
+              mountPath: /etc/ssl/cf-tcp-router
+            - name: cf-tcp-router-config
+              mountPath: /cf-tcp-router
+            - name: shared
+              mountPath: /haproxy
+            - name: haproxy-config
+              mountPath: /haproxy-original/haproxy.conf
+              subPath: haproxy.conf
+            - name: tmp
+              mountPath: /tmp
+        - name: haproxy
+          image: haproxy:{{ .Values.tcpRouter.haproxy.image.tag }}
+          imagePullPolicy: {{ .Values.tcpRouter.haproxy.image.imagePullPolicy }}
+          args:
+            - -W
+            - -db
+            - -p
+            - /haproxy/haproxy.pid
+            - -f
+            - /haproxy/haproxy.conf
+          {{- if .Values.tcpRouter.haproxy.resources }}
+          resources:
+            {{- toYaml .Values.tcpRouter.haproxy.resources | nindent 12 }}
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+          volumeMounts:
+            - name: shared
+              mountPath: /haproxy
+            - name: cf-tcp-router
+              mountPath: /etc/ssl/cf-tcp-router
+            - name: tmp
+              mountPath: /tmp
+      {{- if .Values.tcpRouter.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.tcpRouter.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tcpRouter.tolerations }}
+      tolerations:
+        {{- toYaml .Values.tcpRouter.tolerations | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: cf-tcp-router
+          secret:
+            secretName: {{ default "cf-tcp-router" .Values.tcpRouter.certificateSecret }}
+        - name: cf-tcp-router-config
+          configMap:
+            name: cf-tcp-router-configmap
+        - name: haproxy-config
+          configMap:
+            name: haproxy-configmap
+        - name: shared
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: cf-tcp-router
+  labels:
+    app: cf-tcp-router
+spec:
+  selector:
+    app: cf-tcp-router
+  ports:
+    - name: tcp-1
+      port: 32000
+      targetPort: 32000
+    - name: tcp-2
+      port: 32001
+      targetPort: 32001
+    - name: tcp-3
+      port: 32002
+      targetPort: 32002
+    - name: tcp-4
+      port: 32003
+      targetPort: 32003
+    - name: tcp-5
+      port: 32004
+      targetPort: 32004
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-1
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-1
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32000
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-2
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-2
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32001
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-3
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-3
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32002
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-4
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-4
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32003
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-5
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-5
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32004
+{{- if not .Values.tcpRouter.certificateSecret }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cf-tcp-router
+spec:
+  secretName: cf-tcp-router
+  commonName: client
+  dnsNames:
+    - cf-tcp-router
+    - cf-tcp-router.{{ .Release.Namespace }}.svc
+    - cf-tcp-router.{{ .Release.Namespace }}.svc.cluster.local
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{- end }}
+{{- end }}

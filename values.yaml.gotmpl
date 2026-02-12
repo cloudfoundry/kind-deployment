@@ -13,6 +13,7 @@ optionalComponents:
   enableLoggregator: {{ env "ENABLE_LOGGREGATOR" | default "true" }}
   enablePolicySupport: {{ env "ENABLE_POLICY_SUPPORT" | default "true" }}
   enableNfsVolume: {{ env "ENABLE_NFS_VOLUME" | default "false" }}
+  enableTcpRouting: {{ env "ENABLE_TCP_ROUTING" | default "true" }}
 
 secrets:
   dbPassword: {{ requiredEnv "DB_PASSWORD" }}

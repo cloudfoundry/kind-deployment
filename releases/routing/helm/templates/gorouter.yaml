@@ -1,3 +1,4 @@
+{{- if .Values.gorouter.enabled }}
 ---
 kind: Deployment
 apiVersion: apps/v1
@@ -162,8 +163,8 @@ spec:
     - backendRefs:
         - name: gorouter
           port: 443
+{{- if not .Values.gorouter.certificateSecret }}
 ---
-{{ if not .Values.gorouter.certificateSecret }}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -186,9 +187,9 @@ spec:
     - client auth
   privateKey:
     rotationPolicy: Always
-{{end }}
+{{- end }}
+{{- if not .Values.udpForwarder.certificateSecret }}
 ---
-{{ if not .Values.udpForwarder.certificateSecret }}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -208,4 +209,5 @@ spec:
     - client auth
   privateKey:
     rotationPolicy: Always
-{{end }}
+{{- end }}
+{{- end }}

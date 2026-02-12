@@ -1,0 +1,118 @@
+{{- if .Values.routingApi.enabled }}
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: routing-api
+  labels:
+    app: routing-api
+  annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/routing-api-configmap.yaml") . | sha256sum }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: routing-api
+  template:
+    metadata:
+      labels:
+        app: routing-api
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/routing-api-configmap.yaml") . | sha256sum }}
+    spec:
+      shareProcessNamespace: true
+      containers:
+        - name: routing-api
+          image: {{ .Values.routingApi.image.repository }}:{{ default .Chart.AppVersion .Values.routingApi.image.tag }}
+          imagePullPolicy: {{ .Values.routingApi.image.imagePullPolicy }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          args:
+          - -config=/routing-api/routing-api.yaml
+          - -ip=$(POD_IP)
+          {{- if .Values.routingApi.resources }}
+          resources:
+            {{- toYaml .Values.routingApi.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: routing-api
+              mountPath: /etc/ssl/routing-api
+            - name: routing-api-config
+              mountPath: /routing-api
+        - name: route-registrar
+          image: {{ .Values.routeRegistrar.image.repository }}:{{ .Values.routeRegistrar.image.tag }}
+          imagePullPolicy: {{ .Values.routeRegistrar.image.imagePullPolicy }}
+          env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          {{- if .Values.routeRegistrar.resources }}
+          resources:
+            {{- toYaml .Values.routeRegistrar.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: routing-api
+              mountPath: /etc/ssl/certs/routing-api
+            - name: etc-route-registrar
+              mountPath: /etc/route-registrar-template
+            - name: tmpdir
+              mountPath: /tmp
+      volumes:
+        - name: routing-api
+          secret:
+            secretName: {{ default "routing-api" .Values.routingApi.certificateSecret }}
+        - name: routing-api-config
+          configMap:
+            name: routing-api-configmap
+        - name: etc-route-registrar
+          configMap:
+            name: routing-api-route-registrar-configmap
+        - name: tmpdir
+          emptyDir: {}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: routing-api
+  labels:
+    app: routing-api
+spec:
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+    - name: https
+      port: 3001
+      targetPort: 3001
+  selector:
+    app: routing-api
+---
+{{ if not .Values.routingApi.certificateSecret }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: routing-api
+spec:
+  secretName: routing-api
+  commonName: client
+  dnsNames:
+    - routing-api
+    - routing-api.{{ .Release.Namespace }}.svc
+    - routing-api.{{ .Release.Namespace }}.svc.cluster.local
+    - "api.{{ .Values.routingApi.systemDomain }}"
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  usages:
+    - key encipherment
+    - digital signature
+    - server auth
+    - client auth
+  privateKey:
+    rotationPolicy: Always
+{{- end }}
+{{- end }}

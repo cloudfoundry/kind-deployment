@@ -1,0 +1,34 @@
+{{- if .Values.routingApi.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: routing-api-route-registrar-configmap
+data:
+  route-registrar.json: |-
+    {
+      "message_bus_servers": [
+        {
+          "host": "nats.{{ .Release.Namespace }}.svc.cluster.local:4222"
+        }
+      ],
+      "nats_mtls_config": {
+        "enabled": true,
+        "cert_path": "/etc/ssl/certs/routing-api/tls.crt",
+        "key_path": "/etc/ssl/certs/routing-api/tls.key",
+        "ca_path": "/etc/ssl/certs/routing-api/ca.crt"
+      },
+      "host": "",
+      "routes": [
+        {
+          "name": "routing-api",
+          "port": 3000,
+          "registration_interval": "10s",
+          "server_cert_domain_san": "api.{{ .Values.routingApi.systemDomain }}",
+          "uris": [
+            "api.{{ .Values.routingApi.systemDomain }}/routing"
+          ]
+        }
+      ]
+    }
+{{- end }}

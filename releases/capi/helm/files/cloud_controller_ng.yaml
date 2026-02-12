@@ -141,9 +141,9 @@ cc_service_key_client_name: "cc_service_key_client"
 cc_service_key_client_secret: {{ .Values.oauthClientsSecret | quote }}
 
 routing_api:
-  url: "http://localhost:3000"
-  routing_client_name: "routing-client"
-  routing_client_secret: "routing-secret"
+  url: "https://{{ .Values.cloudController.externalDomain }}/routing"
+  routing_client_name: "cc_routing"
+  routing_client_secret: {{ .Values.oauthClientsSecret | quote }}
 route_services_enabled: true
 volume_services_enabled: true
 disable_private_domain_cross_space_context_path_route_sharing: false

@@ -39,12 +39,23 @@ data:
       "bbs_address": "{{ .Values.routeEmitter.bbsAddress }}",
       "cell_id": "$NODE_UID",
       "enable_internal_emitter": {{ .Values.routeEmitter.enableInternalEmitter }},
-      "enable_tcp_emitter": false,
+      "enable_tcp_emitter": {{ .Values.routeEmitter.enableTcpEmitter }},
       "tcp_enable_tls": true,
       "routing_api": {
-          "url": "http://routing-api.service.cf.internal",
-          "port": 3000,
-          "auth_enabled": true
+        "url": "https://routing-api.{{ .Release.Namespace }}.svc.cluster.local",
+        "port": 3001,
+        "ca_cert_file": "/etc/ssl/certs/routing_api/ca.crt",
+        "client_cert_file": "/etc/ssl/certs/routing_api/tls.crt",
+        "client_key_file": "/etc/ssl/certs/routing_api/tls.key",
+        "auth_enabled": true
+      },
+      "oauth": {
+        "uaa_url": "https://uaa.{{ .Release.Namespace }}.svc.cluster.local:443",
+        "uaa_request_timeout": "10s",
+        "client_name": "tcp_emitter",
+        "client_secret": {{ .Values.routeEmitter.oauthClientsSecret | quote }},
+        "skip_cert_verify": false,
+        "ca_certs": "/etc/ssl/certs/uaa/ca.crt"
       },
       "loggregator": {
         "loggregator_use_v2_api": true,

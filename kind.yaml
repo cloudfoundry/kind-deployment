@@ -33,6 +33,16 @@ nodes:
     hostPort: 443
   - containerPort: 31222
     hostPort: 2222
+  - containerPort: 32000
+    hostPort: 32000
+  - containerPort: 32001
+    hostPort: 32001
+  - containerPort: 32002
+    hostPort: 32002
+  - containerPort: 32003
+    hostPort: 32003
+  - containerPort: 32004
+    hostPort: 32004
 - role: worker
   labels:
     cloudfoundry.org/cell: "true"

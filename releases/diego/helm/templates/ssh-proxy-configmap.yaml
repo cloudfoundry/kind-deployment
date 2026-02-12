@@ -1,7 +1,4 @@
 {{- if .Values.sshProxy.enabled }}
-{{ $_ := required ".Values.oauthClientsSecret must be provided" .Values.oauthClientsSecret }}
-{{ $_ := required ".Values.sshProxyHostKey must be provided" .Values.sshProxyHostKey }}
-{{ $_ := required ".Values.diegoSSHCredentials must be provided" .Values.diegoSSHCredentials }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -13,7 +10,7 @@ data:
       "address": "0.0.0.0:2222",
       "health_check_address": "0.0.0.0:2223",
       "disable_health_check_server": true,
-      "host_key": {{ .Values.sshProxyHostKey | quote }},
+      "host_key": {{ required ".Values.sshProxyHostKey must be provided" .Values.sshProxyHostKey | quote }},
       "skip_cert_verify": false,
       "log_level": "info",
       "debug_address": "127.0.0.1:17016",
@@ -27,10 +24,10 @@ data:
       "bbs_client_key": "/etc/ssl/certs/ssh-proxy/tls.key",
       "bbs_ca_cert": "/etc/ssl/certs/ssh-proxy/ca.crt",
       "enable_diego_auth": true,
-      "diego_credentials": {{ .Values.diegoSSHCredentials | quote }},
+      "diego_credentials": {{ required ".Values.diegoSSHCredentials must be provided" .Values.diegoSSHCredentials | quote }},
       "enable_cf_auth": true,
       "uaa_token_url": "https://uaa.{{ .Release.Namespace }}.svc.cluster.local/oauth/token",
-      "uaa_password": {{ .Values.oauthClientsSecret | quote }},
+      "uaa_password": {{ required ".Values.sshProxy.oauthClientsSecret must be provided" .Values.sshProxy.oauthClientsSecret | quote }},
       "uaa_username": "ssh-proxy",
       "uaa_ca_cert": "/etc/ssl/certs/ssh-proxy/ca.crt",
       "time_format": "rfc3339",

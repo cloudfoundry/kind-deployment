@@ -3,92 +3,379 @@
   "additionalProperties": false,
   "properties": {
     "global": {
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "required": [],
+      "title": "global",
       "type": "object"
     },
     "gorouter": {
       "additionalProperties": false,
       "properties": {
         "appsDomain": {
+          "default": "*.apps.127-0-0-1.nip.io",
+          "title": "appsDomain",
           "type": "string"
         },
         "certificateSecret": {
+          "default": "",
+          "title": "certificateSecret",
           "type": "string"
         },
+        "enabled": {
+          "default": true,
+          "title": "enabled",
+          "type": "boolean"
+        },
         "hostname": {
+          "default": "gorouter.127-0-0-1.nip.io",
+          "title": "hostname",
           "type": "string"
         },
         "image": {
           "additionalProperties": false,
           "properties": {
             "repository": {
+              "default": "ghcr.io/cloudfoundry/k8s/gorouter",
+              "title": "repository",
               "type": "string"
             },
             "tag": {
+              "default": "",
+              "title": "tag",
               "type": "string"
             }
           },
+          "required": [
+            "repository",
+            "tag"
+          ],
+          "title": "image",
           "type": "object"
         },
         "imagePullPolicy": {
+          "default": "IfNotPresent",
+          "title": "imagePullPolicy",
           "type": "string"
         },
         "nodeSelector": {
-          "type": ["object", "null"]
+          "default": "~",
+          "title": "nodeSelector",
+          "type": "null"
         },
         "tolerations": {
-          "type": ["array", "null"],
-          "items": {
-            "additionalProperties": false,
-            "properties": {
-              "effect": {
-                "type": "string"
-              },
-              "key": {
-                "type": "string"
-              },
-              "operator": {
-                "type": "string"
-              },
-              "value": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "effect",
-              "key",
-              "operator",
-              "value"
-            ],
-            "type": "object"
-          }
+          "default": "~",
+          "title": "tolerations",
+          "type": "null"
         }
       },
+      "required": [
+        "enabled",
+        "certificateSecret",
+        "hostname",
+        "appsDomain",
+        "image",
+        "imagePullPolicy",
+        "nodeSelector",
+        "tolerations"
+      ],
+      "title": "gorouter",
+      "type": "object"
+    },
+    "routeRegistrar": {
+      "additionalProperties": false,
+      "properties": {
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "imagePullPolicy": {
+              "default": "IfNotPresent",
+              "title": "imagePullPolicy",
+              "type": "string"
+            },
+            "repository": {
+              "default": "ghcr.io/cloudfoundry/k8s/route-registrar",
+              "title": "repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "0.365.0",
+              "description": "renovate: dataSource=docker depName=routing-release packageName=ghcr.io/cloudfoundry/k8s/route-registrar",
+              "title": "tag",
+              "type": "string"
+            }
+          },
+          "required": [
+            "repository",
+            "tag",
+            "imagePullPolicy"
+          ],
+          "title": "image",
+          "type": "object"
+        }
+      },
+      "required": [
+        "image"
+      ],
+      "title": "routeRegistrar",
+      "type": "object"
+    },
+    "routingApi": {
+      "additionalProperties": false,
+      "properties": {
+        "certificateSecret": {
+          "default": "",
+          "title": "certificateSecret",
+          "type": "string"
+        },
+        "dbPassword": {
+          "default": "postgres",
+          "title": "dbPassword",
+          "type": "string"
+        },
+        "enabled": {
+          "default": true,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "imagePullPolicy": {
+              "default": "IfNotPresent",
+              "title": "imagePullPolicy",
+              "type": "string"
+            },
+            "repository": {
+              "default": "routing-api",
+              "title": "repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "latest",
+              "title": "tag",
+              "type": "string"
+            }
+          },
+          "required": [
+            "repository",
+            "tag",
+            "imagePullPolicy"
+          ],
+          "title": "image",
+          "type": "object"
+        },
+        "nodeSelector": {
+          "default": "~",
+          "title": "nodeSelector",
+          "type": "null"
+        },
+        "systemDomain": {
+          "default": "127-0-0-1.nip.io",
+          "title": "systemDomain",
+          "type": "string"
+        },
+        "tolerations": {
+          "default": "~",
+          "title": "tolerations",
+          "type": "null"
+        }
+      },
+      "required": [
+        "enabled",
+        "certificateSecret",
+        "systemDomain",
+        "dbPassword",
+        "image",
+        "nodeSelector",
+        "tolerations"
+      ],
+      "title": "routingApi",
+      "type": "object"
+    },
+    "tcpRouter": {
+      "additionalProperties": false,
+      "properties": {
+        "backendTLS": {
+          "additionalProperties": false,
+          "properties": {
+            "caCertPath": {
+              "default": "~",
+              "title": "caCertPath",
+              "type": "null"
+            },
+            "clientCertAndKeyPath": {
+              "default": "~",
+              "title": "clientCertAndKeyPath",
+              "type": "null"
+            }
+          },
+          "required": [
+            "caCertPath",
+            "clientCertAndKeyPath"
+          ],
+          "title": "backendTLS",
+          "type": "object"
+        },
+        "certificateSecret": {
+          "default": "",
+          "title": "certificateSecret",
+          "type": "string"
+        },
+        "enabled": {
+          "default": true,
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "haproxy": {
+          "additionalProperties": false,
+          "properties": {
+            "image": {
+              "additionalProperties": false,
+              "properties": {
+                "imagePullPolicy": {
+                  "default": "IfNotPresent",
+                  "title": "imagePullPolicy",
+                  "type": "string"
+                },
+                "repository": {
+                  "default": "haproxy",
+                  "title": "repository",
+                  "type": "string"
+                },
+                "tag": {
+                  "default": "3.3.3-alpine",
+                  "title": "tag",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "repository",
+                "tag",
+                "imagePullPolicy"
+              ],
+              "title": "image",
+              "type": "object"
+            },
+            "resources": {
+              "default": "~",
+              "title": "resources",
+              "type": "null"
+            }
+          },
+          "required": [
+            "image",
+            "resources"
+          ],
+          "title": "haproxy",
+          "type": "object"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "imagePullPolicy": {
+              "default": "IfNotPresent",
+              "title": "imagePullPolicy",
+              "type": "string"
+            },
+            "repository": {
+              "default": "cf-tcp-router",
+              "title": "repository",
+              "type": "string"
+            },
+            "tag": {
+              "default": "latest",
+              "title": "tag",
+              "type": "string"
+            }
+          },
+          "required": [
+            "repository",
+            "tag",
+            "imagePullPolicy"
+          ],
+          "title": "image",
+          "type": "object"
+        },
+        "nodeSelector": {
+          "default": "~",
+          "title": "nodeSelector",
+          "type": "null"
+        },
+        "oauthClientsSecret": {
+          "default": "",
+          "title": "oauthClientsSecret",
+          "type": "string"
+        },
+        "tolerations": {
+          "default": "~",
+          "title": "tolerations",
+          "type": "null"
+        }
+      },
+      "required": [
+        "enabled",
+        "certificateSecret",
+        "oauthClientsSecret",
+        "backendTLS",
+        "image",
+        "haproxy",
+        "nodeSelector",
+        "tolerations"
+      ],
+      "title": "tcpRouter",
       "type": "object"
     },
     "udpForwarder": {
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
+          "default": "",
+          "title": "certificateSecret",
           "type": "string"
         },
         "image": {
           "additionalProperties": false,
           "properties": {
             "imagePullPolicy": {
+              "default": "IfNotPresent",
+              "title": "imagePullPolicy",
               "type": "string"
             },
             "repository": {
+              "default": "ghcr.io/cloudfoundry/k8s/udp-forwarder",
+              "title": "repository",
               "type": "string"
             },
             "tag": {
+              "default": "8.3.13",
+              "description": "renovate: dataSource=docker depName=loggregator-agent-release packageName=ghcr.io/cloudfoundry/k8s/udp-forwarder",
+              "title": "tag",
               "type": "string"
             }
           },
+          "required": [
+            "repository",
+            "tag",
+            "imagePullPolicy"
+          ],
+          "title": "image",
           "type": "object"
         }
       },
+      "required": [
+        "certificateSecret",
+        "image"
+      ],
+      "title": "udpForwarder",
       "type": "object"
     }
   },
+  "required": [
+    "gorouter",
+    "udpForwarder",
+    "routingApi",
+    "tcpRouter",
+    "routeRegistrar"
+  ],
   "type": "object"
 }

@@ -90,6 +90,10 @@ spec:
               mountPath: /etc/ssl/certs/locket
             - name: nats
               mountPath: /etc/ssl/certs/nats
+            - name: uaa
+              mountPath: /etc/ssl/certs/uaa
+            - name: routing-api
+              mountPath: /etc/ssl/certs/routing_api
             - name: route-emitter-config
               mountPath: /route-emitter
             - name: tmp
@@ -116,6 +120,12 @@ spec:
         - name: loggregator
           secret:
             secretName: {{ default "loggregator" .Values.routeEmitter.loggregatorCertificateSecret }}
+        - name: uaa
+          secret:
+            secretName: {{ default "uaa" .Values.routeEmitter.uaaCertificateSecret }}
+        - name: routing-api
+          secret:
+            secretName: {{ default "routing-api" .Values.routeEmitter.routingApiCertificateSecret }}
         - name: route-emitter-config
           configMap:
             name: route-emitter-configmap

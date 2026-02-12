@@ -248,9 +248,6 @@
       },
       "type": "object"
     },
-    "oauthClientsSecret": {
-      "type": ["string", "null"]
-    },
     "routeEmitter": {
       "additionalProperties": false,
       "properties": {
@@ -272,11 +269,23 @@
         "loggregatorCertificateSecret": {
           "type": "string"
         },
+        "routingApiCertificateSecret": {
+          "type": "string"
+        },
+        "uaaCertificateSecret": {
+          "type": "string"
+        },
         "enabled": {
           "type": "boolean"
         },
         "enableInternalEmitter": {
           "type": "boolean"
+        },
+        "enableTcpEmitter": {
+          "type": "boolean"
+        },
+        "oauthClientsSecret": {
+          "type": "string"
         },
         "image": {
           "additionalProperties": false,
@@ -348,6 +357,9 @@
           "type": "boolean"
         },
         "hostname": {
+          "type": "string"
+        },
+        "oauthClientsSecret": {
           "type": "string"
         },
         "image": {

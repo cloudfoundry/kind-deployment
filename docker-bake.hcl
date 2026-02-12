@@ -21,7 +21,7 @@ target "routing" {
   name = component
   
   matrix = {
-    "component" = [ "gorouter", "route-registrar" ]
+    "component" = [ "gorouter", "route-registrar", "cf-tcp-router", "routing-api" ]
   }
 
   contexts = {

@@ -12,9 +12,7 @@ environments:
   default:
     values:
       - ./values.yaml.gotmpl
-
 ---
-
 repositories:
   - name: jetstack
     url: https://charts.jetstack.io
@@ -65,8 +63,6 @@ releases:
     namespace: istio-system
     chart: istio/base
     version: 1.28.3
-    needs:
-      - cert-manager/cert-manager
     values:
       - defaultRevision: minimal
     hooks:
@@ -84,6 +80,7 @@ releases:
     version: 1.28.3
     needs:
       - istio-base
+      - cert-manager/cert-manager
     values:
       - ./assets/values/istiod.yaml
     hooks:
@@ -136,24 +133,51 @@ releases:
     namespace: default
     chart: ./releases/loggregator-agent/helm
     needs:
-      - capi
+      - cert-manager/cert-manager
+      - istio-system/istiod
     values:
       - syslogBindingCache:
           enabled: true
       - forwarderAgent:
           enabled: true
 
-  - name: routing
+  - name: gorouter
     namespace: default
     chart: ./releases/routing/helm
     needs:
+      - cert-manager/cert-manager
+      - istio-system/istiod
+    values:
+      - routingApi:
+          enabled: false
+      - tcpRouter:
+          enabled: false
+
+  - name: tcp-routing
+    namespace: default
+    chart: ./releases/routing/helm
+    installed: {{ .Values.optionalComponents.enableTcpRouting }}
+    needs:
+      - loggregator-agent
+      - locket
       - uaa
+      - postgresql
+    values:
+      - gorouter:
+          enabled: false
+      - routingApi:
+          enabled: true
+          dbPassword: {{ .Values.secrets.dbPassword }}
+      - tcpRouter:
+          enabled: true
+          oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
 
   - name: loggregator
     namespace: default
     chart: ./releases/loggregator/helm
     installed: {{ .Values.optionalComponents.enableLoggregator }}
     needs:
+      - cert-manager/cert-manager
       - istio-system/istiod
     values:
       - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
@@ -162,12 +186,15 @@ releases:
     namespace: default
     chart: ./releases/log-cache/helm
     needs:
-      - capi
+      - cert-manager/cert-manager
+      - istio-system/istiod
+      - uaa
 
   - name: uaa
     namespace: default
     chart: ./releases/uaa/helm
     needs:
+      - cert-manager/cert-manager
       - postgresql
       - istio-system/istiod
     values:
@@ -181,6 +208,7 @@ releases:
     chart: ./releases/credhub/helm
     needs:
       - uaa
+      - postgresql
     values:
       - dbPassword: {{ .Values.secrets.dbPassword }}
 
@@ -189,11 +217,9 @@ releases:
     chart: ./releases/diego/helm
     needs:
       - loggregator-agent
+      - postgresql
     values:
       - dbPassword: {{ .Values.secrets.dbPassword }}
-      - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
-      - diegoSSHCredentials: ""
-      - sshProxyHostKey: ""
       - locket:
           enabled: true
 
@@ -202,10 +228,13 @@ releases:
     chart: ./releases/diego/helm
     needs:
       - locket
+      - uaa
+      - loggregator-agent
     values:
       - dbPassword: {{ .Values.secrets.dbPassword }}
       - diegoSSHCredentials: {{ .Values.secrets.diegoSSHCredentials }}
-      - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
+      - sshProxy:
+          oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
       - sshProxyHostKey: |
 {{ readFile (printf "%s/ssh_key" .Values.certsDir) | indent 10 }}
       - auctioneer:
@@ -221,13 +250,12 @@ releases:
     namespace: default
     chart: ./releases/capi/helm
     needs:
-      - locket
+      - capi
     values:
       - tpsWatcher:
           enabled: true
       - dbPassword: ""
       - oauthClientsSecret: ""
-
 
   - name: route-emitter
     namespace: default
@@ -235,30 +263,36 @@ releases:
     needs:
       - diego
       - nats
+      - cf-networking
     values:
       - diegoSSHCredentials: ""
       - sshProxyHostKey: ""
       - dbPassword: ""
-      - oauthClientsSecret: ""
       - routeEmitter:
           enabled: true
           bbsCertificateSecret: route-emitter
           locketCertificateSecret: route-emitter
           natsCertificateSecret: route-emitter
           loggregatorCertificateSecret: route-emitter
+          oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
           enableInternalEmitter: {{ .Values.optionalComponents.enableLoggregator }}
+          enableTcpEmitter: {{ .Values.optionalComponents.enableTcpRouting }}
 
   - name: k8s-rep
     namespace: default
     chart: cloudfoundry-k8s/k8s-rep
     version: "{{ .Values.versions.k8sRep }}"
     needs:
-      - locket
+      - diego
     values:
       - caCertificate: |
 {{ readFile (printf "%s/ca.crt" .Values.certsDir) | indent 10 }}
       - stacks:
           cflinuxfs4: ghcr.io/cloudfoundry/k8s/cflinuxfs4:{{ .Values.versions.cflinuxfs4 }}
+      - containerProxyVerifySubjectAltName: 
+          - gorouter
+          - ssh-proxy
+          - cf-tcp-router
     hooks:
       - events: ["presync"]
         showlogs: true
@@ -274,7 +308,11 @@ releases:
     chart: ./releases/capi/helm
     needs:
       - minio
-      - routing
+      - diego
+      - postgresql
+      {{- if .Values.optionalComponents.enableTcpRouting }}
+      - tcp-routing
+      {{- end }}
     values:
       - cloudController:
           enabled: true
@@ -298,6 +336,9 @@ releases:
     installed: {{ .Values.optionalComponents.enablePolicySupport }}
     needs:
       - capi
+      - uaa
+      - locket
+      - loggregator-agent
     values:
       - policyServer:
           dbPassword: {{ .Values.secrets.dbPassword }}

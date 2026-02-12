@@ -1,0 +1,58 @@
+{{- if .Values.routingApi.enabled }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: routing-api-configmap
+data:
+  routing-api.yaml: |-
+    ---
+    log_guid: "routing_api"
+    max_ttl: 120s
+    system_domain: {{ .Values.routingApi.systemDomain | quote }}
+    metron_config:
+      address: forwarder-agent.{{ .Release.Namespace }}.svc.cluster.local
+      port: 3458
+    metrics_reporting_interval: 30s
+    statsd_endpoint: localhost:8125
+    oauth:
+      token_endpoint: uaa.{{ .Release.Namespace }}.svc.cluster.local
+      port: 443
+      skip_ssl_validation: false
+      ca_certs: "/etc/ssl/routing-api/ca.crt"
+    debug_address: "127.0.0.1:17002"
+    statsd_client_flush_interval: 300ms
+    router_groups:
+    - name: default-tcp
+      reservable_ports: 32000-32004
+      type: tcp
+    reserved_system_component_ports: [2822, 2825, 3457, 3458, 3459, 3460, 3461, 8853, 9100, 14726, 14727, 14821, 14822, 14823, 14824, 14829, 14830, 14920, 14922, 15821, 17002, 53035, 53080]
+    fail_on_router_port_conflicts: false
+    uuid: 07c65e06-b676-4f4a-a37f-96df62d387d7
+    admin_port: 15897
+    api:
+      listen_port: 3000
+      http_enabled: true
+      mtls_listen_port: 3001
+      mtls_client_ca_file: "/etc/ssl/routing-api/ca.crt"
+      mtls_server_cert_file: "/etc/ssl/routing-api/tls.crt"
+      mtls_server_key_file: "/etc/ssl/routing-api/tls.key"
+    sqldb:
+      host: postgresql.{{ .Release.Namespace }}.svc.cluster.local
+      port: 5432
+      type: postgres
+      schema: routing_api
+      username: postgres
+      password: {{ .Values.routingApi.dbPassword }}
+      skip_hostname_validation: false
+      skip_ssl_validation: true
+      max_open_connections: 200
+      max_idle_connections: 10
+      connections_max_lifetime_seconds: 3600
+    lock_ttl: 10s
+    retry_interval: 5s
+    locket:
+      locket_address: locket.{{ .Release.Namespace }}.svc.cluster.local:8891
+      locket_ca_cert_file: "/etc/ssl/routing-api/ca.crt"
+      locket_client_cert_file: "/etc/ssl/routing-api/tls.crt"
+      locket_client_key_file: "/etc/ssl/routing-api/tls.key"
+{{- end }}

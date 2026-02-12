@@ -1,3 +1,4 @@
+{{- if .Values.gorouter.enabled }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -142,3 +143,4 @@ data:
         add_headers_if_not_present:
         remove_headers:
     html_error_template_file:
+{{- end }}

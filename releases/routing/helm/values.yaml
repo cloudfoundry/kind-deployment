@@ -1,4 +1,5 @@
 gorouter:
+  enabled: true
   certificateSecret: ""
   hostname: "gorouter.127-0-0-1.nip.io"
   appsDomain: "*.apps.127-0-0-1.nip.io"
@@ -15,4 +16,43 @@ udpForwarder:
     repository: ghcr.io/cloudfoundry/k8s/udp-forwarder
     # renovate: dataSource=docker depName=loggregator-agent-release packageName=ghcr.io/cloudfoundry/k8s/udp-forwarder
     tag: "8.3.14"
+    imagePullPolicy: IfNotPresent
+
+routingApi:
+  enabled: true
+  certificateSecret: ""
+  systemDomain: "127-0-0-1.nip.io"
+  dbPassword: "postgres"
+  image:
+    repository: routing-api
+    tag: "latest"
+    imagePullPolicy: IfNotPresent
+  nodeSelector: ~
+  tolerations: ~
+
+tcpRouter:
+  enabled: true
+  certificateSecret: ""
+  oauthClientsSecret: ""
+  backendTLS:
+    caCertPath: ~
+    clientCertAndKeyPath: ~
+  image:
+    repository: cf-tcp-router
+    tag: "latest"
+    imagePullPolicy: IfNotPresent
+  haproxy:
+    image:
+      repository: haproxy
+      tag: "3.3.3-alpine"
+      imagePullPolicy: IfNotPresent
+    resources: ~
+  nodeSelector: ~
+  tolerations: ~
+
+routeRegistrar:
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/route-registrar
+    # renovate: dataSource=docker depName=routing-release packageName=ghcr.io/cloudfoundry/k8s/route-registrar
+    tag: "0.365.0"
     imagePullPolicy: IfNotPresent

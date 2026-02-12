@@ -8,7 +8,7 @@ primary:
     scripts:
       init.sh: |
         export PGPASSWORD=$POSTGRES_PASSWORD
-        for db in locket diego cc uaa credhub network_policy; do
+        for db in locket diego cc uaa credhub network_policy routing_api; do
             psql -U postgres -h localhost -tc "SELECT 1 FROM pg_database WHERE datname = '$db'" | grep -q 1 || psql -U postgres -h localhost -c "CREATE DATABASE $db"
         done
         psql -U postgres -h localhost -d cc -c 'CREATE EXTENSION IF NOT EXISTS citext; CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; CREATE EXTENSION IF NOT EXISTS pgcrypto;'

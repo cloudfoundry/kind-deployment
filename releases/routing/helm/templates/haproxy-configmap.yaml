@@ -1,0 +1,27 @@
+{{- if .Values.tcpRouter.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: haproxy-configmap
+data:
+  haproxy.conf: |+
+    global
+        log 127.0.0.1   syslog info
+        maxconn 64000
+        spread-checks 4
+        stats socket /haproxy/haproxy.sock mode 600 level operator expose-fd listeners
+        ssl-default-bind-options ssl-min-ver TLSv1.2
+
+    defaults
+        log global
+        timeout connect 30000ms
+        maxconn 64000
+        timeout client 300000ms
+        timeout server 300000ms
+
+    listen health_check_http_url
+        mode http
+        bind :80
+        monitor-uri /health
+        monitor fail if { env(IS_DRAINING) -m str true }
+{{- end }}
