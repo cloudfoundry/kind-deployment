@@ -2,6 +2,8 @@
 
 I want to show you how easy it is to install Cloud Foundry locally. Whether you're using this setup to test something on your machine, showcase a feature, or simply learn how Cloud Foundry works, doesn't really matter.
 
+Setting up "classic" Cloud Foundry locally using BOSH is currently not supported and creates a significant barrier to entry. First-time users must overcome significant hurdles just to try cf push, and developers struggle with long setup times when testing changes.
+
 Instead of using the traditional way, utilizing BOSH and virtual machines, this installation deploys all the same familiar Cloud Foundry components (UAA, Diego, CAPI, etc.) in a fully containerized environment without reimplementing anything. It simply changes how these existing components are installed and orchestrated.
 
 ### Starting Point
