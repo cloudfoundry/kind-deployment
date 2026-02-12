@@ -21,7 +21,6 @@ spec:
         - name: reverse-log-proxy
           image: {{ .Values.reverseLogProxy.image.repository }}:{{ default .Chart.AppVersion .Values.reverseLogProxy.image.tag }}
           imagePullPolicy: {{ .Values.reverseLogProxy.image.imagePullPolicy }}
-          imagePullPolicy: IfNotPresent
           {{- if .Values.reverseLogProxy.resources }}
           resources:
             {{- toYaml .Values.reverseLogProxy.resources | nindent 12 }}
@@ -51,7 +50,6 @@ spec:
         - name: reverse-log-proxy-gateway
           image: {{ .Values.reverseLogProxyGateway.image.repository }}:{{ default .Chart.AppVersion .Values.reverseLogProxyGateway.image.tag }}
           imagePullPolicy: {{ .Values.reverseLogProxyGateway.image.imagePullPolicy }}
-          imagePullPolicy: IfNotPresent
           {{- if .Values.reverseLogProxyGateway.resources }}
           resources:
             {{- toYaml .Values.reverseLogProxyGateway.resources | nindent 12 }}
@@ -105,7 +103,6 @@ spec:
         - name: trafficcontroller
           image: {{ .Values.trafficcontroller.image.repository }}:{{ default .Chart.AppVersion .Values.trafficcontroller.image.tag }}
           imagePullPolicy: {{ .Values.trafficcontroller.image.imagePullPolicy }}
-          imagePullPolicy: IfNotPresent
           {{- if .Values.trafficcontroller.resources }}
           resources:
             {{- toYaml .Values.trafficcontroller.resources | nindent 12 }}

@@ -76,7 +76,6 @@ spec:
         - name: route-emitter
           image: {{ .Values.routeEmitter.image.repository }}:{{ default .Chart.AppVersion .Values.routeEmitter.image.tag }}
           imagePullPolicy: {{ .Values.routeEmitter.image.imagePullPolicy }}
-          imagePullPolicy: IfNotPresent
           args:
           - --config
           - /tmp/route-emitter.json

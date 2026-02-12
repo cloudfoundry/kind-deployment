@@ -24,7 +24,6 @@ spec:
         - name: service-discovery-controller
           image: {{ .Values.serviceDiscoveryController.image.repository }}:{{ default .Chart.AppVersion .Values.serviceDiscoveryController.image.tag }}
           imagePullPolicy: {{ .Values.serviceDiscoveryController.image.imagePullPolicy }}
-          imagePullPolicy: IfNotPresent
           {{- if .Values.serviceDiscoveryController.resources }}
           resources:
             {{- toYaml .Values.serviceDiscoveryController.resources | nindent 12 }}

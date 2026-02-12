@@ -19,7 +19,6 @@ spec:
       - name: syslog-server
         image: {{ .Values.logCacheBackend.syslogServer.image.repository }}:{{ default .Chart.AppVersion .Values.logCacheBackend.syslogServer.image.tag }}
         imagePullPolicy: {{ .Values.logCacheBackend.syslogServer.image.imagePullPolicy }}
-        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8082
         env:
@@ -49,7 +48,6 @@ spec:
       - name: log-cache
         image: {{ .Values.logCacheBackend.logCache.image.repository }}:{{ default .Chart.AppVersion .Values.logCacheBackend.logCache.image.tag }}
         imagePullPolicy: {{ .Values.logCacheBackend.logCache.image.imagePullPolicy }}
-        imagePullPolicy: IfNotPresent
         env:
         - name: ADDR
           value: 0.0.0.0:8080

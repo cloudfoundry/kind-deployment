@@ -32,7 +32,6 @@ spec:
         - name: syslog-binding-cache
           image: {{ .Values.syslogBindingCache.image.repository }}:{{ default .Chart.AppVersion .Values.syslogBindingCache.image.tag }}
           imagePullPolicy: {{ .Values.syslogBindingCache.image.imagePullPolicy }}
-          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9000
           env:

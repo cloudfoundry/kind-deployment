@@ -24,7 +24,6 @@ spec:
         - name: bosh-dns-adapter
           image: {{ .Values.boshDnsAdapter.image.repository }}:{{ default .Chart.AppVersion .Values.boshDnsAdapter.image.tag }}
           imagePullPolicy: {{ .Values.boshDnsAdapter.image.imagePullPolicy }}
-          imagePullPolicy: IfNotPresent
           {{- if .Values.boshDnsAdapter.resources }}
           resources:
             {{- toYaml .Values.boshDnsAdapter.resources | nindent 12 }}
@@ -38,7 +37,6 @@ spec:
         - name: bosh-dns
           image: {{ .Values.boshDns.image.repository }}:{{ .Values.boshDns.image.tag }}
           imagePullPolicy: {{ .Values.boshDns.image.imagePullPolicy }}
-          imagePullPolicy: IfNotPresent
           {{- if .Values.boshDns.resources }}
           resources:
             {{- toYaml .Values.boshDns.resources | nindent 12 }}

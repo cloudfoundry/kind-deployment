@@ -40,7 +40,6 @@ spec:
         - name: nginx
           image: {{ .Values.fileserver.image.repository }}:{{ .Values.fileserver.image.tag }}
           imagePullPolicy: {{ .Values.fileserver.image.imagePullPolicy }}
-          imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 8080

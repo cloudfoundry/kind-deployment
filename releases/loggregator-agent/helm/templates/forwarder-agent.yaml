@@ -20,7 +20,6 @@ spec:
         - name: forwarder-agent
           image: {{ .Values.forwarderAgent.image.repository }}:{{ default .Chart.AppVersion .Values.forwarderAgent.image.tag }}
           imagePullPolicy: {{ .Values.forwarderAgent.image.imagePullPolicy }}
-          imagePullPolicy: IfNotPresent
           {{- if .Values.forwarderAgent.resources }}
           resources:
             {{- toYaml .Values.forwarderAgent.resources | nindent 12 }}
@@ -50,7 +49,6 @@ spec:
         - name: loggregator-agent
           image: {{ .Values.loggregatorAgent.image.repository }}:{{ default .Chart.AppVersion .Values.loggregatorAgent.image.tag }}
           imagePullPolicy: {{ .Values.loggregatorAgent.image.imagePullPolicy }}
-          imagePullPolicy: IfNotPresent
           {{- if .Values.loggregatorAgent.resources }}
           resources:
             {{- toYaml .Values.loggregatorAgent.resources | nindent 12 }}
@@ -80,7 +78,6 @@ spec:
         - name: syslog-agent
           image: {{ .Values.syslogAgent.image.repository }}:{{ default .Chart.AppVersion .Values.syslogAgent.image.tag }}
           imagePullPolicy: {{ .Values.syslogAgent.image.imagePullPolicy }}
-          imagePullPolicy: IfNotPresent
           {{- if .Values.syslogAgent.resources }}
           resources:
             {{- toYaml .Values.syslogAgent.resources | nindent 12 }}
