@@ -22,7 +22,7 @@ make up
 
 But let's take a closer look at what actually happens...
 
-It starts by creating a local kind cluster prepared to host our Cloud Foundry installation. All dependencies are installed in the local cluster (database, NATS, blobstore ...). If you want to dig into it, check out [`deploy.sh`](https://github.com/cloudfoundry/kind-deployment/blob/main/scripts/deploy.sh).
+It starts by creating a local kind cluster prepared to host our Cloud Foundry installation. All dependencies are installed in the local cluster (database, NATS, blobstore ...). If you want to dig into it, check out [`helmfile.yaml.gotmpl`](https://github.com/cloudfoundry/kind-deployment/blob/main/helmfile.yaml.gotmpl).
 
 Once the cluster is prepared, the installation of the Cloud Foundry components begins: `uaa`, `locket`, `diego` and others - all sound very familiar. Only `k8s-rep` sounds somewhat new.
 
