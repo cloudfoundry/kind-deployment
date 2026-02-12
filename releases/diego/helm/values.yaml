@@ -72,6 +72,12 @@ routeEmitter:
       value: "true"
       effect: NoSchedule
 
+nats:
+  certificateSecret: ~
+
+loggregator:
+  certificateSecret: ~
+
 dbPassword: ~
 sshProxyHostKey: ~
 diegoSSHCredentials: ~

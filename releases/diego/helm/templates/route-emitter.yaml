@@ -82,6 +82,14 @@ spec:
           volumeMounts:
             - name: route-emitter
               mountPath: /etc/ssl/certs/route-emitter
+            - name: bbs
+              mountPath: /etc/ssl/certs/bbs
+            - name: loggregator
+              mountPath: /etc/ssl/certs/loggregator
+            - name: locket
+              mountPath: /etc/ssl/certs/locket
+            - name: nats
+              mountPath: /etc/ssl/certs/nats
             - name: route-emitter-config
               mountPath: /route-emitter
             - name: tmp
@@ -96,6 +104,18 @@ spec:
         - name: route-emitter
           secret:
             secretName: {{ default "route-emitter" .Values.routeEmitter.certificateSecret }}
+        - name: bbs
+          secret:
+            secretName: {{ default "bbs" .Values.bbs.certificateSecret }}
+        - name: locket
+          secret:
+            secretName: {{ default "locket" .Values.locket.certificateSecret }}
+        - name: nats
+          secret:
+            secretName: {{ default "nats" .Values.nats.certificateSecret }}
+        - name: loggregator
+          secret:
+            secretName: {{ default "loggregator" .Values.loggregator.certificateSecret }}
         - name: route-emitter-config
           configMap:
             name: route-emitter-configmap
@@ -107,8 +127,8 @@ spec:
       tolerations:
         {{- toYaml .Values.routeEmitter.tolerations | nindent 8 }}
       {{- end }}
----
 {{ if not .Values.routeEmitter.certificateSecret }}
+---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
