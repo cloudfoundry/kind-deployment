@@ -53,9 +53,8 @@ You can configure the installation by setting following environment variables:
 | ENABLE_POLICY_SUPPORT | true  | policy-serverver, policy-agent, bosh-dns, service-discovery-controller |
 | ENABLE_NFS_VOLUME | false | nfsbroker |
 
-## Features
-
-`TCP routing` is the only feature to not work (yet) in the kind deployment.
+## Supported CF Features
+The CF kind deployment aims to support all Cloud Foundry features available for CF on BOSH. Currently, the only not yet supported feature is [TCP routing](https://docs.cloudfoundry.org/adminguide/enabling-tcp-routing.html) .
 
 ## Read More Documentation
 
