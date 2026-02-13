@@ -242,6 +242,10 @@ releases:
       - oauthClientsSecret: ""
       - routeEmitter:
           enabled: true
+          bbsCertificateSecret: route-emitter
+          locketCertificateSecret: route-emitter
+          natsCertificateSecret: route-emitter
+          loggregatorCertificateSecret: route-emitter
           enableInternalEmitter: {{ .Values.optionalComponents.enableLoggregator }}
 
   - name: k8s-rep

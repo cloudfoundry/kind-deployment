@@ -260,6 +260,18 @@
         "certificateSecret": {
           "type": "string"
         },
+        "bbsSertificateSecret": {
+          "type": "string"
+        },
+        "locketCertificateSecret": {
+          "type": "string"
+        },
+        "natsCertificateSecret": {
+          "type": "string"
+        },
+        "loggregatorCertificateSecret": {
+          "type": "string"
+        },
         "enabled": {
           "type": "boolean"
         },

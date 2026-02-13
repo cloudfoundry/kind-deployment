@@ -106,16 +106,16 @@ spec:
             secretName: {{ default "route-emitter" .Values.routeEmitter.certificateSecret }}
         - name: bbs
           secret:
-            secretName: {{ default "bbs" .Values.bbs.certificateSecret }}
+            secretName: {{ default "bbs" .Values.routeEmitter.bbsCertificateSecret }}
         - name: locket
           secret:
-            secretName: {{ default "locket" .Values.locket.certificateSecret }}
+            secretName: {{ default "locket" .Values.routeEmitter.locketCertificateSecret }}
         - name: nats
           secret:
-            secretName: {{ default "nats" .Values.nats.certificateSecret }}
+            secretName: {{ default "nats" .Values.routeEmitter.natsCertificateSecret }}
         - name: loggregator
           secret:
-            secretName: {{ default "loggregator" .Values.loggregator.certificateSecret }}
+            secretName: {{ default "loggregator" .Values.routeEmitter.loggregatorCertificateSecret }}
         - name: route-emitter-config
           configMap:
             name: route-emitter-configmap
@@ -127,8 +127,8 @@ spec:
       tolerations:
         {{- toYaml .Values.routeEmitter.tolerations | nindent 8 }}
       {{- end }}
-{{ if not .Values.routeEmitter.certificateSecret }}
 ---
+{{ if not .Values.routeEmitter.certificateSecret }}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:

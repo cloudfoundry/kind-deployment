@@ -56,6 +56,10 @@ sshProxy:
 routeEmitter:
   enabled: false
   certificateSecret: ""
+  natsCertificateSecret: ""
+  loggregatorCertificateSecret: ""
+  bbsCertificateSecret: ""
+  locketCertificateSecret: ""
   natsAddress: "nats.default.svc.cluster.local:4222"
   locketAddress: "locket.default.svc.cluster.local:8891"
   bbsAddress: "https://bbs.default.svc.cluster.local:8889"
@@ -71,12 +75,6 @@ routeEmitter:
       operator: Equal
       value: "true"
       effect: NoSchedule
-
-nats:
-  certificateSecret: ~
-
-loggregator:
-  certificateSecret: ~
 
 dbPassword: ~
 sshProxyHostKey: ~
