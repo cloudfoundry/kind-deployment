@@ -26,8 +26,6 @@ syslogAgent:
     address: "https://syslog-binding-cache.default.svc.cluster.local:9000"
   logCacheSyslog:
     address: "syslog://log-cache-syslog.cf.ci.example.com:8082"
-  cache:
-    commonName: "syslog-binding-cache"
   aggregateDrain: false
   certificateSecret: ""
   resources: ~

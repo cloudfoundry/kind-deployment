@@ -113,15 +113,6 @@
         "aggregateDrain": {
           "type": "boolean"
         },
-        "cache": {
-          "additionalProperties": false,
-          "properties": {
-            "commonName": {
-              "type": "string"
-            }
-          },
-          "type": "object"
-        },
         "certificateSecret": {
           "type": "string"
         },
