@@ -260,7 +260,7 @@
         "certificateSecret": {
           "type": "string"
         },
-        "bbsSertificateSecret": {
+        "bbsCertificateSecret": {
           "type": "string"
         },
         "locketCertificateSecret": {
