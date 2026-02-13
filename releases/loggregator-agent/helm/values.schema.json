@@ -161,6 +161,15 @@
         "certificateSecret": {
           "type": "string"
         },
+        "cache": {
+          "additionalProperties": false,
+          "properties": {
+            "commonName": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
         "enabled": {
           "type": "boolean"
         },
