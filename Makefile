@@ -29,8 +29,8 @@ create-org:
 bootstrap: create-org
 	@ ./scripts/upload_buildpacks.sh
 
-bootstrap-complete: create-org bootstrap
-	@ ./scripts/upload_buildpacks_complete.sh
+bootstrap-complete: create-org 
+	@ ALL_BUILDPACKS=true ./scripts/upload_buildpacks.sh
 
 up: create-kind init install
 
