@@ -100,7 +100,7 @@ spec:
             - name: CACHE_URL
               value: "{{ .Values.syslogAgent.syslogBindingCache.address }}"
             - name: CACHE_COMMON_NAME
-              value: syslog-binding-cache
+              value: "{{ .Values.syslogAgent.cache.commonName }}"
             - name: CACHE_CA_FILE_PATH
               value: /etc/ssl/certs/syslog-agent/ca.crt
             - name: CACHE_CERT_FILE_PATH

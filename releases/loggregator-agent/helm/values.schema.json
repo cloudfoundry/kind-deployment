@@ -113,6 +113,15 @@
         "aggregateDrain": {
           "type": "boolean"
         },
+        "cache": {
+          "additionalProperties": false,
+          "properties": {
+            "commonName": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
         "certificateSecret": {
           "type": "string"
         },
@@ -160,6 +169,15 @@
       "properties": {
         "certificateSecret": {
           "type": "string"
+        },
+        "cache": {
+          "additionalProperties": false,
+          "properties": {
+            "commonName": {
+              "type": "string"
+            }
+          },
+          "type": "object"
         },
         "enabled": {
           "type": "boolean"
