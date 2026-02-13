@@ -131,7 +131,7 @@ metadata:
   name: syslog-binding-cache
 spec:
   secretName: syslog-binding-cache
-  commonName: syslog-binding-cache
+  commonName: "{{ .Values.syslogBindingCache.cache.commonName }}"
   dnsNames:
     - syslog-binding-cache
     - syslog-binding-cache.{{ .Release.Namespace }}.svc
