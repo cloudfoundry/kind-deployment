@@ -84,3 +84,12 @@ This setup is ideal for:
 - Running integration tests in CI/CD pipelines
 
 The entire environment runs locally, giving you full control and the ability to experiment freely. Whether you're a Cloud Foundry newcomer or an experienced operator, having a local playground makes development much more efficient.
+
+This article was written by:
+
+[Jan von Löwenstein](https://github.com/loewenstein-sap)
+[Pavel Busko](https://github.com/pbusko)
+[Ralf Pannemans](https://github.com/c0d1ngm0nk3y)
+[Nicolas Bender](https://github.com/nicolasbender)
+[Matthias Vach](https://github.com/mvach)
+[Johannes Dillmann](https://github.com/modulo11)
