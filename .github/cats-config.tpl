@@ -40,7 +40,7 @@
     "include_windows": false,
     "include_service_discovery": false,
     "include_volume_services": false,
-    "java_buildpack_name": "java_buildpack",
+    "java_buildpack_name": "java-buildpack",
     "ruby_buildpack_name": "ruby_buildpack",
     "nodejs_buildpack_name": "nodejs_buildpack",
     "binary_buildpack_name": "binary_buildpack",
