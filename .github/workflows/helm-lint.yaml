@@ -1,0 +1,93 @@
+name: Helm Chart Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'releases/*/helm/**'
+      - '.github/workflows/helm-lint.yaml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'releases/*/helm/**'
+  workflow_dispatch:
+
+jobs:
+  helm-lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3  # v6.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Install Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Find Helm charts
+        id: find_charts
+        run: |
+          CHARTS=$(find releases -type f -name Chart.yaml -exec dirname {} \; | sort -u)
+          echo "Found charts:"
+          echo "$CHARTS"
+          echo "charts<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHARTS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Helm lint
+        run: |
+          EXIT_CODE=0
+          while IFS= read -r chart; do
+            if [ -n "$chart" ]; then
+              echo "===== Linting $chart ====="
+              if ! helm lint "$chart"; then
+                echo "ERROR: Lint failed for $chart"
+                EXIT_CODE=1
+              fi
+              echo ""
+            fi
+          done <<< "${{ steps.find_charts.outputs.charts }}"
+          exit $EXIT_CODE
+
+      - name: Helm template rendering
+        run: |
+          EXIT_CODE=0
+          while IFS= read -r chart; do
+            if [ -n "$chart" ]; then
+              echo "===== Templating $chart ====="
+              CHART_NAME=$(basename "$chart")
+              if ! helm template "test-$CHART_NAME" "$chart" > /dev/null; then
+                echo "ERROR: Template rendering failed for $chart"
+                EXIT_CODE=1
+              fi
+              echo ""
+            fi
+          done <<< "${{ steps.find_charts.outputs.charts }}"
+          exit $EXIT_CODE
+
+      - name: Validate Chart.yaml metadata
+        run: |
+          EXIT_CODE=0
+          while IFS= read -r chart; do
+            if [ -n "$chart" ]; then
+              echo "===== Validating $chart/Chart.yaml ====="
+              if [ ! -f "$chart/Chart.yaml" ]; then
+                echo "ERROR: Chart.yaml not found in $chart"
+                EXIT_CODE=1
+                continue
+              fi
+              # Check required fields
+              for field in name version; do
+                if ! grep -q "^$field:" "$chart/Chart.yaml"; then
+                  echo "ERROR: Required field '$field' missing in $chart/Chart.yaml"
+                  EXIT_CODE=1
+                fi
+              done
+              echo ""
+            fi
+          done <<< "${{ steps.find_charts.outputs.charts }}"
+          exit $EXIT_CODE
