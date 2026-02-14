@@ -42,7 +42,7 @@ fi
 
 kind create cluster --name "cfk8s" --config="$script_full_path/../kind.yaml"
 
-if [ "${DISABLE_CACHE}" != "true" ]; then
+if [ "${DISABLE_CACHE:-}" != "true" ]; then
   echo "Setting up registry caches..."
 
   setup_registry_caches
