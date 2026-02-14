@@ -120,7 +120,7 @@ releases:
     values:
       - extraEnvVars:
           - name: MINIO_DOMAIN
-            value: blobstore.127-0-0-1.nip.io
+            value: blobstore.{{ .Values.domain }}
       - console:
           enabled: false
       - resourcesPreset: small

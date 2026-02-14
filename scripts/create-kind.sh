@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 configure_registry_mirror() {
   local cache_name=$1
@@ -11,10 +11,10 @@ configure_registry_mirror() {
     echo "Configuring cache ${cache_name} on all nodes..."
     for node in $(kind get nodes --name cfk8s); do
         # Create containerd registry config directories
-        docker exec "$node" mkdir -p /etc/containerd/certs.d/${registry_uri}
+        docker exec "$node" mkdir -p /etc/containerd/certs.d/"${registry_uri}"
 
         # Configure registry to use cache as mirror (expand variables!)
-        cat <<EOF | docker exec -i "$node" sh -c "cat > /etc/containerd/certs.d/${registry_uri}/hosts.toml"
+        cat <<EOF | docker exec -i "$node" sh -c "cat > /etc/containerd/certs.d/\"${registry_uri}\"/hosts.toml"
 server = "${remote_url}"
 
 [host."http://${cache_name}:5000"]

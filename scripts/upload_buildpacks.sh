@@ -1,6 +1,8 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
+
+CF_DOMAIN="${CF_DOMAIN:-127-0-0-1.nip.io}"
 
 INSTALLED_BUILPACKS=$(cf curl /v3/buildpacks | jq -r '.resources[] | "#" + .name + "#"')
 
@@ -13,10 +15,10 @@ fi
 
 
 for buildpack in "${buildpacks[@]}"; do
-  if [[ $INSTALLED_BUILPACKS =~ "#$buildpack#" ]]; then
-    cf update-buildpack "$buildpack" -p "http://file-server.127-0-0-1.nip.io/${buildpack}-cflinuxfs4.zip"
+  if [[ $INSTALLED_BUILPACKS =~ \#$buildpack\# ]]; then
+    cf update-buildpack "$buildpack" -p "http://file-server.${CF_DOMAIN}/${buildpack}-cflinuxfs4.zip"
   else
-    cf create-buildpack "$buildpack" "http://file-server.127-0-0-1.nip.io/${buildpack}-cflinuxfs4.zip" "$position"
+    cf create-buildpack "$buildpack" "http://file-server.${CF_DOMAIN}/${buildpack}-cflinuxfs4.zip" "$position"
   fi
   ((position++))
 done

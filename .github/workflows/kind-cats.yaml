@@ -49,7 +49,7 @@ jobs:
         run: |
           cf push -p examples/hello-js -i 2 -m 1024M hello-js
           cf apps
-          curl --fail hello-js.apps.127-0-0-1.nip.io
+          curl --fail hello-js.apps.${CF_DOMAIN:-127-0-0-1.nip.io}
           cf delete -f hello-js
       - name: setup CF tests
         uses: ./.github/actions/setup-cf-tests

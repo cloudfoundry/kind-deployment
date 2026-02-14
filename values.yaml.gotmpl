@@ -1,6 +1,8 @@
 ---
 certsDir: "./temp/certs"
 
+domain: {{ env "CF_DOMAIN" | default "127-0-0-1.nip.io" }}
+
 versions:
   # renovate: dataSource=github-releases depName=cloudfoundry/k8s-garden-client
   k8sRep: "0.4.0"

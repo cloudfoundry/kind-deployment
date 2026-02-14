@@ -1,8 +1,8 @@
 {
     "suite_name": "CF_SMOKE_TESTS",
     "skip_ssl_validation": true,
-    "api": "api.127-0-0-1.nip.io",
-    "apps_domain": "apps.127-0-0-1.nip.io",
+    "api": "api.${CF_DOMAIN}",
+    "apps_domain": "apps.${CF_DOMAIN}",
     "user": "ccadmin",
     "password": "${CC_ADMIN_PASSWORD}",
     "cleanup": true,

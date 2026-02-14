@@ -12,7 +12,8 @@ install:
 
 login:
 	@ . temp/secrets.sh; \
-	cf login -a https://api.127-0-0-1.nip.io -u ccadmin -p "$$CC_ADMIN_PASSWORD" --skip-ssl-validation
+	CF_DOMAIN=$${CF_DOMAIN:-127-0-0-1.nip.io}; \
+	cf login -a https://api.$$CF_DOMAIN -u ccadmin -p "$$CC_ADMIN_PASSWORD" --skip-ssl-validation
 
 create-kind:
 	@ ./scripts/create-kind.sh

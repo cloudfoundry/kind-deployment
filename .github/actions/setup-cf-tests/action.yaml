@@ -39,4 +39,5 @@ runs:
       shell: bash
       run: |
         source temp/secrets.sh
+        export CF_DOMAIN="${CF_DOMAIN:-127-0-0-1.nip.io}"
         python3 -c 'import os,sys;[sys.stdout.write(os.path.expandvars(l)) for l in sys.stdin]' < ${{ inputs.config-template }} > ${{ inputs.config-output }}
