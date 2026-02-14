@@ -12,7 +12,7 @@ group "default" {
 
 variable "ROUTING_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/routing-release
-  default = "0.364.0"
+  default = "0.365.0"
 }
 
 target "routing" {
