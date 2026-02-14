@@ -5,6 +5,23 @@
     "caCertificateSecret": {
       "type": "string"
     },
+    "credhub": {
+      "type": "object",
+      "properties": {
+        "encryptionPassword": {
+          "type": ["string", "null"]
+        },
+        "trustStorePassword": {
+          "type": ["string", "null"]
+        },
+        "keyStorePassword": {
+          "type": ["string", "null"]
+        },
+        "keyPassword": {
+          "type": ["string", "null"]
+        }
+      }
+    },
     "dbPassword": {
       "type": ["string", "null"]
     },

@@ -248,6 +248,9 @@
         "enabled": {
           "type": "boolean"
         },
+        "dbEncryptionKey": {
+          "type": ["string", "null"]
+        },
         "externalDomain": {
           "type": "string"
         },

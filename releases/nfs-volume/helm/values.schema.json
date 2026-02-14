@@ -38,6 +38,12 @@
         "oauthClientsSecret": {
           "type": "string"
         },
+        "username": {
+          "type": ["string", "null"]
+        },
+        "password": {
+          "type": ["string", "null"]
+        },
         "resources": {
           "type": ["object", "null"]
         },
