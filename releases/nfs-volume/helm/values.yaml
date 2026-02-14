@@ -3,6 +3,10 @@ nfsbroker:
   certificateSecret: ""
   oauthClientsSecret: ""
   credhubURL: https://credhub.default.svc.cluster.local:8844
+  # NFS Broker credentials
+  # If not provided, secure random values will be generated
+  username: ~      # defaults to "nfsbroker" if not set
+  password: ~      # 32-char random generated if not set
   image:
     repository: ghcr.io/cloudfoundry/k8s/nfsbroker
     tag: ""

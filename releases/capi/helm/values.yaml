@@ -27,7 +27,7 @@ ccWorkerClock:
 
 cloudController:
   enabled: false
-  resources: ~ 
+  resources: ~
   certificateSecret: ""
   appDomain: apps.127-0-0-1.nip.io
   externalDomain: api.127-0-0-1.nip.io
@@ -37,6 +37,9 @@ cloudController:
   appSSHEndpoint: ssh.127-0-0-1.nip.io:2222
   sshProxyKeyFingerprint: ""
   loginUrl: https://uaa.127-0-0-1.nip.io
+  # Database encryption key
+  # If not provided, a secure random 16-char value will be generated
+  dbEncryptionKey: ~
   image:
     repository: ghcr.io/cloudfoundry/k8s/cloud-controller
     tag: ""

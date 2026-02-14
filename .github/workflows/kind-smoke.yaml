@@ -13,7 +13,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3  # v6.0.0
         with:
           fetch-depth: 0
       - name: Check if only ignored paths changed
@@ -97,7 +97,7 @@ jobs:
           echo "===== CC_WORKER_CLOCK ====="
           kubectl get pod -l app.kubernetes.io/name=cc-worker-clock -o wide
           kubectl logs -l app.kubernetes.io/name=cc-worker-clock
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
         if: always()
         with:
           name: report.json

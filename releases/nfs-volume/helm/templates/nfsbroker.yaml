@@ -6,8 +6,8 @@ type: Opaque
 metadata:
   name: nfsbroker-credentials
 stringData:
-  USERNAME: nfsbroker
-  PASSWORD: nfsbroker
+  USERNAME: {{ .Values.nfsbroker.username | default "nfsbroker" }}
+  PASSWORD: {{ .Values.nfsbroker.password | default (randAlphaNum 32) }}
   UAA_CLIENT_ID: "nfsbroker-credhub-client"
   UAA_CLIENT_SECRET: {{ .Values.nfsbroker.oauthClientsSecret | quote }}
 ---

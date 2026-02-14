@@ -188,9 +188,9 @@ buildpacks:
   {{- toYaml .Values.cloudController.blobstore.fog_connection | nindent 4 }}
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}
-db_encryption_key: "asdfasdfasdf"
+db_encryption_key: {{ .Values.cloudController.dbEncryptionKey | default (randAlphaNum 16) | quote }}
 database_encryption:
-  keys: { "encryption_key_0": "asdfasdfasdf" }
+  keys: { "encryption_key_0": {{ .Values.cloudController.dbEncryptionKey | default (randAlphaNum 16) | quote }} }
   current_key_label: "encryption_key_0"
   pbkdf2_hmac_iterations: 2048
 default_health_check_timeout: 60

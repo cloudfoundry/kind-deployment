@@ -12,4 +12,12 @@ tolerations: ~
 
 dbPassword: ~
 
+# Credhub security configuration
+# If not provided, secure random values will be generated
+credhub:
+  encryptionPassword: ~  # 32-char random generated if not set
+  trustStorePassword: ~  # defaults to "changeit" if not set
+  keyStorePassword: ~    # defaults to "changeit" if not set
+  keyPassword: ~         # defaults to "changeit" if not set
+
 caCertificateSecret: root-ca
