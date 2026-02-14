@@ -95,6 +95,8 @@ jobs:
 
           docker buildx bake -f ${{ runner.temp }}/bake.json \
             --set '*.output=type=image,push-by-digest=true,name-canonical=true,push=true' \
+            --set '*.cache-from=type=gha' \
+            --set '*.cache-to=type=gha,mode=max' \
             --set '*.platform=${{ matrix.platform }}' \
             --metadata-file ${{ runner.temp }}/metadata.json ${{ needs.prepare.outputs.target }}
       - name: Export digest
