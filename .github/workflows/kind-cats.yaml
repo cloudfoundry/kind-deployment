@@ -57,6 +57,10 @@ jobs:
           test-repo: cf-acceptance-tests
           config-template: ./.github/cats-config.tpl
           config-output: ./.github/cats-config.json
+        env:
+          CATS_PRIVATE_DOCKER_USERNAME: ${{ secrets.CATS_PRIVATE_DOCKER_USERNAME }}
+          CATS_PRIVATE_DOCKER_PASSWORD: ${{ secrets.CATS_PRIVATE_DOCKER_PASSWORD }}
+          CATS_PRIVATE_DOCKER_IMAGE: ${{ secrets.CATS_PRIVATE_DOCKER_IMAGE }}
       - name: run CATS
         env:
           CONFIG: "${{ github.workspace }}/.github/cats-config.json"

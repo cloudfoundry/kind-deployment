@@ -38,9 +38,9 @@ runs:
     - name: templating config
       shell: bash
       env:
-        CF_DOCKER_USERNAME: ${{ secrets.CATS_PRIVATE_DOCKER_USERNAME }}
-        CF_DOCKER_PASSWORD: ${{ secrets.CATS_PRIVATE_DOCKER_PASSWORD }} 
-        CF_DOCKER_IMAGE: ${{ secrets.CATS_PRIVATE_DOCKER_IMAGE }} 
+        CF_DOCKER_USERNAME: ${{ env.CATS_PRIVATE_DOCKER_USERNAME }}
+        CF_DOCKER_PASSWORD: ${{ env.CATS_PRIVATE_DOCKER_PASSWORD }} 
+        CF_DOCKER_IMAGE: ${{ env.CATS_PRIVATE_DOCKER_IMAGE }} 
       run: |
         source temp/secrets.sh
         python3 -c 'import os,sys;[sys.stdout.write(os.path.expandvars(l)) for l in sys.stdin]' < ${{ inputs.config-template }} > ${{ inputs.config-output }}
