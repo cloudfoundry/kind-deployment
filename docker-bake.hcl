@@ -89,7 +89,7 @@ target "capi" {
 
 variable "DIEGO_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/diego-release
-  default = "2.128.0"
+  default = "2.129.0"
 }
 
 target "diego" {
