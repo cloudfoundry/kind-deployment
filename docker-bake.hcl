@@ -146,7 +146,7 @@ target "loggregator-agent" {
 
 variable "LOG_CACHE_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/log-cache-release
-  default = "3.2.4"
+  default = "3.2.5"
 }
 
 target "log-cache" {
