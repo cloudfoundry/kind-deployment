@@ -56,5 +56,5 @@ routeRegistrar:
   image:
     repository: ghcr.io/cloudfoundry/k8s/route-registrar
     # renovate: dataSource=docker depName=routing-release packageName=ghcr.io/cloudfoundry/k8s/route-registrar
-    tag: "0.364.0"
+    tag: "0.365.0"
     imagePullPolicy: IfNotPresent
