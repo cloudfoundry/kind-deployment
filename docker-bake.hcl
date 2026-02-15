@@ -127,7 +127,7 @@ target "loggregator" {
 
 variable "LOGGREGATOR_AGENT_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/loggregator-agent-release
-  default = "8.3.13"
+  default = "8.3.14"
 }
 
 target "loggregator-agent" {
