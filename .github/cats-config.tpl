@@ -9,7 +9,7 @@
     "credhub_location": "https://credhub.127-0-0-1.nip.io",
     "credhub_client": "credhub_admin_client",
     "credhub_secret": "${OAUTH_CLIENTS_SECRET}",
-    "private_docker_registry_username": "${CF_DOCKER_USER}",
+    "private_docker_registry_username": "${CF_DOCKER_USERNAME}",
     "private_docker_registry_password": "${CF_DOCKER_PASSWORD}",
     "private_docker_registry_image": "${CF_DOCKER_IMAGE}",
     "isolation_segment_name": "isolated",
