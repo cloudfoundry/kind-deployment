@@ -96,7 +96,7 @@ udpForwarder:
   image:
     repository: ghcr.io/cloudfoundry/k8s/udp-forwarder
     # renovate: dataSource=docker depName=loggregator-agent-release packageName=ghcr.io/cloudfoundry/k8s/udp-forwarder
-    tag: "8.3.13"
+    tag: "8.3.14"
     imagePullPolicy: IfNotPresent
   resources: ~
 
