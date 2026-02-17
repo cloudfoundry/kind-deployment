@@ -58,3 +58,9 @@ You can configure the installation by setting following environment variables:
 
 - [Local Development Guide](docs/local-development-guide.md)
 - [FAQs](docs/faq.md)
+
+## Contributing
+
+Please check our [contributing guidelines](/CONTRIBUTING.md).
+
+This project follows [Cloud Foundry Code of Conduct](https://www.cloudfoundry.org/code-of-conduct/).
