@@ -31,6 +31,7 @@ spec:
             - sh
             - -c
             - |
+              set -e
               cat /certs/tls.crt /certs/tls.key > /tmp/tls-combined.pem
               cat /haproxy-original/haproxy.conf > /haproxy/haproxy.conf
           volumeMounts:

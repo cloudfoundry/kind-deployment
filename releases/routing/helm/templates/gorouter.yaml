@@ -25,8 +25,11 @@ spec:
         image: bitnami/kubectl:latest
         imagePullPolicy: IfNotPresent
         command:
-          ["sh", "-c",
-          "yq '
+        - sh
+        - -c
+        - |
+          set -e
+          yq '
             .nats.ca_certs = strenv(CA_CRT) |
             .nats.cert_chain = strenv(TLS_CRT) |
             .nats.private_key = strenv(TLS_KEY) |
@@ -35,8 +38,7 @@ spec:
             .ca_certs[0] = strenv(CA_CRT) |
             .client_ca_certs = strenv(CA_CRT) |
             .backends.cert_chain = strenv(TLS_CRT) |
-            .backends.private_key = strenv(TLS_KEY)' /gorouter/gorouter.yaml > /tmp/gorouter.yaml"
-          ]
+            .backends.private_key = strenv(TLS_KEY)' /gorouter/gorouter.yaml > /tmp/gorouter.yaml
         volumeMounts:
           - name: gorouter-config
             mountPath: /gorouter

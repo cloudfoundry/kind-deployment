@@ -59,6 +59,7 @@ spec:
             - sh
             - -c
             - |
+              set -e
               NODE_UID=$(kubectl get node $NODE_NAME -o jsonpath='{.metadata.uid}')
               export NODE_UID
               cat /route-emitter/route-emitter.json | envsubst > /tmp/route-emitter.json
