@@ -308,6 +308,21 @@
         "natsAddress": {
           "type": "string"
         },
+        "uaaAddress": {
+          "type": "string"
+        },
+        "routingApi": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "address": {
+              "type": "string"
+            },
+            "port": {
+              "type": "integer"
+            }
+          }
+        },
         "nodeSelector": {
           "additionalProperties": false,
           "properties": {

@@ -75,7 +75,7 @@ spec:
             - name: tmp
               mountPath: /tmp
         - name: haproxy
-          image: haproxy:{{ .Values.tcpRouter.haproxy.image.tag }}
+          image: {{ .Values.tcpRouter.haproxy.image.repository }}:{{ .Values.tcpRouter.haproxy.image.tag }}
           imagePullPolicy: {{ .Values.tcpRouter.haproxy.image.imagePullPolicy }}
           args:
             - -W

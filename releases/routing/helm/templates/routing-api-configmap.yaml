@@ -15,17 +15,17 @@ data:
     metrics_reporting_interval: 30s
     statsd_endpoint: localhost:8125
     oauth:
-      token_endpoint: uaa.{{ .Release.Namespace }}.svc.cluster.local
-      port: 443
+      token_endpoint: {{ .Values.routingApi.uaa.address }}
+      port: {{ .Values.routingApi.uaa.port }}
       skip_ssl_validation: false
-      ca_certs: "/etc/ssl/routing-api/ca.crt"
+      ca_certs: "/etc/ssl/uaa/ca.crt"
     debug_address: "127.0.0.1:17002"
     statsd_client_flush_interval: 300ms
     router_groups:
     - name: default-tcp
       reservable_ports: 32000-32004
       type: tcp
-    reserved_system_component_ports: [2822, 2825, 3457, 3458, 3459, 3460, 3461, 8853, 9100, 14726, 14727, 14821, 14822, 14823, 14824, 14829, 14830, 14920, 14922, 15821, 17002, 53035, 53080]
+    reserved_system_component_ports: []
     fail_on_router_port_conflicts: false
     uuid: 07c65e06-b676-4f4a-a37f-96df62d387d7
     admin_port: 15897
@@ -51,8 +51,8 @@ data:
     lock_ttl: 10s
     retry_interval: 5s
     locket:
-      locket_address: locket.{{ .Release.Namespace }}.svc.cluster.local:8891
-      locket_ca_cert_file: "/etc/ssl/routing-api/ca.crt"
-      locket_client_cert_file: "/etc/ssl/routing-api/tls.crt"
-      locket_client_key_file: "/etc/ssl/routing-api/tls.key"
+      locket_address: {{ .Values.routingApi.locketAddress }}
+      locket_ca_cert_file: "/etc/ssl/locket/ca.crt"
+      locket_client_cert_file: "/etc/ssl/locket/tls.crt"
+      locket_client_key_file: "/etc/ssl/locket/tls.key"
 {{- end }}

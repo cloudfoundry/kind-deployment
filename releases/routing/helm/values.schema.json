@@ -43,29 +43,54 @@
               "default": "",
               "title": "tag",
               "type": "string"
+            },
+            "imagePullPolicy": {
+              "type": "string"
             }
           },
           "required": [
             "repository",
-            "tag"
+            "tag",
+            "imagePullPolicy"
           ],
           "title": "image",
           "type": "object"
         },
-        "imagePullPolicy": {
-          "default": "IfNotPresent",
-          "title": "imagePullPolicy",
-          "type": "string"
-        },
         "nodeSelector": {
-          "default": "~",
-          "title": "nodeSelector",
-          "type": "null"
+          "type": [
+            "object",
+            "null"
+          ]
         },
         "tolerations": {
-          "default": "~",
-          "title": "tolerations",
-          "type": "null"
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "effect": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "effect",
+              "key",
+              "operator",
+              "value"
+            ],
+            "type": "object"
+          }
         }
       },
       "required": [
@@ -74,7 +99,6 @@
         "hostname",
         "appsDomain",
         "image",
-        "imagePullPolicy",
         "nodeSelector",
         "tolerations"
       ],
@@ -89,18 +113,12 @@
           "properties": {
             "imagePullPolicy": {
               "default": "IfNotPresent",
-              "title": "imagePullPolicy",
               "type": "string"
             },
             "repository": {
-              "default": "ghcr.io/cloudfoundry/k8s/route-registrar",
-              "title": "repository",
               "type": "string"
             },
             "tag": {
-              "default": "0.365.0",
-              "description": "renovate: dataSource=docker depName=routing-release packageName=ghcr.io/cloudfoundry/k8s/route-registrar",
-              "title": "tag",
               "type": "string"
             }
           },
@@ -123,8 +141,27 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "default": "",
-          "title": "certificateSecret",
+          "type": "string"
+        },
+        "loggregatorCertificateSecret": {
+          "type": "string"
+        },
+        "uaaCertificateSecret": {
+          "type": "string"
+        },
+        "uaa": {
+          "additionalProperties": false,
+          "properties": {
+            "address": {
+              "type": "string"
+            },
+            "port": {
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "locketAddress": {
           "type": "string"
         },
         "dbPassword": {
@@ -164,20 +201,46 @@
           "title": "image",
           "type": "object"
         },
-        "nodeSelector": {
-          "default": "~",
-          "title": "nodeSelector",
-          "type": "null"
-        },
         "systemDomain": {
           "default": "127-0-0-1.nip.io",
           "title": "systemDomain",
           "type": "string"
         },
+        "nodeSelector": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
         "tolerations": {
-          "default": "~",
-          "title": "tolerations",
-          "type": "null"
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "effect": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "effect",
+              "key",
+              "operator",
+              "value"
+            ],
+            "type": "object"
+          }
         }
       },
       "required": [
@@ -195,27 +258,6 @@
     "tcpRouter": {
       "additionalProperties": false,
       "properties": {
-        "backendTLS": {
-          "additionalProperties": false,
-          "properties": {
-            "caCertPath": {
-              "default": "~",
-              "title": "caCertPath",
-              "type": "null"
-            },
-            "clientCertAndKeyPath": {
-              "default": "~",
-              "title": "clientCertAndKeyPath",
-              "type": "null"
-            }
-          },
-          "required": [
-            "caCertPath",
-            "clientCertAndKeyPath"
-          ],
-          "title": "backendTLS",
-          "type": "object"
-        },
         "certificateSecret": {
           "default": "",
           "title": "certificateSecret",
@@ -296,27 +338,76 @@
           "title": "image",
           "type": "object"
         },
-        "nodeSelector": {
-          "default": "~",
-          "title": "nodeSelector",
-          "type": "null"
-        },
         "oauthClientsSecret": {
           "default": "",
           "title": "oauthClientsSecret",
           "type": "string"
         },
+        "uaa": {
+          "additionalProperties": false,
+          "properties": {
+            "address": {
+              "type": "string"
+            },
+            "port": {
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "routingApi": {
+          "additionalProperties": false,
+          "properties": {
+            "address": {
+              "type": "string"
+            },
+            "port": {
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "nodeSelector": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
         "tolerations": {
-          "default": "~",
-          "title": "tolerations",
-          "type": "null"
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "effect": {
+                "type": "string"
+              },
+              "key": {
+                "type": "string"
+              },
+              "operator": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "effect",
+              "key",
+              "operator",
+              "value"
+            ],
+            "type": "object"
+          }
         }
       },
       "required": [
         "enabled",
         "certificateSecret",
         "oauthClientsSecret",
-        "backendTLS",
         "image",
         "haproxy",
         "nodeSelector",

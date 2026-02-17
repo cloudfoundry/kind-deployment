@@ -40,6 +40,10 @@ spec:
           volumeMounts:
             - name: routing-api
               mountPath: /etc/ssl/routing-api
+            - name: uaa
+              mountPath: /etc/ssl/uaa
+            - name: locket
+              mountPath: /etc/ssl/locket
             - name: routing-api-config
               mountPath: /routing-api
         - name: route-registrar
@@ -65,6 +69,12 @@ spec:
         - name: routing-api
           secret:
             secretName: {{ default "routing-api" .Values.routingApi.certificateSecret }}
+        - name: uaa
+          secret:
+            secretName: {{ default "uaa" .Values.routingApi.uaaCertificateSecret }}
+        - name: locket
+          secret:
+            secretName: {{ default "locket" .Values.routingApi.locketCertificateSecret }}
         - name: routing-api-config
           configMap:
             name: routing-api-configmap

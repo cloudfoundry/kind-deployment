@@ -51,12 +51,8 @@ You can configure the installation by setting following environment variables:
 |---------------------|---------|---------------------------|
 | ENABLE_LOGGREGATOR  | true    | Loggregator |
 | ENABLE_POLICY_SUPPORT | true  | policy-serverver, policy-agent, bosh-dns, service-discovery-controller |
-| ENABLE_NFS_VOLUME | false | nfsbroker |
 | ENABLE_TCP_ROUTING| true | cf-tcp-router, routing-api |
-
-## Supported CF Features
-
-The CF kind deployment aims to support all Cloud Foundry features available for CF on BOSH. Currently, the only not yet supported features are [TCP routing](https://docs.cloudfoundry.org/adminguide/enabling-tcp-routing.html) and `Routing API`.
+| ENABLE_NFS_VOLUME | false | nfsbroker |
 
 ## Read More Documentation
 
