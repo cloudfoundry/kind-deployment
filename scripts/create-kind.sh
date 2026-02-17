@@ -47,22 +47,3 @@ if [ "${DISABLE_CACHE}" != "true" ]; then
 
   setup_registry_caches
 fi
-
-helm upgrade --install --repo https://helm.cilium.io/ cilium cilium --version "1.18.4" --namespace kube-system --wait --values "$script_full_path/../assets/values/cilium.yaml"
-
-echo "Waiting for nodes to become ready after CNI installation..."
-kubectl wait --for=condition=Ready nodes --all --timeout=300s
-
-echo "Applying taints to workload nodes..."
-kubectl taint nodes -l cloudfoundry.org/cell=true cloudfoundry.org/cell=true:NoSchedule --overwrite || true
-
-kubectl cluster-info
-
-corefile=$(kubectl -n kube-system get configmap coredns -o jsonpath='{.data.Corefile}' | sed '/kubernetes/i \
-    rewrite name regex (.*)\\.127-0-0-1\\.nip\\.io istio-gateway-istio.default.svc.cluster.local answer auto\
-')
-kubectl -n kube-system patch configmap coredns --type=json \
-  -p="$(jq -n --arg cf "$corefile" '[{"op":"replace","path":"/data/Corefile","value":$cf}]')"
-
-kubectl -n kube-system rollout restart deployment/coredns
-

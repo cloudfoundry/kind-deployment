@@ -1,5 +1,7 @@
 LOCAL = true
 TARGET_ARCH ?= $(if $(filter true,$(LOCAL)),$(shell go env GOARCH),amd64)
+# renovate: dataSource=github-releases depName=helmfile/helmfile
+HELMFILE_VERSION ?= v1.2.3
 
 init: temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub temp/secrets.sh
 
@@ -8,7 +10,7 @@ temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub te
 
 install:
 	@ . temp/secrets.sh; \
-	helmfile sync
+	docker run --rm --net=host --env-file temp/secrets.env -v "$$HOME/.kube:/helm/.kube" -v "$$PWD:/wd" --workdir /wd ghcr.io/helmfile/helmfile:$(HELMFILE_VERSION) helmfile sync
 
 login:
 	@ . temp/secrets.sh; \

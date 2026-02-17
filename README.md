@@ -4,14 +4,13 @@ This repository provides a simple and fast way to run Cloud Foundry locally. It 
 
 ## Prerequisites
 
-You need to install following tools:
+The following tools need to be installed:
 
-- kind: <https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries>
-- kubectl: <https://kubernetes.io/docs/tasks/tools/#kubectl>
-- helm: <https://helm.sh/docs/intro/install#through-package-managers>
-- helmfile: <https://helmfile.readthedocs.io/en/latest/#installation>
-- make:
-  - It should be alreay installed on MacOS and Linux.
+- [`docker`](https://docs.docker.com/engine/install/)
+- [`kind`](https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries) (v0.31.0 or higher)
+- [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl) (v1.35.1 or higher)
+- `make`:
+  - It should be already installed on MacOS and Linux.
   - For Windows installation see: <https://gnuwin32.sourceforge.net/packages/make.htm>
 
 ## Run the Installation
@@ -47,12 +46,12 @@ make down
 
 You can configure the installation by setting following environment variables:
 
-| environment variable | default | component(s) to be installed |
-|---------------------|---------|---------------------------|
-| ENABLE_LOGGREGATOR  | true    | Loggregator |
-| ENABLE_POLICY_SUPPORT | true  | policy-serverver, policy-agent, bosh-dns, service-discovery-controller |
-| ENABLE_TCP_ROUTING| true | cf-tcp-router, routing-api |
-| ENABLE_NFS_VOLUME | false | nfsbroker |
+| environment variable    | default | component(s) to be installed                                           |
+| ----------------------- | ------- | ---------------------------------------------------------------------- |
+| `ENABLE_LOGGREGATOR`    | `true`  | Loggregator                                                            |
+| `ENABLE_POLICY_SUPPORT` | `true`  | policy-serverver, policy-agent, bosh-dns, service-discovery-controller |
+| `ENABLE_TCP_ROUTING`    | `true`  | cf-tcp-router, routing-api                                             |
+| `ENABLE_NFS_VOLUME`     | `false` | nfsbroker                                                              |
 
 ## Read More Documentation
 

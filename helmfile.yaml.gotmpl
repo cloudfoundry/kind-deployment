@@ -22,11 +22,38 @@ repositories:
     url: https://istio-release.storage.googleapis.com/charts
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
+  - name: cilium
+    url: https://helm.cilium.io/
   - name: cloudfoundry-k8s
     oci: true
     url: ghcr.io/cloudfoundry/helm
 
 releases:
+  - name: cilium
+    namespace: kube-system
+    chart: cilium/cilium
+    version: 1.18.4
+    values:
+      - ./assets/values/cilium.yaml
+    hooks:
+      - events: ["postsync"]
+        showlogs: true
+        command: "/bin/sh"
+        args:
+          - "-c"
+          - |
+            echo "Waiting for nodes to become ready after CNI installation..."
+            kubectl wait --for=condition=Ready nodes --all --timeout=300s
+            echo "Applying taints to workload nodes..."
+            kubectl taint nodes -l cloudfoundry.org/cell=true cloudfoundry.org/cell=true:NoSchedule --overwrite || true
+            kubectl cluster-info
+            corefile=$(kubectl -n kube-system get configmap coredns -o jsonpath='{.data.Corefile}' | sed '/kubernetes/i \
+                rewrite name regex (.*)\\.127-0-0-1\\.nip\\.io istio-gateway-istio.default.svc.cluster.local answer auto\
+            ')
+            kubectl -n kube-system patch configmap coredns --type=json \
+              -p="$(jq -n --arg cf "$corefile" '[{"op":"replace","path":"/data/Corefile","value":$cf}]')"
+            kubectl -n kube-system rollout restart deployment/coredns
+
   - name: cert-manager
     namespace: cert-manager
     chart: jetstack/cert-manager
@@ -63,6 +90,8 @@ releases:
     namespace: istio-system
     chart: istio/base
     version: 1.28.3
+    needs:
+      - kube-system/cilium
     values:
       - defaultRevision: minimal
     hooks:
