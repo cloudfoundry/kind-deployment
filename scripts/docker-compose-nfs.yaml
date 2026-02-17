@@ -1,13 +1,13 @@
 services:
   nfs-server:
-    image: itsthenetwork/nfs-server-alpine:latest
+    image: erichough/nfs-server:latest
     container_name: nfs-server
     restart: always
     privileged: true
     networks:
       - kind
     environment:
-      SHARED_DIRECTORY: /exports
+      NFS_EXPORT_0: /exports *(rw,sync,no_subtree_check,fsid=0,no_root_squash)
     volumes:
       - nfs-exports:/exports
 
