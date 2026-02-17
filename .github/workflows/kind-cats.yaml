@@ -33,6 +33,8 @@ jobs:
           KIND_VERSION: '0.30.0'
           HELMFILE_VERSION: '1.2.3'
       - name: Run make up
+        env:
+          ENABLE_NFS_VOLUME: "true"
         run: |
           echo '- role: worker
             labels:
@@ -51,6 +53,15 @@ jobs:
           cf apps
           curl --fail hello-js.apps.127-0-0-1.nip.io
           cf delete -f hello-js
+      - name: Register broker and enable access to service
+        run: |
+          cf create-service-broker nfsbroker nfsbroker nfsbroker http://nfsbroker:8080
+          cf enable-service-access nfs
+          cf marketplace
+      - name: Create nfs share
+        run: |
+          # Create test share directory
+          docker exec nfs-server sh -c "mkdir -p /exports/test-share && chmod 777 /exports/test-share"
       - name: setup CF tests
         uses: ./.github/actions/setup-cf-tests
         with:

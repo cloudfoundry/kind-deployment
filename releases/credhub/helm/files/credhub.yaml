@@ -31,7 +31,7 @@ security:
       - read
       path: "/*"
     - actors:
-      - uaa-client:nfs-broker-credhub-client
+      - uaa-client:nfsbroker-credhub-client
       operations:
       - read
       - write

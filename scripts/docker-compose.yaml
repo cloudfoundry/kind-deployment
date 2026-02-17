@@ -29,10 +29,23 @@ services:
     volumes:
       - quay-io:/var/lib/registry
 
+  nfs-server:
+    image: itsthenetwork/nfs-server-alpine:latest
+    container_name: nfs-server
+    restart: always
+    privileged: true
+    networks:
+      - kind
+    environment:
+      SHARED_DIRECTORY: /exports
+    volumes:
+      - nfs-exports:/exports
+
 volumes:
   docker-io:
   ghcr-io:
   quay-io:
+  nfs-exports:
 
 networks:
   kind:
