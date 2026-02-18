@@ -13,7 +13,8 @@
         "/^releases/.*/Chart.yaml$/",
         "/^releases/.*/values.yaml$/",
         "/^values.yaml.gotmpl$/",
-        "/^docker-bake.hcl$/"
+        "/^docker-bake.hcl$/",
+        "/^Makefile$/"
       ],
       "matchStrings": [
         "# renovate: dataSource=(?<datasource>.*?) depName=(?<depName>.*?)( packageName=(?<packageName>.*?))?\\s+\\S+?(: | = )\"?(?<currentValue>\\d+\\.\\d+\\.\\d+)\"?"
