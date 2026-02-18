@@ -3,9 +3,9 @@ TARGET_ARCH ?= $(if $(filter true,$(LOCAL)),$(shell go env GOARCH),amd64)
 # renovate: dataSource=github-releases depName=helmfile/helmfile
 HELMFILE_VERSION ?= v1.2.3
 
-init: temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub temp/secrets.env
+init: temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub temp/secrets.sh temp/secrets.env
 
-temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub temp/secrets.env:
+temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub temp/secrets.sh temp/secrets.env:
 	@ ./scripts/init.sh
 
 install:
@@ -13,7 +13,7 @@ install:
 	docker run --rm --net=host --env-file temp/secrets.env -v "$$PWD/temp/kubeconfig:/helm/.kube/config:ro" -v "$$PWD:/wd" --workdir /wd ghcr.io/helmfile/helmfile:$(HELMFILE_VERSION) helmfile sync
 
 login:
-	@ . temp/secrets.env; \
+	@ . temp/secrets.sh; \
 	cf login -a https://api.127-0-0-1.nip.io -u ccadmin -p "$$CC_ADMIN_PASSWORD" --skip-ssl-validation
 
 create-kind:
