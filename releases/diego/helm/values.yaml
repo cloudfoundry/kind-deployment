@@ -61,13 +61,14 @@ routeEmitter:
   loggregatorCertificateSecret: ""
   bbsCertificateSecret: ""
   locketCertificateSecret: ""
-  routingApiCertificateSecret: ""
   uaaCertificateSecret: ""
   oauthClientsSecret: ""
   natsAddress: "nats.default.svc.cluster.local:4222"
   locketAddress: "locket.default.svc.cluster.local:8891"
   bbsAddress: "https://bbs.default.svc.cluster.local:8889"
   routingApi:
+    enabled: true
+    certificateSecret: ""
     address: "https://routing-api.default.svc.cluster.local"
     port: 3001
   uaaAddress: "https://uaa.default.svc.cluster.local:443"

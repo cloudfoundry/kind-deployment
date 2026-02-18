@@ -269,9 +269,6 @@
         "loggregatorCertificateSecret": {
           "type": "string"
         },
-        "routingApiCertificateSecret": {
-          "type": "string"
-        },
         "uaaCertificateSecret": {
           "type": "string"
         },
@@ -317,6 +314,12 @@
           "properties": {
             "address": {
               "type": "string"
+            },
+            "certificateSecret": {
+              "type": "string"
+            },
+            "enabled": {
+              "type": "boolean"
             },
             "port": {
               "type": "integer"

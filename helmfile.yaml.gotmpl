@@ -274,6 +274,8 @@ releases:
           locketCertificateSecret: route-emitter
           natsCertificateSecret: route-emitter
           loggregatorCertificateSecret: route-emitter
+          routingApi:
+            enabled: {{ .Values.optionalComponents.enableTcpRouting }}
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
           enableInternalEmitter: {{ and .Values.optionalComponents.enablePolicySupport .Values.optionalComponents.enableLoggregator }}
           enableTcpEmitter: {{ .Values.optionalComponents.enableTcpRouting }}
