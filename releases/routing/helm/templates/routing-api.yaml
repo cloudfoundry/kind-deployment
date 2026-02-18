@@ -101,8 +101,6 @@ spec:
   selector:
     app: routing-api
 ---
-{{- end }}
-# Create the secret even without tcp routing since toute-emiter mounts it
 {{ if not .Values.routingApi.certificateSecret }}
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -126,4 +124,5 @@ spec:
     - client auth
   privateKey:
     rotationPolicy: Always
+{{- end }}
 {{- end }}

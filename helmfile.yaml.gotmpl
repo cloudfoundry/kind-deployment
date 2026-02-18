@@ -167,7 +167,6 @@ releases:
           enabled: false
       - routingApi:
           enabled: true
-          certificateSecret: "not-provide-here"
           dbPassword: {{ .Values.secrets.dbPassword }}
       - tcpRouter:
           enabled: true
