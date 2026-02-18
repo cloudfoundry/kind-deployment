@@ -34,8 +34,27 @@ bootstrap: create-org
 bootstrap-complete: create-org 
 	@ ALL_BUILDPACKS=true ./scripts/upload_buildpacks.sh
 
-up: create-kind init install
+check-changes:
+	@ CURRENT_COMMIT=$$(git rev-parse HEAD); \
+	CURRENT_TEMP_HASH=$$(find temp -type f -print0 | sort -z | xargs -0 cat | md5 || echo "no-temp"); \
+	if [ -f .last-run-state ]; then \
+		LAST_COMMIT=$$(grep "^COMMIT=" .last-run-state | cut -d= -f2); \
+		LAST_TEMP_HASH=$$(grep "^TEMP_HASH=" .last-run-state | cut -d= -f2); \
+		if [ "$$CURRENT_COMMIT" != "$$LAST_COMMIT" ] || [ "$$CURRENT_TEMP_HASH" != "$$LAST_TEMP_HASH" ]; then \
+			echo "⚠️ Local changes detected, please run make down to ensure a clean state"; \
+			exit 1; \
+		fi; \
+	fi
+
+save-state:
+	@ CURRENT_COMMIT=$$(git rev-parse HEAD); \
+	CURRENT_TEMP_HASH=$$(find temp -type f -print0 | sort -z | xargs -0 cat | md5 || echo "no-temp"); \
+	echo "COMMIT=$$CURRENT_COMMIT" > .last-run-state; \
+	echo "TEMP_HASH=$$CURRENT_TEMP_HASH" >> .last-run-state
+
+up: check-changes create-kind init install save-state
 
 down: delete-kind
+	@ rm .last-run-state
 
-PHONY: install login create-kind delete-kind up down create-org bootstrap bootstrap-complete
+PHONY: install login create-kind delete-kind up down create-org bootstrap bootstrap-complete check-changes save-state
