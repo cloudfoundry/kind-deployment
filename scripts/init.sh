@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -exuo pipefail
 
 mkdir -p temp/certs
 
@@ -10,6 +10,7 @@ SSH_KEYGEN="docker run --rm -v $(pwd)/temp/certs:/certs --entrypoint /usr/bin/ss
 $OPENSSL genrsa -traditional -out /certs/ca.key 4096
 $OPENSSL req -x509 -key /certs/ca.key -out /certs/ca.crt -days 365 -nodes -subj "/CN=ca/O=ca" > /dev/null 2>&1
 
+rm -f temp/certs/ssh_key temp/certs/ssh_key.pub
 $SSH_KEYGEN -t rsa -b 4096 -f /certs/ssh_key -N "" > /dev/null 2>&1
 
 echo "export BLOBSTORE_PASSWORD=$($OPENSSL rand -hex 16)" >> temp/secrets.sh
