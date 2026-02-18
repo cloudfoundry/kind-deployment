@@ -167,7 +167,7 @@ releases:
           enabled: false
       - routingApi:
           enabled: true
-          certificateSecret: "not-provide-here""
+          certificateSecret: "not-provide-here"
           dbPassword: {{ .Values.secrets.dbPassword }}
       - tcpRouter:
           enabled: true
@@ -276,7 +276,7 @@ releases:
           natsCertificateSecret: route-emitter
           loggregatorCertificateSecret: route-emitter
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
-          enableInternalEmitter: {{ .Values.optionalComponents.enableLoggregator }}
+          enableInternalEmitter: {{ and .Values.optionalComponents.enablePolicySupport .Values.optionalComponents.enableLoggregator }}
           enableTcpEmitter: {{ .Values.optionalComponents.enableTcpRouting }}
 
   - name: k8s-rep
