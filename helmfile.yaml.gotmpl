@@ -333,7 +333,6 @@ releases:
   - name: cf-networking
     namespace: default
     chart: ./releases/cf-networking/helm
-    installed: {{ .Values.optionalComponents.enablePolicySupport }}
     needs:
       - capi
       - uaa
@@ -341,6 +340,7 @@ releases:
       - loggregator-agent
     values:
       - policyServer:
+          enabled: {{ .Values.optionalComponents.enablePolicySupport }}
           dbPassword: {{ .Values.secrets.dbPassword }}
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
 
