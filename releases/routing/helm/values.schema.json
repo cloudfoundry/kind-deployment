@@ -17,8 +17,6 @@
           "type": "string"
         },
         "certificateSecret": {
-          "default": "",
-          "title": "certificateSecret",
           "type": "string",
           "minLength": 1
         },
@@ -267,8 +265,6 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "default": "",
-          "title": "certificateSecret",
           "type": "string",
           "minLength": 1
         },
@@ -429,8 +425,6 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "default": "",
-          "title": "certificateSecret",
           "type": "string",
           "minLength": 1
         },
