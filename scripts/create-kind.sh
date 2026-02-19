@@ -42,6 +42,9 @@ fi
 
 kind create cluster --name "cfk8s" --config="$script_full_path/../kind.yaml"
 
+echo "Applying taints to workload nodes..."
+kubectl taint nodes -l cloudfoundry.org/cell=true cloudfoundry.org/cell=true:NoSchedule --overwrite || true
+
 if [ "${DISABLE_CACHE}" != "true" ]; then
   echo "Setting up registry caches..."
 

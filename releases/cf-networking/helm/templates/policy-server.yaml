@@ -105,7 +105,7 @@ spec:
             name: policy-server-configmap
         - name: policy-server
           secret:
-            secretName: {{ default "policy-server" .Values.policyServer.certificateSecret }}
+            secretName: {{ .Values.policyServer.certificateSecret }}
         - name: etc-route-registrar
           configMap:
             name: policy-server-route-registrar-configmap
@@ -139,29 +139,4 @@ spec:
     - backendRefs:
         - name: policy-server
           port: 4003
----
-{{- if not .Values.policyServer.certificateSecret }}
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: policy-server
-spec:
-  secretName: policy-server
-  commonName: client
-  dnsNames:
-    - policy-server
-    - policy-server.{{ .Release.Namespace }}.svc
-    - policy-server.{{ .Release.Namespace }}.svc.cluster.local
-    - "{{ .Values.policyServer.hostname }}"
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{- end }}
 {{- end }}

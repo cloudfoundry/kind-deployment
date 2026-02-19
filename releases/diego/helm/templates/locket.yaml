@@ -48,7 +48,7 @@ spec:
       volumes:
         - name: locket
           secret:
-            secretName: {{ default "locket" .Values.locket.certificateSecret }}
+            secretName: {{ .Values.locket.certificateSecret }}
         - name: postgres-tls
           secret:
             secretName: postgres-tls
@@ -69,29 +69,4 @@ spec:
       protocol: TCP
   selector:
     app: locket
----
-{{ if not .Values.locket.certificateSecret }}
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: locket
-spec:
-  secretName: locket
-  commonName: client
-  dnsNames:
-    - locket
-    - locket.{{ .Release.Namespace }}.svc
-    - locket.{{ .Release.Namespace }}.svc.cluster.local
-    - "{{ .Values.locket.hostname }}"
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{end }}
 {{- end }}

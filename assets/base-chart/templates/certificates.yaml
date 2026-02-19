@@ -1,0 +1,28 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: instance-identity
+  namespace: default
+data:
+  ca.crt: {{ .Values.caCert | b64enc }}
+  ca.key: {{ .Values.caKey | b64enc }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ca
+  namespace: default
+data:
+  ca.crt: |
+    {{- .Values.caCert | nindent 4 }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: all-in-one-tls
+  namespace: default
+data:
+  ca.crt: {{ .Values.caCert | b64enc }}
+  tls.crt: {{ .Values.tlsCert | b64enc }}
+  tls.key: {{ .Values.tlsKey | b64enc }}

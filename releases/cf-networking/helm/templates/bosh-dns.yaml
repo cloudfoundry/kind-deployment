@@ -71,10 +71,10 @@ spec:
       volumes:
         - name: bosh-dns-adapter
           secret:
-            secretName: {{ default "bosh-dns-adapter" .Values.boshDnsAdapter.certificateSecret }}
+            secretName: {{ .Values.boshDnsAdapter.certificateSecret }}
         - name: bosh-dns
           secret:
-            secretName: {{ default "bosh-dns" .Values.boshDns.certificateSecret }}
+            secretName: {{ .Values.boshDns.certificateSecret }}
         - name: bosh-dns-config
           configMap:
             name: bosh-dns-configmap
@@ -97,52 +97,4 @@ spec:
       protocol: UDP
   selector:
     app: bosh-dns
-{{ if not .Values.boshDnsAdapter.certificateSecret }}
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: bosh-dns-adapter
-spec:
-  secretName: bosh-dns-adapter
-  commonName: bosh-dns-adapter
-  dnsNames:
-    - bosh-dns-adapter
-    - bosh-dns-adapter.{{ .Release.Namespace }}.svc
-    - bosh-dns-adapter.{{ .Release.Namespace }}.svc.cluster.local
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{end }}
-{{- if not .Values.boshDns.certificateSecret }}
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: bosh-dns
-spec:
-  secretName: bosh-dns
-  commonName: bosh-dns
-  dnsNames:
-    - bosh-dns
-    - bosh-dns.{{ .Release.Namespace }}.svc
-    - bosh-dns.{{ .Release.Namespace }}.svc.cluster.local
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{end }}
 {{- end }}

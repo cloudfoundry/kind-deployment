@@ -12,4 +12,4 @@ tolerations: ~
 
 dbPassword: ~
 
-caCertificateSecret: root-ca
+caCertificateSecret: ""

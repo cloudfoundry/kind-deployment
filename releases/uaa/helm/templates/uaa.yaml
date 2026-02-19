@@ -84,7 +84,7 @@ spec:
             name: uaa-spring-configmap
         - name: uaa
           secret:
-            secretName: {{ default "uaa" .Values.certificateSecret }}
+            secretName: {{ .Values.certificateSecret }}
         - name: tmp
           emptyDir: {}
 ---
@@ -115,28 +115,3 @@ spec:
     - backendRefs:
         - name: uaa
           port: 443
----
-{{ if not .Values.certificateSecret }}
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: uaa
-spec:
-  secretName: uaa
-  commonName: uaa
-  dnsNames:
-    - uaa
-    - uaa.{{ .Release.Namespace }}.svc
-    - uaa.{{ .Release.Namespace }}.svc.cluster.local
-    - "{{ .Values.hostname }}"
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{end }}

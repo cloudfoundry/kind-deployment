@@ -6,9 +6,9 @@ config:
       enabled: true
       merge:
         timeout: 5
-      secretName: nats-tls
+      secretName: all-in-one-tls
 natsBox:
   enabled: false
 tlsCA:
   enabled: true
-  secretName: nats-tls
+  secretName: all-in-one-tls

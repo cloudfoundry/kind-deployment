@@ -45,7 +45,8 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "hostname": {
           "type": "string"
@@ -210,7 +211,8 @@
           "type": "object"
         },
         "certificateSecret": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "credhubApi": {
           "additionalProperties": false,
@@ -529,7 +531,8 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "enabled": {
           "type": "boolean"

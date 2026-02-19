@@ -213,7 +213,7 @@ spec:
       volumes:
         - name: cloud-controller
           secret:
-            secretName: {{ default "cloud-controller" .Values.cloudController.certificateSecret }}
+            secretName: {{ .Values.cloudController.certificateSecret }}
         - name: etc-cloud-controller
           configMap:
             name: cloud-controller-configmap
@@ -230,29 +230,4 @@ spec:
           emptyDir: {}
         - name: tmpdir
           emptyDir: {}
-{{- if not .Values.cloudController.certificateSecret }}
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: cloud-controller
-spec:
-  secretName: cloud-controller
-  commonName: client
-  dnsNames:
-    - cloud-controller
-    - cloud-controller.{{ .Release.Namespace }}.svc
-    - cloud-controller.{{ .Release.Namespace }}.svc.cluster.local
-    - "{{ .Values.cloudController.externalDomain }}"
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{- end }}
 {{- end }}

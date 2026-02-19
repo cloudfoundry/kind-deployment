@@ -46,7 +46,7 @@ spec:
       volumes:
         - name: ssh-proxy
           secret:
-            secretName: {{ default "ssh-proxy" .Values.sshProxy.certificateSecret }}
+            secretName: {{ .Values.sshProxy.certificateSecret }}
         - name: ssh-proxy-config
           configMap:
             name: ssh-proxy-configmap
@@ -77,29 +77,4 @@ spec:
     - backendRefs:
       - name: ssh-proxy
         port: 2222
----
-{{ if not .Values.sshProxy.certificateSecret }}
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: ssh-proxy
-spec:
-  secretName: ssh-proxy
-  commonName: client
-  dnsNames:
-    - ssh-proxy
-    - ssh-proxy.{{ .Release.Namespace }}.svc
-    - ssh-proxy.{{ .Release.Namespace }}.svc.cluster.local
-    - "{{ .Values.sshProxy.hostname }}"
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{end }}
 {{- end }}

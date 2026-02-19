@@ -74,7 +74,7 @@ spec:
             name: nfsbroker-configmap
         - name: server-certs
           secret:
-            secretName: {{ default "nfsbroker" .Values.nfsbroker.certificateSecret }}
+            secretName: {{ .Values.nfsbroker.certificateSecret }}
 ---
 kind: Service
 apiVersion: v1
@@ -87,28 +87,4 @@ spec:
       protocol: TCP
   selector:
     app: nfsbroker
-{{- if not .Values.nfsbroker.certificateSecret }}
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: nfsbroker
-spec:
-  secretName: nfsbroker
-  commonName: client
-  dnsNames:
-    - nfsbroker
-    - nfsbroker.{{ .Release.Namespace }}.svc
-    - nfsbroker.{{ .Release.Namespace }}.svc.cluster.local
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{- end }}
 {{- end }}

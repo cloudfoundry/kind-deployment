@@ -169,13 +169,13 @@ spec:
           emptyDir: {}
         - name: trafficcontroller
           secret:
-            secretName: {{ default "trafficcontroller" .Values.trafficcontroller.certificateSecret }}
+            secretName: {{ .Values.trafficcontroller.certificateSecret }}
         - name: reverse-log-proxy
           secret:
-            secretName: {{ default "reverse-log-proxy" .Values.reverseLogProxy.certificateSecret }}
+            secretName: {{ .Values.reverseLogProxy.certificateSecret }}
         - name: reverse-log-proxy-gateway
           secret:
-            secretName: {{ default "reverse-log-proxy-gateway" .Values.reverseLogProxyGateway.certificateSecret }}
+            secretName: {{ .Values.reverseLogProxyGateway.certificateSecret }}
 ---
 kind: Service
 apiVersion: v1
@@ -237,82 +237,4 @@ spec:
     - backendRefs:
         - name: log-api
           port: 8081
----
-{{ if not .Values.reverseLogProxy.certificateSecret }}
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: reverse-log-proxy
-spec:
-  secretName: reverse-log-proxy
-  commonName: reverse-log-proxy
-  dnsNames:
-    - loggregator
-    - reverse-log-proxy
-    - reverse-log-proxy.{{ .Release.Namespace }}.svc
-    - reverse-log-proxy.{{ .Release.Namespace }}.svc.cluster.local
-    - "{{ .Values.reverseLogProxy.hostname }}"
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{end }}
----
-{{ if not .Values.reverseLogProxyGateway.certificateSecret }}
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: reverse-log-proxy-gateway
-spec:
-  secretName: reverse-log-proxy-gateway
-  commonName: reverse-log-proxy-gateway
-  dnsNames:
-    - loggregator
-    - reverse-log-proxy-gateway
-    - reverse-log-proxy-gateway.{{ .Release.Namespace }}.svc
-    - reverse-log-proxy-gateway.{{ .Release.Namespace }}.svc.cluster.local
-    - "{{ .Values.reverseLogProxyGateway.hostname }}"
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{end }}
----
-{{ if not .Values.trafficcontroller.certificateSecret }}
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: trafficcontroller
-spec:
-  secretName: trafficcontroller
-  commonName: trafficcontroller
-  dnsNames:
-    - loggregator
-    - trafficcontroller
-    - trafficcontroller.{{ .Release.Namespace }}.svc
-    - trafficcontroller.{{ .Release.Namespace }}.svc.cluster.local
-    - "{{ .Values.trafficcontroller.hostname }}"
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{end }}
 {{- end }}

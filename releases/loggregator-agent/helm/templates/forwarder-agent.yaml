@@ -129,13 +129,13 @@ spec:
           emptyDir: {}
         - name: syslog-agent
           secret:
-            secretName: {{ default "syslog-agent" .Values.syslogAgent.certificateSecret }}
+            secretName: {{ .Values.syslogAgent.certificateSecret }}
         - name: forwarder-agent
           secret:
-            secretName: {{ default "forwarder-agent" .Values.forwarderAgent.certificateSecret }}
+            secretName: {{ .Values.forwarderAgent.certificateSecret }}
         - name: loggregator-agent
           secret:
-            secretName: {{ default "loggregator-agent" .Values.loggregatorAgent.certificateSecret }}
+            secretName: {{ .Values.loggregatorAgent.certificateSecret }}
 ---
 kind: Service
 apiVersion: v1
@@ -150,79 +150,4 @@ spec:
       protocol: TCP
   selector:
     app: forwarder-agent
-{{- if not .Values.syslogAgent.certificateSecret }}
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: syslog-agent
-spec:
-  secretName: syslog-agent
-  commonName: syslog-agent
-  dnsNames:
-    - metron
-    {{- if .Values.syslogAgent.aggregateDrain }}
-    - syslog-agent.{{ .Release.Namespace }}.svc.cluster.local
-    {{- end }}
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{- end }}
-{{- if not .Values.forwarderAgent.certificateSecret }}
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: forwarder-agent
-spec:
-  secretName: forwarder-agent
-  commonName: forwarder-agent
-  dnsNames:
-    - metron
-    {{- if .Values.forwarderAgent.aggregateDrain }}
-    - forwarder-agent.{{ .Release.Namespace }}.svc.cluster.local
-    {{- end }}
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{- end }}
-{{- if not .Values.loggregatorAgent.certificateSecret }}
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: loggregator-agent
-spec:
-  secretName: loggregator-agent
-  commonName: loggregator-agent
-  dnsNames:
-    - metron
-    {{- if .Values.loggregatorAgent.aggregateDrain }}
-    - loggregator-agent.{{ .Release.Namespace }}.svc.cluster.local
-    {{- end }}
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{- end }}
 {{- end }}

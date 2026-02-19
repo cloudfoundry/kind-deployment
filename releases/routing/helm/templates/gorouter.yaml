@@ -119,7 +119,7 @@ spec:
             name: gorouter-configmap
         - name: udp-forwarder
           secret:
-            secretName: {{ default "udp-forwarder" .Values.udpForwarder.certificateSecret }}
+            secretName: {{ .Values.udpForwarder.certificateSecret }}
 ---
 kind: Service
 apiVersion: v1
@@ -165,51 +165,4 @@ spec:
     - backendRefs:
         - name: gorouter
           port: 443
-{{- if not .Values.gorouter.certificateSecret }}
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: gorouter
-spec:
-  secretName: gorouter
-  commonName: client
-  dnsNames:
-    - gorouter
-    - gorouter.{{ .Release.Namespace }}.svc
-    - gorouter.{{ .Release.Namespace }}.svc.cluster.local
-    - "{{ .Values.gorouter.hostname }}"
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{- end }}
-{{- if not .Values.udpForwarder.certificateSecret }}
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: udp-forwarder
-spec:
-  secretName: udp-forwarder
-  commonName: udp-forwarder
-  dnsNames:
-    - metron
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{- end }}
 {{- end }}

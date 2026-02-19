@@ -37,38 +37,8 @@ spec:
       volumes:
         - name: cloud-controller
           secret:
-            secretName: {{ default "cloud-controller-db-migration" .Values.cloudController.certificateSecret }}
+            secretName: {{ .Values.cloudController.certificateSecret }}
         - name: etc-cloud-controller
           configMap:
             name: cloud-controller-configmap
-{{- if not .Values.cloudController.certificateSecret }}
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: cloud-controller-db-migration
-  annotations:
-    "helm.sh/hook": pre-install,pre-upgrade
-    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
-    "helm.sh/hook-weight": "-1"
-spec:
-  secretName: cloud-controller-db-migration
-  commonName: client
-  dnsNames:
-    - cloud-controller
-    - cloud-controller.{{ .Release.Namespace }}.svc
-    - cloud-controller.{{ .Release.Namespace }}.svc.cluster.local
-    - "{{ .Values.cloudController.externalDomain }}"
-    - "{{ .Values.cloudController.internalDomain }}"
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{- end }}
 {{- end }}

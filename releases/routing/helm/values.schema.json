@@ -19,7 +19,8 @@
         "certificateSecret": {
           "default": "",
           "title": "certificateSecret",
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "enabled": {
           "default": true,
@@ -141,13 +142,16 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "loggregatorCertificateSecret": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "uaaCertificateSecret": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "uaa": {
           "additionalProperties": false,
@@ -261,7 +265,8 @@
         "certificateSecret": {
           "default": "",
           "title": "certificateSecret",
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "enabled": {
           "default": true,
@@ -422,7 +427,8 @@
         "certificateSecret": {
           "default": "",
           "title": "certificateSecret",
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "image": {
           "additionalProperties": false,

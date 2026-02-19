@@ -111,7 +111,7 @@ spec:
       volumes:
         - name: cf-tcp-router
           secret:
-            secretName: {{ default "cf-tcp-router" .Values.tcpRouter.certificateSecret }}
+            secretName: {{ .Values.tcpRouter.certificateSecret }}
         - name: cf-tcp-router-config
           configMap:
             name: cf-tcp-router-configmap
@@ -213,28 +213,4 @@ spec:
     - backendRefs:
       - name: cf-tcp-router
         port: 32004
-{{- if not .Values.tcpRouter.certificateSecret }}
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: cf-tcp-router
-spec:
-  secretName: cf-tcp-router
-  commonName: client
-  dnsNames:
-    - cf-tcp-router
-    - cf-tcp-router.{{ .Release.Namespace }}.svc
-    - cf-tcp-router.{{ .Release.Namespace }}.svc.cluster.local
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{- end }}
 {{- end }}

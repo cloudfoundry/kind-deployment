@@ -91,7 +91,7 @@ spec:
       volumes:
       - name: syslog-binding-cache
         secret:
-          secretName: {{ default "syslog-binding-cache" .Values.syslogBindingCache.certificateSecret }}
+          secretName: {{ .Values.syslogBindingCache.certificateSecret }}
       - name: aggregate-drains
         secret:
           secretName: aggregate-drains
@@ -123,29 +123,4 @@ spec:
     - backendRefs:
       - name: syslog-binding-cache
         port: 9000
-{{- if not .Values.syslogBindingCache.certificateSecret }}
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: syslog-binding-cache
-spec:
-  secretName: syslog-binding-cache
-  commonName: "{{ .Values.syslogBindingCache.cache.commonName }}"
-  dnsNames:
-    - syslog-binding-cache
-    - syslog-binding-cache.{{ .Release.Namespace }}.svc
-    - syslog-binding-cache.{{ .Release.Namespace }}.svc.cluster.local
-    - "{{ .Values.syslogBindingCache.hostname }}"
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{- end }}
 {{- end }}

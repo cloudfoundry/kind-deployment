@@ -46,7 +46,7 @@ spec:
       volumes:
         - name: auctioneer
           secret:
-            secretName: {{ default "auctioneer" .Values.auctioneer.certificateSecret }}
+            secretName: {{ .Values.auctioneer.certificateSecret }}
         - name: auctioneer-config
           configMap:
             name: auctioneer-configmap
@@ -64,29 +64,4 @@ spec:
       protocol: TCP
   selector:
     app: auctioneer
----
-{{ if not .Values.auctioneer.certificateSecret }}
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: auctioneer
-spec:
-  secretName: auctioneer
-  commonName: auctioneer
-  dnsNames:
-    - auctioneer
-    - auctioneer.{{ .Release.Namespace }}.svc
-    - auctioneer.{{ .Release.Namespace }}.svc.cluster.local
-    - "{{ .Values.auctioneer.hostname }}"
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{end }}
 {{- end }}

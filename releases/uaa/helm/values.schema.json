@@ -9,7 +9,8 @@
       "type": ["string", "null"]
     },
     "certificateSecret": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     },
     "dbPassword": {
       "type": ["string", "null"]

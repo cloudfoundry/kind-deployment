@@ -108,26 +108,26 @@ spec:
           emptyDir: {}
         - name: route-emitter
           secret:
-            secretName: {{ default "route-emitter" .Values.routeEmitter.certificateSecret }}
+            secretName: {{ .Values.routeEmitter.certificateSecret }}
         - name: bbs
           secret:
-            secretName: {{ default "bbs" .Values.routeEmitter.bbsCertificateSecret }}
+            secretName: {{ .Values.routeEmitter.bbsCertificateSecret }}
         - name: locket
           secret:
-            secretName: {{ default "locket" .Values.routeEmitter.locketCertificateSecret }}
+            secretName: {{ .Values.routeEmitter.locketCertificateSecret }}
         - name: nats
           secret:
-            secretName: {{ default "nats" .Values.routeEmitter.natsCertificateSecret }}
+            secretName: {{ .Values.routeEmitter.natsCertificateSecret }}
         - name: loggregator
           secret:
-            secretName: {{ default "loggregator" .Values.routeEmitter.loggregatorCertificateSecret }}
+            secretName: {{ .Values.routeEmitter.loggregatorCertificateSecret }}
         - name: uaa
           secret:
-            secretName: {{ default "uaa" .Values.routeEmitter.uaaCertificateSecret }}
+            secretName: {{ .Values.routeEmitter.uaaCertificateSecret }}
         - name: routing-api
 {{- if .Values.routeEmitter.routingApi.enabled }}
           secret:
-            secretName: {{ default "routing-api" .Values.routeEmitter.routingApi.certificateSecret }}
+            secretName: {{ .Values.routeEmitter.routingApi.certificateSecret }}
 {{- else }}
           emptyDir: {}
 {{- end }}
@@ -142,23 +142,4 @@ spec:
       tolerations:
         {{- toYaml .Values.routeEmitter.tolerations | nindent 8 }}
       {{- end }}
----
-{{ if not .Values.routeEmitter.certificateSecret }}
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: route-emitter
-spec:
-  secretName: route-emitter
-  commonName: route-emitter
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{end }}
 {{- end }}

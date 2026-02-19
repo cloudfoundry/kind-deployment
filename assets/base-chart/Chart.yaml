@@ -1,0 +1,5 @@
+name: base
+version: 0.0.1
+description: Helm chart for base components
+type: application
+apiVersion: v2

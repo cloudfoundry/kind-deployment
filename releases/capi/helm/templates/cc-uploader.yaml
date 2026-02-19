@@ -46,7 +46,7 @@ spec:
       volumes:
         - name: cc-uploader
           secret:
-            secretName: {{ default "cc-uploader" .Values.ccUploader.certificateSecret }}
+            secretName: {{ .Values.ccUploader.certificateSecret }}
         - name: cc-uploader-config
           configMap:
             name: cc-uploader-configmap

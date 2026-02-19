@@ -68,13 +68,13 @@ spec:
       volumes:
         - name: routing-api
           secret:
-            secretName: {{ default "routing-api" .Values.routingApi.certificateSecret }}
+            secretName: {{ .Values.routingApi.certificateSecret }}
         - name: uaa
           secret:
-            secretName: {{ default "uaa" .Values.routingApi.uaaCertificateSecret }}
+            secretName: {{ .Values.routingApi.uaaCertificateSecret }}
         - name: locket
           secret:
-            secretName: {{ default "locket" .Values.routingApi.locketCertificateSecret }}
+            secretName: {{ .Values.routingApi.locketCertificateSecret }}
         - name: routing-api-config
           configMap:
             name: routing-api-configmap
@@ -100,29 +100,3 @@ spec:
       targetPort: 3001
   selector:
     app: routing-api
----
-{{ if not .Values.routingApi.certificateSecret }}
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: routing-api
-spec:
-  secretName: routing-api
-  commonName: client
-  dnsNames:
-    - routing-api
-    - routing-api.{{ .Release.Namespace }}.svc
-    - routing-api.{{ .Release.Namespace }}.svc.cluster.local
-    - "api.{{ .Values.routingApi.systemDomain }}"
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{- end }}
-{{- end }}

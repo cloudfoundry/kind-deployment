@@ -19,7 +19,7 @@ primary:
 tls:
   certFilename: tls.crt
   certKeyFilename: tls.key
-  certificatesSecret: postgres-tls
+  certificatesSecret: all-in-one-tls
   enabled: true
 volumePermissions:
   enabled: true

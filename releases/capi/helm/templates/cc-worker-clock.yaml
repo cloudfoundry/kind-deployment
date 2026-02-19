@@ -53,7 +53,7 @@ spec:
       volumes:
         - name: cloud-controller
           secret:
-            secretName: {{ default "cloud-controller" .Values.cloudController.certificateSecret }}
+            secretName: {{ .Values.cloudController.certificateSecret }}
         - name: etc-cloud-controller
           configMap:
             name: cloud-controller-configmap

@@ -1,25 +1,3 @@
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: istio-ingressgateway-certs
-  namespace: default
-spec:
-  commonName: istio-ingressgateway-certs
-  dnsNames:
-  - '*.127-0-0-1.nip.io'
-  - '*.apps.127-0-0-1.nip.io'
-  - '*.blobstore.127-0-0-1.nip.io'
-  issuerRef:
-    kind: ClusterIssuer
-    name: ca-issuer
-  secretName: istio-ingressgateway-certs
-  usages:
-  - key encipherment
-  - digital signature
-  - server auth
-  - client auth
-  privateKey:
-    rotationPolicy: Always
 ---
 apiVersion: v1
 kind: Service
@@ -182,7 +160,7 @@ spec:
       certificateRefs:
       - group: ""
         kind: Secret
-        name: istio-ingressgateway-certs
+        name: all-in-one-tls
       mode: Terminate
   - allowedRoutes:
       namespaces:

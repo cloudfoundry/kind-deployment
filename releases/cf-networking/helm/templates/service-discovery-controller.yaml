@@ -44,7 +44,7 @@ spec:
       volumes:
         - name: service-discovery-controller
           secret:
-            secretName: {{ default "service-discovery-controller" .Values.serviceDiscoveryController.certificateSecret }}
+            secretName: {{ .Values.serviceDiscoveryController.certificateSecret }}
         - name: service-discovery-controller-config
           configMap:
             name: service-discovery-controller-configmap
@@ -75,27 +75,4 @@ spec:
     - backendRefs:
         - name: service-discovery-controller
           port: {{ .Values.serviceDiscoveryController.port }}
----
-{{- if not .Values.serviceDiscoveryController.certificateSecret }}
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: service-discovery-controller
-spec:
-  secretName: service-discovery-controller
-  commonName: service-discovery-controller
-  dnsNames:
-    - service-discovery-controller
-    - "{{ .Values.serviceDiscoveryController.hostname }}"
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{- end }}
 {{- end }}
