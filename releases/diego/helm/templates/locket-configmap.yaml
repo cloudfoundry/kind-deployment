@@ -16,7 +16,7 @@ data:
       "log_level": "info",
       "max_open_database_connections": 200,
       "max_database_connection_lifetime": "1h",
-      "database_connection_string": "postgres://postgres:{{ .Values.dbPassword }}@postgresql:5432/locket",
+      "database_connection_string": "postgres://postgres:{{ .Values.dbPassword }}@postgresql.{{ .Release.Namespace }}.svc.cluster.local:5432/locket",
       "database_driver": "postgres",
       "db_connection_timeout": "30s",
       "db_read_timeout": "600s",

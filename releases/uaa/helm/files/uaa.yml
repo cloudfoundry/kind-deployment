@@ -104,7 +104,7 @@ database:
   abandonedtimeout: 300
   username: postgres
   password: {{ .Values.dbPassword | quote }}
-  url: jdbc:postgresql://postgresql.default.svc.cluster.local:5432/uaa?sslmode=disable
+  url: jdbc:postgresql://postgresql.{{ .Release.Namespace }}.svc.cluster.local:5432/uaa?sslmode=disable
 scim:
   userids_enabled: true
   user:

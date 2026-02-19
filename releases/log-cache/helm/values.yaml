@@ -1,6 +1,6 @@
 logCacheApi:
   hostname: "log-cache-api.127-0-0-1.nip.io"
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   cfAuthProxy:
     image:
       repository: ghcr.io/cloudfoundry/k8s/cf-auth-proxy
@@ -16,7 +16,7 @@ logCacheApi:
 
 logCacheBackend:
   hostname: "log-cache.127-0-0-1.nip.io"
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   syslogServer:
     image:
       repository: ghcr.io/cloudfoundry/k8s/syslog-server

@@ -1,6 +1,6 @@
 nfsbroker:
   enabled: true
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   oauthClientsSecret: ""
   credhubURL: https://credhub.default.svc.cluster.local:8844
   image:

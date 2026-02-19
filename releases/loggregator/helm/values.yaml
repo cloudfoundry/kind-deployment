@@ -3,7 +3,7 @@ loggregator:
 
 doppler:
   hostname: "doppler.127-0-0-1.nip.io"
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   resources: ~
   image:
     repository: ghcr.io/cloudfoundry/k8s/doppler
@@ -17,7 +17,7 @@ logStream:
 
 reverseLogProxy:
   hostname: "reverse-log-proxy.127-0-0-1.nip.io"
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   resources: ~
   image:
     repository: ghcr.io/cloudfoundry/k8s/reverse-log-proxy
@@ -26,7 +26,7 @@ reverseLogProxy:
 
 reverseLogProxyGateway:
   hostname: "reverse-log-proxy-gateway.127-0-0-1.nip.io"
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   resources: ~
   image:
     repository: ghcr.io/cloudfoundry/k8s/reverse-log-proxy-gateway
@@ -36,7 +36,7 @@ reverseLogProxyGateway:
 trafficcontroller:
   hostname: "trafficcontroller.127-0-0-1.nip.io"
   systemDomain: "127-0-0-1.nip.io"
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   resources: ~
   image:
     repository: ghcr.io/cloudfoundry/k8s/traffic-controller

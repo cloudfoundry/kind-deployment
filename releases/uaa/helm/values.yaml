@@ -1,4 +1,4 @@
-certificateSecret: ""
+certificateSecret: "all-in-one-tls"
 hostname: "uaa.127-0-0-1.nip.io"
 address: "https://uaa.127-0-0-1.nip.io"
 

@@ -33,7 +33,7 @@ spec:
           volumeMounts:
             - name: bbs
               mountPath: /etc/ssl/certs/bbs
-            - name: postgres-tls
+            - name: all-in-one-tls
               mountPath: /etc/ssl/certs/postgres
             - name: bbs-config
               mountPath: /bbs
@@ -49,9 +49,9 @@ spec:
         - name: bbs
           secret:
             secretName: {{ .Values.bbs.certificateSecret }}
-        - name: postgres-tls
+        - name: all-in-one-tls
           secret:
-            secretName: postgres-tls
+            secretName: all-in-one-tls
         - name: bbs-config
           configMap:
             name: bbs-configmap

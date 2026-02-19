@@ -593,6 +593,10 @@
     "udpForwarder": {
       "additionalProperties": false,
       "properties": {
+        "certificateSecret": {
+          "type": "string",
+          "minLength": 1
+        },
         "image": {
           "additionalProperties": false,
           "properties": {

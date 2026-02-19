@@ -9,7 +9,8 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "cfAuthProxy": {
           "additionalProperties": false,
@@ -93,7 +94,8 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "hostname": {
           "type": "string"

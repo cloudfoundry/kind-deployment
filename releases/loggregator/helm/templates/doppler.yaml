@@ -55,7 +55,7 @@ spec:
           emptyDir: {}
         - name: doppler
           secret:
-            secretName: {{ default "doppler" .Values.doppler.certificateSecret }}
+            secretName: {{ .Values.doppler.certificateSecret }}
 ---
 kind: Service
 apiVersion: v1
@@ -84,29 +84,4 @@ spec:
     - backendRefs:
       - name: doppler
         port: 8082
----
-{{ if not .Values.doppler.certificateSecret }}
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: doppler
-spec:
-  secretName: doppler
-  commonName: doppler
-  dnsNames:
-    - doppler
-    - doppler.{{ .Release.Namespace }}.svc
-    - doppler.{{ .Release.Namespace }}.svc.cluster.local
-    - "{{ .Values.doppler.hostname }}"
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{end }}
 {{- end }}

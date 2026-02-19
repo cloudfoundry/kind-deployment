@@ -68,7 +68,7 @@ spring:
   datasource:
     username: postgres
     password: {{ .Values.dbPassword | quote }}
-    url: jdbc:postgresql://postgresql.default.svc.cluster.local:5432/credhub?autoReconnect=true&ssl=false&sslmode=allow
+    url: jdbc:postgresql://postgresql.{{ .Release.Namespace }}.svc.cluster.local:5432/credhub?autoReconnect=true&ssl=false&sslmode=allow
   profiles:
     active: prod
 certificates:

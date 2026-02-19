@@ -10,7 +10,7 @@ ccWorker:
 
 ccUploader:
   resources: ~
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   hostname: "cc-uploader.default.svc.cluster.local"
   image:
     repository: ghcr.io/cloudfoundry/k8s/cc-uploader
@@ -28,7 +28,7 @@ ccWorkerClock:
 cloudController:
   enabled: false
   resources: ~ 
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   appDomain: apps.127-0-0-1.nip.io
   externalDomain: api.127-0-0-1.nip.io
   internalDomain: cloud-controller.default.svc.cluster.local
@@ -99,11 +99,12 @@ udpForwarder:
     tag: "8.3.14"
     imagePullPolicy: IfNotPresent
   resources: ~
+  certificateSecret: "all-in-one-tls"
 
 tpsWatcher:
   enabled: false
   resources: ~
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   hostname: tps.default.svc.cluster.local
   image:
     repository: ghcr.io/cloudfoundry/k8s/tps-watcher

@@ -1,6 +1,6 @@
 gorouter:
   enabled: true
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   hostname: "gorouter.127-0-0-1.nip.io"
   appsDomain: "*.apps.127-0-0-1.nip.io"
   image:
@@ -11,7 +11,7 @@ gorouter:
   tolerations: ~
 
 udpForwarder:
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   image:
     repository: ghcr.io/cloudfoundry/k8s/udp-forwarder
     # renovate: dataSource=docker depName=loggregator-agent-release packageName=ghcr.io/cloudfoundry/k8s/udp-forwarder
@@ -20,9 +20,10 @@ udpForwarder:
 
 routingApi:
   enabled: true
-  certificateSecret: ""
-  loggregatorCertificateSecret: ""
-  uaaCertificateSecret: ""
+  certificateSecret: "all-in-one-tls"
+  locketCertificateSecret: "all-in-one-tls"
+  loggregatorCertificateSecret: "all-in-one-tls"
+  uaaCertificateSecret: "all-in-one-tls"
   systemDomain: "127-0-0-1.nip.io"
   dbPassword: "postgres"
   locketAddress: locket.default.svc.cluster.local:8891
@@ -38,7 +39,7 @@ routingApi:
 
 tcpRouter:
   enabled: true
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   oauthClientsSecret: ""
   image:
     repository: ghcr.io/cloudfoundry/k8s/cf-tcp-router

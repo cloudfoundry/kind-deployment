@@ -289,10 +289,6 @@ releases:
       - dbPassword: ""
       - routeEmitter:
           enabled: true
-          bbsCertificateSecret: route-emitter
-          locketCertificateSecret: route-emitter
-          natsCertificateSecret: route-emitter
-          loggregatorCertificateSecret: route-emitter
           routingApi:
             enabled: {{ .Values.optionalComponents.enableTcpRouting }}
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
@@ -314,6 +310,8 @@ releases:
           - gorouter
           - ssh-proxy
           - cf-tcp-router
+      - loggregatorCertificateSecret: all-in-one-tls
+
     hooks:
       - events: ["presync"]
         showlogs: true
@@ -373,6 +371,9 @@ releases:
     needs:
       - cf-networking
     {{ if .Values.optionalComponents.enablePolicySupport }}
+    set:
+      - name: certificateSecret
+        value: all-in-one-tls
     hooks:
       - events: ["postsync"]
         showlogs: true

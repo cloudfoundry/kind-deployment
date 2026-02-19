@@ -85,7 +85,7 @@ spec:
       volumes:
       - name: log-cache-api
         secret:
-          secretName: {{ default "log-cache-api" .Values.logCacheApi.certificateSecret }}
+          secretName: {{ .Values.logCacheApi.certificateSecret }}
 ---
 kind: Service
 apiVersion: v1
@@ -115,29 +115,3 @@ spec:
     - backendRefs:
         - name: log-cache-api
           port: 8083
----
-{{ if not .Values.logCacheApi.certificateSecret }}
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: log-cache-api
-spec:
-  secretName: log-cache-api
-  commonName: client
-  dnsNames:
-    - localhost
-    - log-cache-api
-    - log-cache-api.{{ .Release.Namespace }}.svc
-    - log-cache-api.{{ .Release.Namespace }}.svc.cluster.local
-    - "{{ .Values.logCacheApi.hostname }}"
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{end }}

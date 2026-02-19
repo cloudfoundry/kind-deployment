@@ -1,6 +1,6 @@
 auctioneer:
   enabled: false
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   hostname: "auctioneer.default.svc.cluster.local"
   image:
     repository: ghcr.io/cloudfoundry/k8s/auctioneer
@@ -11,7 +11,7 @@ auctioneer:
 
 bbs:
   enabled: false
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   hostname: "bbs.default.svc.cluster.local"
   image:
     repository: ghcr.io/cloudfoundry/k8s/bbs
@@ -19,7 +19,7 @@ bbs:
     imagePullPolicy: IfNotPresent
   nodeSelector: ~
   tolerations: ~
-  
+
 fileserver:
   enabled: false
   hostname: "file-server.127-0-0-1.nip.io"
@@ -33,7 +33,7 @@ fileserver:
   
 locket:
   enabled: false
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   hostname: "locket.default.svc.cluster.local"
   image:
     repository: ghcr.io/cloudfoundry/k8s/locket
@@ -41,10 +41,10 @@ locket:
     imagePullPolicy: IfNotPresent
   nodeSelector: ~
   tolerations: ~
-  
+
 sshProxy:
   enabled: false
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   hostname: "ssh-proxy.127-0-0-1.nip.io"
   oauthClientsSecret: ""
   image:
@@ -53,22 +53,22 @@ sshProxy:
     imagePullPolicy: IfNotPresent
   nodeSelector: ~
   tolerations: ~
-  
+
 routeEmitter:
   enabled: false
-  certificateSecret: ""
-  natsCertificateSecret: ""
-  loggregatorCertificateSecret: ""
-  bbsCertificateSecret: ""
-  locketCertificateSecret: ""
-  uaaCertificateSecret: ""
+  certificateSecret: "all-in-one-tls"
+  natsCertificateSecret: "all-in-one-tls"
+  loggregatorCertificateSecret: "all-in-one-tls"
+  bbsCertificateSecret: "all-in-one-tls"
+  locketCertificateSecret: "all-in-one-tls"
+  uaaCertificateSecret: "all-in-one-tls"
   oauthClientsSecret: ""
   natsAddress: "nats.default.svc.cluster.local:4222"
   locketAddress: "locket.default.svc.cluster.local:8891"
   bbsAddress: "https://bbs.default.svc.cluster.local:8889"
   routingApi:
     enabled: true
-    certificateSecret: ""
+    certificateSecret: "all-in-one-tls"
     address: "https://routing-api.default.svc.cluster.local"
     port: 3001
   uaaAddress: "https://uaa.default.svc.cluster.local:443"

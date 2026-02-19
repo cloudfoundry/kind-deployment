@@ -225,7 +225,7 @@ spec:
             name: nginx-configmap
         - name: udp-forwarder
           secret:
-            secretName: udp-forwarder
+            secretName: {{ .Values.udpForwarder.certificateSecret }}
         - name: var-run # Share unix sockets between containers.
           emptyDir: {}
         - name: tmpdir

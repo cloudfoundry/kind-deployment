@@ -5,8 +5,8 @@ metadata:
   name: instance-identity
   namespace: default
 data:
-  ca.crt: {{ .Values.caCert | b64enc }}
-  ca.key: {{ .Values.caKey | b64enc }}
+  tls.crt: {{ .Values.caCert | b64enc }}
+  tls.key: {{ .Values.caKey | b64enc }}
 ---
 apiVersion: v1
 kind: ConfigMap

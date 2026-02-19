@@ -149,6 +149,10 @@
           "type": "string",
           "minLength": 1
         },
+        "locketCertificateSecret": {
+          "type": "string",
+          "minLength": 1
+        },
         "uaaCertificateSecret": {
           "type": "string",
           "minLength": 1

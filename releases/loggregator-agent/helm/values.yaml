@@ -1,7 +1,7 @@
 forwarderAgent:
   enabled: false
   aggregateDrain: false
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   resources: ~
   image:
     repository: ghcr.io/cloudfoundry/k8s/forwarder-agent
@@ -14,7 +14,7 @@ loggregatorAgent:
   doppler:
     address: "doppler.default.svc.cluster.local:8082"
   aggregateDrain: false
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   resources: ~
   image:
     repository: ghcr.io/cloudfoundry/k8s/loggregator-agent
@@ -27,7 +27,7 @@ syslogAgent:
   logCacheSyslog:
     address: "syslog://log-cache-syslog.cf.ci.example.com:8082"
   aggregateDrain: false
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   resources: ~
   image:
     repository: ghcr.io/cloudfoundry/k8s/syslog-agent
@@ -39,7 +39,7 @@ syslogBindingCache:
   cache:
     commonName: "syslog-binding-cache"
   enabled: false
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   resources: ~
   image:
     repository: ghcr.io/cloudfoundry/k8s/syslog-binding-cache

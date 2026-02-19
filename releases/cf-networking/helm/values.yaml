@@ -1,7 +1,7 @@
 policyServer:
   enabled: true
   resources: ~
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   hostname: "policy-server.127-0-0-1.nip.io"
   externalDomain: api.127-0-0-1.nip.io
   image:
@@ -18,7 +18,7 @@ policyServer:
 serviceDiscoveryController:
   enabled: true
   resources: ~
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   hostname: service-discovery-controller.default.svc.cluster.local
   port: 8054
   image:
@@ -34,7 +34,7 @@ serviceDiscoveryController:
 boshDnsAdapter:
   enabled: true
   resources: ~
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   image:
     repository: ghcr.io/cloudfoundry/k8s/bosh-dns-adapter
     tag: ""
@@ -42,7 +42,7 @@ boshDnsAdapter:
 
 boshDns:
   resources: ~
-  certificateSecret: ""
+  certificateSecret: "all-in-one-tls"
   image:
     repository: ghcr.io/cloudfoundry/k8s/bosh-dns
     # renovate: dataSource=docker depName=bosh-dns-release packageName=ghcr.io/cloudfoundry/k8s/bosh-dns
