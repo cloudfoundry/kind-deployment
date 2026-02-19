@@ -263,7 +263,9 @@ releases:
     needs:
       - diego
       - nats
+    {{ if .Values.optionalComponents.enablePolicySupport }}
       - cf-networking
+    {{ end }}
     values:
       - diegoSSHCredentials: ""
       - sshProxyHostKey: ""
@@ -277,7 +279,7 @@ releases:
           routingApi:
             enabled: {{ .Values.optionalComponents.enableTcpRouting }}
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
-          enableInternalEmitter: {{ and .Values.optionalComponents.enablePolicySupport .Values.optionalComponents.enableLoggregator }}
+          enableInternalEmitter: {{ and .Values.optionalComponents.enablePolicySupport }}
           enableTcpEmitter: {{ .Values.optionalComponents.enableTcpRouting }}
 
   - name: k8s-rep
@@ -335,6 +337,7 @@ releases:
   - name: cf-networking
     namespace: default
     chart: ./releases/cf-networking/helm
+    installed: {{ .Values.optionalComponents.enablePolicySupport }}
     needs:
       - capi
       - uaa
@@ -342,7 +345,6 @@ releases:
       - loggregator-agent
     values:
       - policyServer:
-          enabled: {{ .Values.optionalComponents.enablePolicySupport }}
           dbPassword: {{ .Values.secrets.dbPassword }}
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
 
@@ -353,6 +355,7 @@ releases:
     installed: {{ .Values.optionalComponents.enablePolicySupport }}
     needs:
       - cf-networking
+    {{ if .Values.optionalComponents.enablePolicySupport }}
     hooks:
       - events: ["postsync"]
         showlogs: true
@@ -360,7 +363,6 @@ releases:
         args:
           - "-c"
           - |
-            {{ if .Values.optionalComponents.enablePolicySupport }}
             kubectl get configmap coredns -n kube-system -o jsonpath='{.data.Corefile}' | grep -q "apps.internal:53" || {
               echo "Patching CoreDNS to forward apps.internal to bosh-dns"
               BOSH_DNS_IP=$(kubectl get svc bosh-dns -n default -o jsonpath='{.spec.clusterIP}')
@@ -371,4 +373,4 @@ releases:
               }" "$COREFILE" | kubectl create configmap coredns -n kube-system --from-file=Corefile=/dev/stdin --dry-run=client -o yaml | kubectl apply -f -
               kubectl rollout restart deployment coredns -n kube-system
             }
-            {{ end }}
+    {{ end }}
