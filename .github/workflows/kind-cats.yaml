@@ -28,7 +28,7 @@ jobs:
           curl -L https://github.com/helmfile/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz | tar -zx
           mv helmfile $HOME/.local/bin/helmfile
           curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=${CF_CLI_VERSION}&source=github" | tar -zx
-          mv cf8 $HOME/.local/bin/cf  
+          mv cf8 $HOME/.local/bin/cf
         env:
           CF_CLI_VERSION: '8.14.1'
           KIND_VERSION: '0.30.0'
@@ -61,7 +61,6 @@ jobs:
           cf marketplace
       - name: Create nfs share
         run: |
-          # Create test share directory with proper ownership for Cloud Foundry apps
           docker exec nfs-server sh -c "mkdir -p /exports/test-share && chown 1000:1000 /exports/test-share && chmod 777 /exports/test-share"
       - name: setup CF tests
         uses: ./.github/actions/setup-cf-tests
