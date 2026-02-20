@@ -50,7 +50,7 @@
 
     "volume_service_name": "nfs",
     "volume_service_plan_name": "Existing",
-    "volume_service_create_config": "{\"share\": \"nfs-server/export/test-share\"}",
+    "volume_service_create_config": "{\"share\": \"nfs-server/exports/test-share\"}",
 
 
     "java_buildpack_name": "java-buildpack",

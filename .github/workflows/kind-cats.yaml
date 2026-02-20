@@ -61,8 +61,6 @@ jobs:
           cf marketplace
       - name: Create nfs share
         run: |
-          docker ps
-          docker logs nfs-server
           # Create test share directory with proper ownership for Cloud Foundry apps
           docker exec nfs-server sh -c "mkdir -p /exports/test-share && chown 1000:1000 /exports/test-share && chmod 777 /exports/test-share"
       - name: setup CF tests
