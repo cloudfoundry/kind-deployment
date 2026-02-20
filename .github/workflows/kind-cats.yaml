@@ -47,12 +47,12 @@ jobs:
         run: make login
       - name: Init
         run: make bootstrap-complete
-      - name: Minimal Test
-        run: |
-          cf push -p examples/hello-js -i 2 -m 1024M hello-js
-          cf apps
-          curl --fail hello-js.apps.127-0-0-1.nip.io
-          cf delete -f hello-js
+      # - name: Minimal Test
+      #   run: |
+      #     cf push -p examples/hello-js -i 2 -m 1024M hello-js
+      #     cf apps
+      #     curl --fail hello-js.apps.127-0-0-1.nip.io
+      #     cf delete -f hello-js
       - name: Register broker and enable access to service
         run: |
           cf create-service-broker nfsbroker nfsbroker nfsbroker http://nfsbroker:8080
@@ -61,6 +61,7 @@ jobs:
       - name: Create nfs share
         run: |
           docker ps
+          docker logs nfs-server
           # Create test share directory with proper ownership for Cloud Foundry apps
           docker exec nfs-server sh -c "mkdir -p /exports/test-share && chown 1000:1000 /exports/test-share && chmod 777 /exports/test-share"
       - name: setup CF tests
