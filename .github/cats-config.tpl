@@ -42,7 +42,7 @@
     "include_tasks": true,
     "include_tcp_routing": true,
     "include_user_provided_services": true,
-    "include_tcp_isolation_segments": true,
+    "include_tcp_isolation_segments": false,
     "include_v3": true,
     "include_volume_services": true,
     "include_windows": false,
