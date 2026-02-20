@@ -18,7 +18,8 @@ jobs:
           docker run --rm \
             --privileged \
             --pid host \
-            alpine sh -c "sysctl -w fs.inotify.max_user_instances=512"
+            -v /lib/modules:/lib/modules:ro \
+            alpine sh -c "sysctl -w fs.inotify.max_user_instances=512 && modprobe nfs && modprobe nfsd"
       - name: Install dependencies
         run: |
           mkdir -p $HOME/.local/bin && echo "$HOME/.local/bin" >> "$GITHUB_PATH"
@@ -27,7 +28,7 @@ jobs:
           curl -L https://github.com/helmfile/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz | tar -zx
           mv helmfile $HOME/.local/bin/helmfile
           curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=${CF_CLI_VERSION}&source=github" | tar -zx
-          mv cf8 $HOME/.local/bin/cf
+          mv cf8 $HOME/.local/bin/cf  
         env:
           CF_CLI_VERSION: '8.14.1'
           KIND_VERSION: '0.30.0'
