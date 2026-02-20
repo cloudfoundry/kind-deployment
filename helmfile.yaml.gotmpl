@@ -257,7 +257,7 @@ releases:
       - postgresql
     values:
       - dbPassword: {{ .Values.secrets.dbPassword }}
-      - caCertificateSecret: all-in-one-tls
+      - caCertificateSecret: instance-identity
 
   - name: locket
     namespace: default
