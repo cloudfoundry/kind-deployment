@@ -1,0 +1,19 @@
+services:
+  nfs-server:
+    image: erichough/nfs-server:latest
+    container_name: nfs-server
+    restart: always
+    privileged: true
+    networks:
+      - kind
+    environment:
+      NFS_EXPORT_0: /exports *(rw,sync,no_subtree_check,fsid=0,no_root_squash)
+    volumes:
+      - nfs-exports:/exports
+
+volumes:
+  nfs-exports:
+
+networks:
+  kind:
+    external: true

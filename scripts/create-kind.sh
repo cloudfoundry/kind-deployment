@@ -26,11 +26,16 @@ EOF
 
 setup_registry_caches() {
     echo "Starting registry pull-through caches with docker-compose..."
-    docker compose -p cache -f "${script_full_path}/docker-compose.yaml" --progress plain up -d
+    docker compose -p cache -f "${script_full_path}/docker-compose-registries.yaml" --progress plain up -d
 
     configure_registry_mirror "docker-io" "https://registry-1.docker.io" "docker.io"
     configure_registry_mirror "ghcr-io" "https://ghcr.io" "ghcr.io"
     configure_registry_mirror "quay-io" "https://quay.io" "quay.io"
+}
+
+setup_nfs() {
+    echo "Starting NFS server with docker-compose..."
+    docker compose -p nfs -f "${script_full_path}/docker-compose-nfs.yaml" --progress plain up -d
 }
 
 script_full_path=$(dirname "$0")
@@ -50,3 +55,11 @@ if [ "${DISABLE_CACHE}" != "true" ]; then
 
   setup_registry_caches
 fi
+
+
+if [ "${ENABLE_NFS_VOLUME}" = "true" ]; then
+  echo "Setting up NFS server..."
+
+  setup_nfs
+fi
+

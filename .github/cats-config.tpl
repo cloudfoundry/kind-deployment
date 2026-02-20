@@ -44,9 +44,14 @@
     "include_user_provided_services": true,
     "include_tcp_isolation_segments": false,
     "include_v3": true,
-    "include_volume_services": false,
+    "include_volume_services": true,
     "include_windows": false,
     "include_zipkin": true,
+
+    "volume_service_name": "nfs",
+    "volume_service_plan_name": "Existing",
+    "volume_service_create_config": "{\"share\": \"nfs-server/exports/test-share\"}",
+
 
     "java_buildpack_name": "java-buildpack",
     "ruby_buildpack_name": "ruby_buildpack",

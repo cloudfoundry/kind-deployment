@@ -395,9 +395,11 @@ releases:
     installed: {{ .Values.optionalComponents.enableNfsVolume }}
     needs:
       - uaa
+      - credhub
     values:
       - nfsbroker:
           certificateSecret: all-in-one-tls
+          oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
 
   - name: cf-networking
     namespace: default
