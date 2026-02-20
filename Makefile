@@ -42,5 +42,6 @@ bootstrap-complete: create-org
 up: create-kind init install
 
 down: delete-kind
+	@ rm -rf temp
 
 PHONY: install login create-kind delete-kind up down create-org bootstrap bootstrap-complete
