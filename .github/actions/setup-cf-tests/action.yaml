@@ -2,9 +2,17 @@ name: Setup CF Tests
 description: Common setup for CF testing workflows
 
 inputs:
+  test-org:
+    description: 'CF test repository organization name (e.g., cloudfoundry, sap-contributions)'
+    required: false
+    default: 'cloudfoundry'
   test-repo:
     description: 'CF test repository name (e.g., cf-acceptance-tests, cf-smoke-tests)'
     required: true
+  test-branch:
+    description: 'CF test repository branch to checkout'
+    required: false
+    default: 'develop'
   config-template:
     description: 'Config template file path'
     required: true
@@ -23,7 +31,8 @@ runs:
     - name: checkout CF test repository
       uses: actions/checkout@v6
       with:
-        repository: "cloudfoundry/${{ inputs.test-repo }}"
+        repository: "${{ inputs.test-org }}/${{ inputs.test-repo }}"
+        branch: ${{ inputs.test-branch }}
         github-server-url: https://github.com
         path: "${{ inputs.test-repo }}"
     - name: setup Go
