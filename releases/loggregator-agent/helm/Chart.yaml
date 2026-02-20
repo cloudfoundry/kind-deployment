@@ -4,4 +4,4 @@ description: Helm chart for Loggregator Agent components
 type: application
 apiVersion: v2
 # renovate: dataSource=docker depName=loggregator-agent-release packageName=ghcr.io/cloudfoundry/k8s/syslog-binding-cache
-appVersion: 8.3.14
+appVersion: 8.3.15
