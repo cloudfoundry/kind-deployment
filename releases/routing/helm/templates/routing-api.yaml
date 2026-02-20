@@ -68,13 +68,13 @@ spec:
       volumes:
         - name: routing-api
           secret:
-            secretName: {{ .Values.routingApi.certificateSecret }}
+            secretName: {{ required "routingApi.certificateSecret is required" .Values.routingApi.certificateSecret }}
         - name: uaa
           secret:
-            secretName: {{ .Values.routingApi.uaaCertificateSecret }}
+            secretName: {{ required "routingApi.uaaCertificateSecret is required" .Values.routingApi.uaaCertificateSecret }}
         - name: locket
           secret:
-            secretName: {{ .Values.routingApi.locketCertificateSecret }}
+            secretName: {{ required "routingApi.locketCertificateSecret is required" .Values.routingApi.locketCertificateSecret }}
         - name: routing-api-config
           configMap:
             name: routing-api-configmap

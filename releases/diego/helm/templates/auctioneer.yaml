@@ -46,7 +46,7 @@ spec:
       volumes:
         - name: auctioneer
           secret:
-            secretName: {{ .Values.auctioneer.certificateSecret }}
+            secretName: {{ required "auctioneer.certificateSecret is required" .Values.auctioneer.certificateSecret }}
         - name: auctioneer-config
           configMap:
             name: auctioneer-configmap

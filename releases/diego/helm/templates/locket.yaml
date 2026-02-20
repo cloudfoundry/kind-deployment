@@ -33,7 +33,7 @@ spec:
           volumeMounts:
             - name: locket
               mountPath: /etc/ssl/certs/locket
-            - name: all-in-one-tls
+            - name: postgres-tls
               mountPath: /etc/ssl/certs/postgres
             - name: locket-config
               mountPath: /locket
@@ -48,10 +48,10 @@ spec:
       volumes:
         - name: locket
           secret:
-            secretName: {{ .Values.locket.certificateSecret }}
-        - name: all-in-one-tls
+            secretName: {{ required "locket.certificateSecret is required" .Values.locket.certificateSecret }}
+        - name: postgres-tls
           secret:
-            secretName: all-in-one-tls
+            secretName: {{ required "locket.certificateSecret is required" .Values.locket.certificateSecret }}
         - name: locket-config
           configMap:
             name: locket-configmap

@@ -129,13 +129,13 @@ spec:
           emptyDir: {}
         - name: syslog-agent
           secret:
-            secretName: {{ .Values.syslogAgent.certificateSecret }}
+            secretName: {{ required "syslogAgent.certificateSecret is required" .Values.syslogAgent.certificateSecret }}
         - name: forwarder-agent
           secret:
-            secretName: {{ .Values.forwarderAgent.certificateSecret }}
+            secretName: {{ required "forwarderAgent.certificateSecret is required" .Values.forwarderAgent.certificateSecret }}
         - name: loggregator-agent
           secret:
-            secretName: {{ .Values.loggregatorAgent.certificateSecret }}
+            secretName: {{ required "loggregatorAgent.certificateSecret is required" .Values.loggregatorAgent.certificateSecret }}
 ---
 kind: Service
 apiVersion: v1

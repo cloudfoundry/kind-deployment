@@ -71,10 +71,10 @@ spec:
       volumes:
         - name: bosh-dns-adapter
           secret:
-            secretName: {{ .Values.boshDnsAdapter.certificateSecret }}
+            secretName: {{ required "boshDnsAdapter.certificateSecret is required" .Values.boshDnsAdapter.certificateSecret }}
         - name: bosh-dns
           secret:
-            secretName: {{ .Values.boshDns.certificateSecret }}
+            secretName: {{ required "boshDns.certificateSecret is required" .Values.boshDns.certificateSecret }}
         - name: bosh-dns-config
           configMap:
             name: bosh-dns-configmap

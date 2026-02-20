@@ -213,7 +213,7 @@ spec:
       volumes:
         - name: cloud-controller
           secret:
-            secretName: {{ .Values.cloudController.certificateSecret }}
+            secretName: {{ required "cloudController.certificateSecret is required" .Values.cloudController.certificateSecret }}
         - name: etc-cloud-controller
           configMap:
             name: cloud-controller-configmap
@@ -225,7 +225,7 @@ spec:
             name: nginx-configmap
         - name: udp-forwarder
           secret:
-            secretName: {{ .Values.udpForwarder.certificateSecret }}
+            secretName: {{ required "udpForwarder.certificateSecret is required" .Values.udpForwarder.certificateSecret }}
         - name: var-run # Share unix sockets between containers.
           emptyDir: {}
         - name: tmpdir

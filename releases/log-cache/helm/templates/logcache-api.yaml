@@ -85,7 +85,7 @@ spec:
       volumes:
       - name: log-cache-api
         secret:
-          secretName: {{ .Values.logCacheApi.certificateSecret }}
+          secretName: {{ required "logCacheApi.certificateSecret is required" .Values.logCacheApi.certificateSecret }}
 ---
 kind: Service
 apiVersion: v1

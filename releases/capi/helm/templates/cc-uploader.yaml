@@ -46,7 +46,7 @@ spec:
       volumes:
         - name: cc-uploader
           secret:
-            secretName: {{ .Values.ccUploader.certificateSecret }}
+            secretName: {{ required "ccUploader.certificateSecret is required" .Values.ccUploader.certificateSecret }}
         - name: cc-uploader-config
           configMap:
             name: cc-uploader-configmap
@@ -65,30 +65,4 @@ spec:
       protocol: TCP
   selector:
     app: cc-uploader
----
-{{ if not .Values.ccUploader.certificateSecret }}
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: cc-uploader
-spec:
-  secretName: cc-uploader
-  commonName: client
-  dnsNames:
-    - localhost
-    - cc-uploader
-    - cc-uploader.{{ .Release.Namespace }}.svc
-    - cc-uploader.{{ .Release.Namespace }}.svc.cluster.local
-    - "{{ .Values.ccUploader.hostname }}"
-  issuerRef:
-    name: ca-issuer
-    kind: ClusterIssuer
-  usages:
-    - key encipherment
-    - digital signature
-    - server auth
-    - client auth
-  privateKey:
-    rotationPolicy: Always
-{{end }}
 {{ end }}

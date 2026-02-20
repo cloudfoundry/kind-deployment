@@ -105,7 +105,7 @@ spec:
             name: policy-server-configmap
         - name: policy-server
           secret:
-            secretName: {{ .Values.policyServer.certificateSecret }}
+            secretName: {{ required "policyServer.certificateSecret is required" .Values.policyServer.certificateSecret }}
         - name: etc-route-registrar
           configMap:
             name: policy-server-route-registrar-configmap

@@ -45,8 +45,7 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "hostname": {
           "type": "string"
@@ -211,8 +210,7 @@
           "type": "object"
         },
         "certificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "credhubApi": {
           "additionalProperties": false,
@@ -531,8 +529,7 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "enabled": {
           "type": "boolean"
@@ -594,8 +591,7 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "image": {
           "additionalProperties": false,

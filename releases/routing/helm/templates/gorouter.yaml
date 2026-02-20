@@ -48,17 +48,17 @@ spec:
           - name: CA_CRT
             valueFrom:
               secretKeyRef:
-                name: {{ default  "gorouter" .Values.gorouter.certificateSecret }}
+                name: {{ required "gorouter.certificateSecret is required" .Values.gorouter.certificateSecret }}
                 key: ca.crt
           - name: TLS_CRT
             valueFrom:
               secretKeyRef:
-                name: {{ default  "gorouter" .Values.gorouter.certificateSecret }}
+                name: {{ required "gorouter.certificateSecret is required" .Values.gorouter.certificateSecret }}
                 key: tls.crt
           - name: TLS_KEY
             valueFrom:
               secretKeyRef:
-                name: {{ default  "gorouter" .Values.gorouter.certificateSecret }}
+                name: {{ required "gorouter.certificateSecret is required" .Values.gorouter.certificateSecret }}
                 key: tls.key
       containers:
         - name: gorouter
@@ -119,7 +119,7 @@ spec:
             name: gorouter-configmap
         - name: udp-forwarder
           secret:
-            secretName: {{ .Values.udpForwarder.certificateSecret }}
+            secretName: {{ required "udpForwarder.certificateSecret is required" .Values.udpForwarder.certificateSecret }}
 ---
 kind: Service
 apiVersion: v1

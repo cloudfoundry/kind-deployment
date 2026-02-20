@@ -84,7 +84,7 @@ spec:
             name: uaa-spring-configmap
         - name: uaa
           secret:
-            secretName: {{ .Values.certificateSecret }}
+            secretName: {{ required "certificateSecret is required" .Values.certificateSecret }}
         - name: tmp
           emptyDir: {}
 ---

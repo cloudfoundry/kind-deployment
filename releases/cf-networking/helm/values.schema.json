@@ -6,8 +6,7 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "image": {
           "additionalProperties": false,
@@ -64,8 +63,7 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "enabled": {
           "type": "boolean"
@@ -98,8 +96,7 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "dbPassword": {
           "type": "string"
@@ -201,8 +198,7 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "enabled": {
           "type": "boolean"

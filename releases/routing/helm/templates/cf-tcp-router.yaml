@@ -111,7 +111,7 @@ spec:
       volumes:
         - name: cf-tcp-router
           secret:
-            secretName: {{ .Values.tcpRouter.certificateSecret }}
+            secretName: {{ required "tcpRouter.certificateSecret is required" .Values.tcpRouter.certificateSecret }}
         - name: cf-tcp-router-config
           configMap:
             name: cf-tcp-router-configmap

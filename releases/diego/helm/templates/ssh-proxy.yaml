@@ -46,7 +46,7 @@ spec:
       volumes:
         - name: ssh-proxy
           secret:
-            secretName: {{ .Values.sshProxy.certificateSecret }}
+            secretName: {{ required "sshProxy.certificateSecret is required" .Values.sshProxy.certificateSecret }}
         - name: ssh-proxy-config
           configMap:
             name: ssh-proxy-configmap

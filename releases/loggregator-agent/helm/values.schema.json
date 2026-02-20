@@ -9,8 +9,7 @@
           "type": "boolean"
         },
         "certificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "enabled": {
           "type": "boolean"
@@ -76,8 +75,7 @@
           "type": "boolean"
         },
         "certificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "doppler": {
           "additionalProperties": false,
@@ -116,8 +114,7 @@
           "type": "boolean"
         },
         "certificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "image": {
           "additionalProperties": false,
@@ -162,8 +159,7 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "cache": {
           "additionalProperties": false,

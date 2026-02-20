@@ -108,26 +108,26 @@ spec:
           emptyDir: {}
         - name: route-emitter
           secret:
-            secretName: {{ .Values.routeEmitter.certificateSecret }}
+            secretName: {{ required "routeEmitter.certificateSecret is required" .Values.routeEmitter.certificateSecret }}
         - name: bbs
           secret:
-            secretName: {{ .Values.routeEmitter.bbsCertificateSecret }}
+            secretName: {{ required "routeEmitter.bbsCertificateSecret is required" .Values.routeEmitter.bbsCertificateSecret }}
         - name: locket
           secret:
-            secretName: {{ .Values.routeEmitter.locketCertificateSecret }}
+            secretName: {{ required "routeEmitter.locketCertificateSecret is required" .Values.routeEmitter.locketCertificateSecret }}
         - name: nats
           secret:
-            secretName: {{ .Values.routeEmitter.natsCertificateSecret }}
+            secretName: {{ required "routeEmitter.natsCertificateSecret is required" .Values.routeEmitter.natsCertificateSecret }}
         - name: loggregator
           secret:
-            secretName: {{ .Values.routeEmitter.loggregatorCertificateSecret }}
+            secretName: {{ required "routeEmitter.loggregatorCertificateSecret is required" .Values.routeEmitter.loggregatorCertificateSecret }}
         - name: uaa
           secret:
-            secretName: {{ .Values.routeEmitter.uaaCertificateSecret }}
+            secretName: {{ required "routeEmitter.uaaCertificateSecret is required" .Values.routeEmitter.uaaCertificateSecret }}
         - name: routing-api
 {{- if .Values.routeEmitter.routingApi.enabled }}
           secret:
-            secretName: {{ .Values.routeEmitter.routingApi.certificateSecret }}
+            secretName: {{ required "routeEmitter.routingApi.certificateSecret is required" .Values.routeEmitter.routingApi.certificateSecret }}
 {{- else }}
           emptyDir: {}
 {{- end }}

@@ -158,8 +158,14 @@ releases:
     values:
       - syslogBindingCache:
           enabled: true
+          certificateSecret: all-in-one-tls
       - forwarderAgent:
           enabled: true
+          certificateSecret: all-in-one-tls
+      - loggregatorAgent:
+          certificateSecret: all-in-one-tls
+      - syslogAgent:
+          certificateSecret: all-in-one-tls
 
   - name: gorouter
     namespace: default
@@ -171,6 +177,10 @@ releases:
           enabled: false
       - tcpRouter:
           enabled: false
+      - gorouter:
+          certificateSecret: all-in-one-tls
+      - udpForwarder:
+          certificateSecret: all-in-one-tls
 
   - name: tcp-routing
     namespace: default
@@ -187,9 +197,14 @@ releases:
       - routingApi:
           enabled: true
           dbPassword: {{ .Values.secrets.dbPassword }}
+          certificateSecret: all-in-one-tls
+          locketCertificateSecret: all-in-one-tls
+          loggregatorCertificateSecret: all-in-one-tls
+          uaaCertificateSecret: all-in-one-tls
       - tcpRouter:
           enabled: true
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
+          certificateSecret: all-in-one-tls
 
   - name: loggregator
     namespace: default
@@ -199,6 +214,14 @@ releases:
       - istio-system/istiod
     values:
       - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
+      - doppler:
+          certificateSecret: all-in-one-tls
+      - reverseLogProxy:
+          certificateSecret: all-in-one-tls
+      - reverseLogProxyGateway:
+          certificateSecret: all-in-one-tls
+      - trafficcontroller:
+          certificateSecret: all-in-one-tls
 
   - name: log-cache
     namespace: default
@@ -207,6 +230,11 @@ releases:
       - default/base
       - istio-system/istiod
       - uaa
+    values:
+      - logCacheApi:
+          certificateSecret: all-in-one-tls
+      - logCacheBackend:
+          certificateSecret: all-in-one-tls
 
   - name: uaa
     namespace: default
@@ -219,6 +247,7 @@ releases:
       - dbPassword: {{ .Values.secrets.dbPassword }}
       - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
       - uaaAdminSecret: {{ .Values.secrets.uaaAdminSecret }}
+      - certificateSecret: all-in-one-tls
 
   - name: credhub
     namespace: default
@@ -228,6 +257,7 @@ releases:
       - postgresql
     values:
       - dbPassword: {{ .Values.secrets.dbPassword }}
+      - caCertificateSecret: all-in-one-tls
 
   - name: locket
     namespace: default
@@ -239,6 +269,7 @@ releases:
       - dbPassword: {{ .Values.secrets.dbPassword }}
       - locket:
           enabled: true
+          certificateSecret: all-in-one-tls
 
   - name: diego
     namespace: default
@@ -256,12 +287,15 @@ releases:
 {{ readFile (printf "%s/ssh_key" .Values.certsDir) | indent 10 }}
       - auctioneer:
           enabled: true
+          certificateSecret: all-in-one-tls
       - bbs:
           enabled: true
+          certificateSecret: all-in-one-tls
       - fileserver:
           enabled: true
       - sshProxy:
           enabled: true
+          certificateSecret: all-in-one-tls
 
   - name: tps-watcher
     namespace: default
@@ -271,6 +305,7 @@ releases:
     values:
       - tpsWatcher:
           enabled: true
+          certificateSecret: all-in-one-tls
       - dbPassword: ""
       - oauthClientsSecret: ""
 
@@ -289,9 +324,16 @@ releases:
       - dbPassword: ""
       - routeEmitter:
           enabled: true
+          certificateSecret: all-in-one-tls
           routingApi:
             enabled: {{ .Values.optionalComponents.enableTcpRouting }}
+            certificateSecret: all-in-one-tls
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
+          natsCertificateSecret: all-in-one-tls
+          loggregatorCertificateSecret: all-in-one-tls
+          bbsCertificateSecret: all-in-one-tls
+          locketCertificateSecret: all-in-one-tls
+          uaaCertificateSecret: all-in-one-tls
           enableInternalEmitter: {{ and .Values.optionalComponents.enablePolicySupport }}
           enableTcpEmitter: {{ .Values.optionalComponents.enableTcpRouting }}
 
@@ -335,10 +377,15 @@ releases:
     values:
       - cloudController:
           enabled: true
+          certificateSecret: all-in-one-tls
           blobstore:
             fog_connection:
               aws_secret_access_key: {{ .Values.secrets.blobstorePassword }}
           sshProxyKeyFingerprint: {{ .Values.secrets.sshProxyKeyFingerprint | quote }}
+      - ccUploader:
+          certificateSecret: all-in-one-tls
+      - udpForwarder:
+          certificateSecret: all-in-one-tls
       - dbPassword: {{ .Values.secrets.dbPassword }}
       - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
 
@@ -348,6 +395,9 @@ releases:
     installed: {{ .Values.optionalComponents.enableNfsVolume }}
     needs:
       - uaa
+    values:
+      - nfsbroker:
+          certificateSecret: all-in-one-tls
 
   - name: cf-networking
     namespace: default
@@ -362,6 +412,13 @@ releases:
       - policyServer:
           dbPassword: {{ .Values.secrets.dbPassword }}
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
+          certificateSecret: all-in-one-tls
+      - serviceDiscoveryController:
+          certificateSecret: all-in-one-tls
+      - boshDnsAdapter:
+          certificateSecret: all-in-one-tls
+      - boshDns:
+          certificateSecret: all-in-one-tls
 
   - name: policy-agent
     namespace: default

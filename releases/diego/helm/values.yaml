@@ -1,6 +1,6 @@
 auctioneer:
   enabled: false
-  certificateSecret: "all-in-one-tls"
+  certificateSecret: ""
   hostname: "auctioneer.default.svc.cluster.local"
   image:
     repository: ghcr.io/cloudfoundry/k8s/auctioneer
@@ -11,7 +11,7 @@ auctioneer:
 
 bbs:
   enabled: false
-  certificateSecret: "all-in-one-tls"
+  certificateSecret: ""
   hostname: "bbs.default.svc.cluster.local"
   image:
     repository: ghcr.io/cloudfoundry/k8s/bbs
@@ -33,7 +33,7 @@ fileserver:
   
 locket:
   enabled: false
-  certificateSecret: "all-in-one-tls"
+  certificateSecret: ""
   hostname: "locket.default.svc.cluster.local"
   image:
     repository: ghcr.io/cloudfoundry/k8s/locket
@@ -44,7 +44,7 @@ locket:
 
 sshProxy:
   enabled: false
-  certificateSecret: "all-in-one-tls"
+  certificateSecret: ""
   hostname: "ssh-proxy.127-0-0-1.nip.io"
   oauthClientsSecret: ""
   image:
@@ -56,19 +56,19 @@ sshProxy:
 
 routeEmitter:
   enabled: false
-  certificateSecret: "all-in-one-tls"
-  natsCertificateSecret: "all-in-one-tls"
-  loggregatorCertificateSecret: "all-in-one-tls"
-  bbsCertificateSecret: "all-in-one-tls"
-  locketCertificateSecret: "all-in-one-tls"
-  uaaCertificateSecret: "all-in-one-tls"
+  certificateSecret: ""
+  natsCertificateSecret: ""
+  loggregatorCertificateSecret: ""
+  bbsCertificateSecret: ""
+  locketCertificateSecret: ""
+  uaaCertificateSecret: ""
   oauthClientsSecret: ""
   natsAddress: "nats.default.svc.cluster.local:4222"
   locketAddress: "locket.default.svc.cluster.local:8891"
   bbsAddress: "https://bbs.default.svc.cluster.local:8889"
   routingApi:
     enabled: true
-    certificateSecret: "all-in-one-tls"
+    certificateSecret: ""
     address: "https://routing-api.default.svc.cluster.local"
     port: 3001
   uaaAddress: "https://uaa.default.svc.cluster.local:443"

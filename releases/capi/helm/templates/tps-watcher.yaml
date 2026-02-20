@@ -48,7 +48,7 @@ spec:
           emptyDir: {}
         - name: tps-watcher
           secret:
-            secretName: {{ .Values.tpsWatcher.certificateSecret }}
+            secretName: {{ required "tpsWatcher.certificateSecret is required" .Values.tpsWatcher.certificateSecret }}
         - name: tps-watcher-config
           configMap:
             name: tps-watcher-configmap

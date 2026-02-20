@@ -6,8 +6,7 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "enabled": {
           "type": "boolean"
@@ -67,8 +66,7 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "enabled": {
           "type": "boolean"
@@ -194,8 +192,7 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "enabled": {
           "type": "boolean"
@@ -258,28 +255,22 @@
           "type": "string"
         },
         "certificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "bbsCertificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "locketCertificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "natsCertificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "loggregatorCertificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "uaaCertificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "enabled": {
           "type": "boolean"
@@ -325,8 +316,7 @@
               "type": "string"
             },
             "certificateSecret": {
-              "type": "string",
-              "minLength": 1
+              "type": "string"
             },
             "enabled": {
               "type": "boolean"
@@ -379,8 +369,7 @@
       "additionalProperties": false,
       "properties": {
         "certificateSecret": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "enabled": {
           "type": "boolean"
