@@ -8,7 +8,7 @@
     "credhub_location": "https://credhub.127-0-0-1.nip.io",
     "credhub_mode": "assisted",
     "credhub_secret": "${OAUTH_CLIENTS_SECRET}",
-    "internal_address": "internal-service:9024",
+    "internal_cc_address": "internal-service",
     "isolation_segment_name": "isolated",
     "private_docker_registry_image": "${CATS_PRIVATE_DOCKER_IMAGE}",
     "private_docker_registry_password": "${CATS_PRIVATE_DOCKER_PASSWORD}",
