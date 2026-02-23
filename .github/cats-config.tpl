@@ -8,7 +8,7 @@
     "credhub_location": "https://credhub.127-0-0-1.nip.io",
     "credhub_mode": "assisted",
     "credhub_secret": "${OAUTH_CLIENTS_SECRET}",
-    "isolation_segment_domain": "iso-seg.127-0-0-1.nip.io"
+    "isolation_segment_domain": "iso-seg.127-0-0-1.nip.io",
     "isolation_segment_name": "isolated",
     "private_docker_registry_image": "${CATS_PRIVATE_DOCKER_IMAGE}",
     "private_docker_registry_password": "${CATS_PRIVATE_DOCKER_PASSWORD}",
