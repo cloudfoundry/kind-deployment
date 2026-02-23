@@ -7,7 +7,7 @@ WORKDIR /loggregator-agent-release/src
 
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/forwarder-agent ./cmd/forwarder-agent
 
-FROM alpine:latest
+FROM ubuntu:latest
 
 
 ENV DOWNSTREAM_INGRESS_PORT_GLOB="/ingress-globs/*.yml"
