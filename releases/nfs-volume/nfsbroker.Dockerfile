@@ -7,7 +7,7 @@ WORKDIR /nfs-volume-release/src/code.cloudfoundry.org/nfsbroker
 
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/nfsbroker code.cloudfoundry.org/nfsbroker
 
-FROM alpine:latest
+FROM gcr.io/distroless/static:latest
 
 COPY --from=builder /usr/local/bin/nfsbroker /usr/local/bin
 

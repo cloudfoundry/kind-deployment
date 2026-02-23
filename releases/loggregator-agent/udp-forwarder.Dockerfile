@@ -7,7 +7,7 @@ WORKDIR /loggregator-agent-release/src
 
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/udp-forwarder ./cmd/udp-forwarder
 
-FROM alpine:latest
+FROM gcr.io/distroless/static:latest
 
 COPY --from=builder /usr/local/bin/udp-forwarder /usr/local/bin
 

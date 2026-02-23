@@ -7,7 +7,7 @@ WORKDIR /bosh-dns-release/src/bosh-dns
 
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/bosh-dns ./dns
 
-FROM alpine:latest
+FROM gcr.io/distroless/static:latest
 
 COPY --from=builder /usr/local/bin/bosh-dns /usr/local/bin/bosh-dns
 

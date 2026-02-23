@@ -7,7 +7,7 @@ WORKDIR /capi-release/src/code.cloudfoundry.org/cc-uploader
 
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/cc-uploader code.cloudfoundry.org/cc-uploader/cmd/cc-uploader
 
-FROM alpine:latest
+FROM gcr.io/distroless/static:latest
 
 COPY --from=builder /usr/local/bin/cc-uploader /usr/local/bin
 

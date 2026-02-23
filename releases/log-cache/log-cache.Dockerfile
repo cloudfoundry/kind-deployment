@@ -7,7 +7,7 @@ WORKDIR /log-cache-release/src
 
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags "-X main.buildVersion=${LOG_CACHE_RELEASE_VERSION}" -o /usr/local/bin/cmd code.cloudfoundry.org/log-cache/cmd/${component}
 
-FROM alpine:latest
+FROM gcr.io/distroless/static:latest
 
 COPY --from=builder /usr/local/bin/cmd /usr/local/bin
 

@@ -8,7 +8,7 @@ WORKDIR /loggregator-agent-release/src
 
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/loggregator-agent ./cmd/loggregator-agent
 
-FROM alpine:latest
+FROM gcr.io/distroless/static:latest
 
 COPY --from=builder /usr/local/bin/loggregator-agent /usr/local/bin
 

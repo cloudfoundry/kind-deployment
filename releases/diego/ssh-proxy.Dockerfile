@@ -7,7 +7,7 @@ WORKDIR /diego-release/src/code.cloudfoundry.org
 
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/ssh-proxy code.cloudfoundry.org/diego-ssh/cmd/ssh-proxy
 
-FROM alpine:latest
+FROM gcr.io/distroless/static:latest
 
 COPY --from=builder /usr/local/bin/ssh-proxy /usr/local/bin
 

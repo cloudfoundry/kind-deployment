@@ -7,7 +7,7 @@ WORKDIR /networking-release/src/code.cloudfoundry.org
 
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/bosh-dns-adapter code.cloudfoundry.org/bosh-dns-adapter
 
-FROM alpine:latest
+FROM gcr.io/distroless/static:latest
 
 COPY --from=builder /usr/local/bin/bosh-dns-adapter /usr/local/bin/bosh-dns-adapter
 

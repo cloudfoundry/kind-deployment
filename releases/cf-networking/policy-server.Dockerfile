@@ -9,7 +9,7 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/p
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/policy-server-internal code.cloudfoundry.org/policy-server/cmd/policy-server-internal
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/policy-server-asg-syncer code.cloudfoundry.org/policy-server/cmd/policy-server-asg-syncer
 
-FROM alpine:latest
+FROM gcr.io/distroless/static:latest
 
 COPY --from=builder /usr/local/bin/* /usr/local/bin
 

@@ -7,7 +7,7 @@ WORKDIR /diego-release/src/code.cloudfoundry.org
 
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/route-emitter code.cloudfoundry.org/route-emitter/cmd/route-emitter
 
-FROM alpine:latest
+FROM gcr.io/distroless/static:latest
 
 COPY --from=builder /usr/local/bin/route-emitter /usr/local/bin
 
