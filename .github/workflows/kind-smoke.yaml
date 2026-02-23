@@ -66,6 +66,7 @@ jobs:
         uses: ./.github/actions/setup-cf-tests
         with:
           test-repo: cf-smoke-tests
+          test-branch: main
           config-template: ./.github/smoke-config.tpl
           config-output: ./.github/smoke-config.json
       - name: run smoke test
