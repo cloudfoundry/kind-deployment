@@ -16,4 +16,12 @@ data:
     - description: Cloud Foundry Linux-based filesystem (Ubuntu 22.04)
       name: cflinuxfs4
     deprecated_stacks:  []
+  storage_cli_config_droplets.json: |-
+    {{- tpl (.Files.Get "files/storage_cli_config_droplets.json") . | nindent 4 }}
+  storage_cli_config_packages.json: |-
+    {{- tpl (.Files.Get "files/storage_cli_config_packages.json") . | nindent 4 }}
+  storage_cli_config_buildpacks.json: |-
+    {{- tpl (.Files.Get "files/storage_cli_config_buildpacks.json") . | nindent 4 }}
+  storage_cli_config_resource_pool.json: |-
+    {{- tpl (.Files.Get "files/storage_cli_config_resource_pool.json") . | nindent 4 }}
 {{ end }}

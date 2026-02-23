@@ -26,6 +26,8 @@ spec:
           env:
             - name: DB_LOG_LEVEL
               value: all
+            - name: STORAGE_CLI_PATH
+              value: /storage-cli/storage-cli
           envFrom:
             - secretRef:
                 name: cc-shared
@@ -34,6 +36,8 @@ spec:
               mountPath: /etc/cloud-controller
             - name: cloud-controller
               mountPath: /etc/ssl/certs/cloud-controller
+            - name: storage-cli
+              mountPath: /storage-cli
       volumes:
         - name: cloud-controller
           secret:
@@ -41,4 +45,8 @@ spec:
         - name: etc-cloud-controller
           configMap:
             name: cloud-controller-configmap
+        - name: storage-cli
+          image:
+            reference: storage-cli:{{ default .Chart.AppVersion .Values.cloudController.image.tag }}
+            pullPolicy: IfNotPresent
 {{- end }}

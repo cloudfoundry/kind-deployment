@@ -83,6 +83,8 @@ spec:
           resources:
             {{- toYaml .Values.cloudController.resources | nindent 12 }}
           {{- end }}
+            - name: STORAGE_CLI_PATH
+              value: /storage-cli/storage-cli
           volumeMounts:
             - name: cloud-controller
               mountPath: /etc/ssl/certs/cloud-controller
@@ -92,6 +94,8 @@ spec:
               mountPath: /var/run
             - name: tmpdir
               mountPath: /tmp
+            - name: storage-cli
+              mountPath: /storage-cli
         - name: route-registrar
           image: {{ .Values.routeRegistrar.image.repository }}:{{ .Values.routeRegistrar.image.tag }}
           imagePullPolicy: {{ .Values.routeRegistrar.image.imagePullPolicy }}
@@ -230,4 +234,8 @@ spec:
           emptyDir: {}
         - name: tmpdir
           emptyDir: {}
+        - name: storage-cli
+          image:
+            reference: storage-cli:{{ default .Chart.AppVersion .Values.cloudController.image.tag }}
+            pullPolicy: IfNotPresent
 {{- end }}

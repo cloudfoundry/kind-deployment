@@ -155,37 +155,65 @@ quota_definitions:
     total_routes: 1000
     total_services: -1
 default_quota_definition: default
+storage_cli_config_file_droplets: /etc/cloud-controller/storage_cli_config_droplets.json
+storage_cli_config_file_packages: /etc/cloud-controller/storage_cli_config_packages.json
+storage_cli_config_file_buildpacks: /etc/cloud-controller/storage_cli_config_buildpacks.json
+storage_cli_config_file_resource_pool: /etc/cloud-controller/storage_cli_config_resource_pool.json
 resource_pool:
-  blobstore_type: fog
+  blobstore_provider: AWS
+  blobstore_type: storage-cli
+  connection_config:
+    access_key_id: "{{ .Values.cloudController.blobstore.fog_connection.aws_access_key_id }}"
+    secret_access_key: "{{ .Values.cloudController.blobstore.fog_connection.aws_secret_access_key }}"
+    bucket_name: "{{ .Values.cloudController.blobstore.resource_directory_key }}"
+    region: us-east-1
+    host: "http://blobstore.127-0-0-1.nip.io"
   minimum_size: 65536
   maximum_size: 536870912
   resource_directory_key: {{ .Values.cloudController.blobstore.resource_directory_key }}
-  fog_connection:
-  {{- toYaml .Values.cloudController.blobstore.fog_connection | nindent 4 }}
+  fog_connection: {}
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}
 packages:
-  blobstore_type: fog
+  blobstore_provider: AWS
+  blobstore_type: storage-cli
+  connection_config:
+    access_key_id: "{{ .Values.cloudController.blobstore.fog_connection.aws_access_key_id }}"
+    secret_access_key: "{{ .Values.cloudController.blobstore.fog_connection.aws_secret_access_key }}"
+    bucket_name: "{{ .Values.cloudController.blobstore.app_package_directory_key }}"
+    region: us-east-1
+    host: "http://blobstore.127-0-0-1.nip.io"
   app_package_directory_key: {{ .Values.cloudController.blobstore.app_package_directory_key }}
   max_valid_packages_stored: 5
   max_package_size: 1073741824
-  fog_connection:
-  {{- toYaml .Values.cloudController.blobstore.fog_connection | nindent 4 }}
+  fog_connection: {}
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}
 droplets:
-  blobstore_type: fog
+  blobstore_provider: AWS
+  blobstore_type: storage-cli
+  connection_config:
+    access_key_id: "{{ .Values.cloudController.blobstore.fog_connection.aws_access_key_id }}"
+    secret_access_key: "{{ .Values.cloudController.blobstore.fog_connection.aws_secret_access_key }}"
+    bucket_name: "{{ .Values.cloudController.blobstore.droplet_directory_key }}"
+    region: us-east-1
+    host: "http://blobstore.127-0-0-1.nip.io"
   droplet_directory_key: {{ .Values.cloudController.blobstore.droplet_directory_key }}
-  fog_connection:
-  {{- toYaml .Values.cloudController.blobstore.fog_connection | nindent 4 }}
+  fog_connection: {}
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}
   max_staged_droplets_stored: 5
 buildpacks:
-  blobstore_type: fog
+  blobstore_provider: AWS
+  blobstore_type: storage-cli
+  connection_config:
+    access_key_id: "{{ .Values.cloudController.blobstore.fog_connection.aws_access_key_id }}"
+    secret_access_key: "{{ .Values.cloudController.blobstore.fog_connection.aws_secret_access_key }}"
+    bucket_name: "{{ .Values.cloudController.blobstore.buildpack_directory_key }}"
+    region: us-east-1
+    host: "http://blobstore.127-0-0-1.nip.io"
   buildpack_directory_key: {{ .Values.cloudController.blobstore.buildpack_directory_key }}
-  fog_connection:
-  {{- toYaml .Values.cloudController.blobstore.fog_connection | nindent 4 }}
+  fog_connection: {}
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}
 db_encryption_key: "asdfasdfasdf"

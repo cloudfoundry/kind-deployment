@@ -1,0 +1,9 @@
+{
+    "provider": "AWS",
+    "bucket_name": "{{ .Values.cloudController.blobstore.app_package_directory_key }}",
+    "credentials_source": "static",
+    "access_key_id": "{{ .Values.cloudController.blobstore.fog_connection.aws_access_key_id }}",
+    "secret_access_key": "{{ .Values.cloudController.blobstore.fog_connection.aws_secret_access_key }}",
+    "host": "http://blobstore.127-0-0-1.nip.io",
+    "region": "us-east-1"
+}
