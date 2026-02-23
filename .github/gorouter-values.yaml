@@ -9,11 +9,6 @@ gorouter:
 
 udpForwarder:
   certificateSecret: "all-in-one-tls"
-  image:
-    repository: ghcr.io/cloudfoundry/k8s/udp-forwarder
-    # renovate: dataSource=docker depName=loggregator-agent-release packageName=ghcr.io/cloudfoundry/k8s/udp-forwarder
-    tag: "8.3.15"
-    imagePullPolicy: IfNotPresent
 
 routingApi:
   enabled: false
