@@ -29,6 +29,22 @@
           "title": "hostname",
           "type": "string"
         },
+        "isolation_segments": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "routing_table_sharding_mode": {
+          "default": "all",
+          "type": "string"
+        },
+        "name": {
+          "default": "gorouter",
+          "title": "name",
+          "type": "string"
+        },
         "image": {
           "additionalProperties": false,
           "properties": {

@@ -1,0 +1,22 @@
+gorouter:
+  enabled: true
+  certificateSecret: "all-in-one-tls"
+  name: gorouter-iso-seg
+  hostname: "gorouter-iso-seg.127-0-0-1.nip.io"
+  appsDomain: "*.iso-seg.127-0-0-1.nip.io"
+  isolation_segments: ["isolated"]
+  routing_table_sharding_mode: segments
+
+udpForwarder:
+  certificateSecret: "all-in-one-tls"
+  image:
+    repository: ghcr.io/cloudfoundry/k8s/udp-forwarder
+    # renovate: dataSource=docker depName=loggregator-agent-release packageName=ghcr.io/cloudfoundry/k8s/udp-forwarder
+    tag: "8.3.15"
+    imagePullPolicy: IfNotPresent
+
+routingApi:
+  enabled: false
+
+tcpRouter:
+  enabled: false
