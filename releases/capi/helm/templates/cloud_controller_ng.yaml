@@ -124,6 +124,9 @@ spec:
           image: {{ .Values.localWorker.image.repository }}:{{ default .Chart.AppVersion .Values.localWorker.image.tag }}
           imagePullPolicy: {{ .Values.localWorker.image.imagePullPolicy }}
           command: ["bundle", "exec", "rake", "jobs:local"]
+          env:
+            - name: STORAGE_CLI_PATH
+              value: /storage-cli/storage-cli
           envFrom:
             - secretRef:
                 name: cc-shared
@@ -140,6 +143,8 @@ spec:
               mountPath: /var/run
             - name: tmpdir
               mountPath: /tmp
+            - name: storage-cli
+              mountPath: /storage-cli
         - name: nginx
           image: {{ .Values.nginx.image.repository }}:{{ default .Chart.AppVersion .Values.nginx.image.tag }}
           imagePullPolicy: {{ .Values.nginx.image.imagePullPolicy }}

@@ -163,8 +163,8 @@ resource_pool:
   blobstore_provider: AWS
   blobstore_type: storage-cli
   connection_config:
-    access_key_id: "{{ .Values.cloudController.blobstore.fog_connection.aws_access_key_id }}"
-    secret_access_key: "{{ .Values.cloudController.blobstore.fog_connection.aws_secret_access_key }}"
+    aws_access_key_id: "{{ .Values.cloudController.blobstore.fog_connection.aws_access_key_id }}"
+    aws_secret_access_key: "{{ .Values.cloudController.blobstore.fog_connection.aws_secret_access_key }}"
     bucket_name: "{{ .Values.cloudController.blobstore.resource_directory_key }}"
     region: us-east-1
     host: "http://blobstore.127-0-0-1.nip.io"
@@ -178,8 +178,8 @@ packages:
   blobstore_provider: AWS
   blobstore_type: storage-cli
   connection_config:
-    access_key_id: "{{ .Values.cloudController.blobstore.fog_connection.aws_access_key_id }}"
-    secret_access_key: "{{ .Values.cloudController.blobstore.fog_connection.aws_secret_access_key }}"
+    aws_access_key_id: "{{ .Values.cloudController.blobstore.fog_connection.aws_access_key_id }}"
+    aws_secret_access_key: "{{ .Values.cloudController.blobstore.fog_connection.aws_secret_access_key }}"
     bucket_name: "{{ .Values.cloudController.blobstore.app_package_directory_key }}"
     region: us-east-1
     host: "http://blobstore.127-0-0-1.nip.io"
@@ -193,8 +193,8 @@ droplets:
   blobstore_provider: AWS
   blobstore_type: storage-cli
   connection_config:
-    access_key_id: "{{ .Values.cloudController.blobstore.fog_connection.aws_access_key_id }}"
-    secret_access_key: "{{ .Values.cloudController.blobstore.fog_connection.aws_secret_access_key }}"
+    aws_access_key_id: "{{ .Values.cloudController.blobstore.fog_connection.aws_access_key_id }}"
+    aws_secret_access_key: "{{ .Values.cloudController.blobstore.fog_connection.aws_secret_access_key }}"
     bucket_name: "{{ .Values.cloudController.blobstore.droplet_directory_key }}"
     region: us-east-1
     host: "http://blobstore.127-0-0-1.nip.io"
@@ -207,8 +207,8 @@ buildpacks:
   blobstore_provider: AWS
   blobstore_type: storage-cli
   connection_config:
-    access_key_id: "{{ .Values.cloudController.blobstore.fog_connection.aws_access_key_id }}"
-    secret_access_key: "{{ .Values.cloudController.blobstore.fog_connection.aws_secret_access_key }}"
+    aws_access_key_id: "{{ .Values.cloudController.blobstore.fog_connection.aws_access_key_id }}"
+    aws_secret_access_key: "{{ .Values.cloudController.blobstore.fog_connection.aws_secret_access_key }}"
     bucket_name: "{{ .Values.cloudController.blobstore.buildpack_directory_key }}"
     region: us-east-1
     host: "http://blobstore.127-0-0-1.nip.io"
