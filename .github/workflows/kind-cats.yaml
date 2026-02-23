@@ -44,6 +44,7 @@ jobs:
           make create-kind
           kubectl annotate node -l cloudfoundry.org/zone=z2 "cloudfoundry.org/placement-tags=isolated"
           make up
+          helm install gorouter-iso-seg releases/routing/helm --values .github/gorouter-values.yaml
       - name: Login
         run: make login
       - name: Init
