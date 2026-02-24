@@ -200,7 +200,7 @@
             "droplet_directory_key": {
               "type": "string"
             },
-            "fog_connection": {
+            "storage_cli": {
               "type": ["object", "null"]
             },
             "resource_directory_key": {

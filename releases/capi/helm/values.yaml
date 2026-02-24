@@ -19,7 +19,6 @@ ccUploader:
   nodeSelector: ~
   tolerations: ~
 
-
 ccWorkerClock:
   resources: ~
   nodeSelector: ~
@@ -27,7 +26,7 @@ ccWorkerClock:
 
 cloudController:
   enabled: false
-  resources: ~ 
+  resources: ~
   certificateSecret: ""
   appDomain: apps.127-0-0-1.nip.io
   externalDomain: api.127-0-0-1.nip.io
@@ -54,9 +53,8 @@ cloudController:
     app_package_directory_key: cc-packages
     droplet_directory_key: cc-droplets
     buildpack_directory_key: cc-buildpacks
-    fog_connection:
-      provider: AWS
-      endpoint:  http://blobstore.127-0-0-1.nip.io
+    storage_cli:
+      host: http://blobstore.127-0-0-1.nip.io
       aws_access_key_id: admin
       aws_secret_access_key: ~
   diego:

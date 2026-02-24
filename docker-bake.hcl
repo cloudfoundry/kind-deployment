@@ -3,7 +3,7 @@ variable "REGISTRY_PREFIX" {
 }
 
 group "all" {
-  targets = ["routing", "cf-networking", "capi", "diego", "loggregator", "loggregator-agent", "log-cache", "fileserver", "bosh-dns", "uaa", "cflinuxfs4", "nfs-volume", "storage-cli"]
+  targets = ["routing", "cf-networking", "capi", "diego", "loggregator", "loggregator-agent", "log-cache", "fileserver", "bosh-dns", "uaa", "cflinuxfs4", "nfs-volume"]
 }
 
 group "default" {
@@ -79,33 +79,14 @@ target "capi" {
   name = component
   
   matrix = {
-    "component" = [ "cloud-controller", "cc-uploader", "cc-nginx", "tps-watcher", "storage-cli" ]
+    "component" = [ "cloud-controller", "cc-uploader", "cc-nginx", "tps-watcher" ]
   }
 
   contexts = {
-    "root" = "https://github.com/cloudfoundry/capi-release.git#${CAPI_RELEASE_VERSION}"
     "src" = "https://github.com/cloudfoundry/capi-release.git#${CAPI_RELEASE_VERSION}:src"
+    "storage-cli" = "https://github.com/cloudfoundry/capi-release.git#${CAPI_RELEASE_VERSION}:packages/storage-cli"
   }
 }
-
-// variable "STORAGE_CLI_RELEASE_VERSION" {
-//   # renovate: dataSource=github-releases depName=cloudfoundry/storage-cli-release
-//   default = "0.0.4"
-// }
-
-// target "storage-cli" {
-//   dockerfile = "releases/capi/${component}.Dockerfile"
-//   tags = [ "${REGISTRY_PREFIX}${component}:latest", "${REGISTRY_PREFIX}${component}:${STORAGE_CLI_RELEASE_VERSION}"]
-//   name = component
-  
-//   matrix = {
-//     "component" = [ "storage-cli" ]
-//   }
-
-//     args = {
-//     "STORAGE_CLI_RELEASE_VERSION" = STORAGE_CLI_RELEASE_VERSION
-//   }
-// }
 
 variable "DIEGO_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/diego-release

@@ -162,28 +162,16 @@ storage_cli_config_file_resource_pool: /etc/cloud-controller/storage_cli_config_
 resource_pool:
   blobstore_provider: AWS
   blobstore_type: storage-cli
-  connection_config:
-    aws_access_key_id: "{{ .Values.cloudController.blobstore.fog_connection.aws_access_key_id }}"
-    aws_secret_access_key: "{{ .Values.cloudController.blobstore.fog_connection.aws_secret_access_key }}"
-    bucket_name: "{{ .Values.cloudController.blobstore.resource_directory_key }}"
-    region: us-east-1
-    host: "http://blobstore.127-0-0-1.nip.io"
   minimum_size: 65536
   maximum_size: 536870912
-  resource_directory_key: {{ .Values.cloudController.blobstore.resource_directory_key }}
+  resource_directory_key: ""
   fog_connection: {}
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}
 packages:
   blobstore_provider: AWS
   blobstore_type: storage-cli
-  connection_config:
-    aws_access_key_id: "{{ .Values.cloudController.blobstore.fog_connection.aws_access_key_id }}"
-    aws_secret_access_key: "{{ .Values.cloudController.blobstore.fog_connection.aws_secret_access_key }}"
-    bucket_name: "{{ .Values.cloudController.blobstore.app_package_directory_key }}"
-    region: us-east-1
-    host: "http://blobstore.127-0-0-1.nip.io"
-  app_package_directory_key: {{ .Values.cloudController.blobstore.app_package_directory_key }}
+  app_package_directory_key: ""
   max_valid_packages_stored: 5
   max_package_size: 1073741824
   fog_connection: {}
@@ -192,13 +180,7 @@ packages:
 droplets:
   blobstore_provider: AWS
   blobstore_type: storage-cli
-  connection_config:
-    aws_access_key_id: "{{ .Values.cloudController.blobstore.fog_connection.aws_access_key_id }}"
-    aws_secret_access_key: "{{ .Values.cloudController.blobstore.fog_connection.aws_secret_access_key }}"
-    bucket_name: "{{ .Values.cloudController.blobstore.droplet_directory_key }}"
-    region: us-east-1
-    host: "http://blobstore.127-0-0-1.nip.io"
-  droplet_directory_key: {{ .Values.cloudController.blobstore.droplet_directory_key }}
+  droplet_directory_key: ""
   fog_connection: {}
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}
@@ -206,13 +188,7 @@ droplets:
 buildpacks:
   blobstore_provider: AWS
   blobstore_type: storage-cli
-  connection_config:
-    aws_access_key_id: "{{ .Values.cloudController.blobstore.fog_connection.aws_access_key_id }}"
-    aws_secret_access_key: "{{ .Values.cloudController.blobstore.fog_connection.aws_secret_access_key }}"
-    bucket_name: "{{ .Values.cloudController.blobstore.buildpack_directory_key }}"
-    region: us-east-1
-    host: "http://blobstore.127-0-0-1.nip.io"
-  buildpack_directory_key: {{ .Values.cloudController.blobstore.buildpack_directory_key }}
+  buildpack_directory_key: ""
   fog_connection: {}
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}

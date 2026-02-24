@@ -379,7 +379,7 @@ releases:
           enabled: true
           certificateSecret: all-in-one-tls
           blobstore:
-            fog_connection:
+            storage_cli:
               aws_secret_access_key: {{ .Values.secrets.blobstorePassword }}
           sshProxyKeyFingerprint: {{ .Values.secrets.sshProxyKeyFingerprint | quote }}
       - ccUploader:
