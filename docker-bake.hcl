@@ -70,7 +70,7 @@ target "bosh-dns" {
 
 variable "CAPI_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/capi-release
-  default = "1.227.0"
+  default = "1.228.0"
 }
 
 target "capi" {
