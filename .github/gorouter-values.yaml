@@ -4,8 +4,8 @@ gorouter:
   name: gorouter-iso-seg
   hostname: "gorouter-iso-seg.127-0-0-1.nip.io"
   appsDomain: "*.iso-seg.127-0-0-1.nip.io"
-  isolation_segments: ["isolated"]
-  routing_table_sharding_mode: segments
+  isolationSegments: ["isolated"]
+  routingTableShardingMode: segments
 
 udpForwarder:
   certificateSecret: "all-in-one-tls"

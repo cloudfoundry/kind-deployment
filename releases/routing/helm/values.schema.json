@@ -29,14 +29,14 @@
           "title": "hostname",
           "type": "string"
         },
-        "isolation_segments": {
+        "isolationSegments": {
           "default": [],
           "items": {
             "type": "string"
           },
           "type": "array"
         },
-        "routing_table_sharding_mode": {
+        "routingTableShardingMode": {
           "default": "all",
           "type": "string"
         },
