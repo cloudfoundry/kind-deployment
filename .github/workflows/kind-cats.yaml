@@ -44,8 +44,8 @@ jobs:
           make create-kind
           kubectl annotate node -l cloudfoundry.org/zone=z2 "cloudfoundry.org/placement-tags=isolated"
           make up
-          helm upgrade gorouter releases/routing/helm --reuse-values --set gorouter.name=gorouter --set gorouter.routing_table_sharding_mode=cf-and-segments
-          helm upgrade gorouter-iso-seg releases/routing/helm --values .github/gorouter-values.yaml
+          helm upgrade gorouter releases/routing/helm --reuse-values --set gorouter.routing_table_sharding_mode=cf-and-segments
+          helm install gorouter-iso-seg releases/routing/helm --values .github/gorouter-values.yaml
       - name: Login
         run: make login
       - name: Init
