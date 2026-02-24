@@ -122,7 +122,6 @@ spec:
     patch:
       operation: MERGE
       value:
-        auto_host_rewrite: false
         typed_extension_protocol_options:
           envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
             '@type': type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
