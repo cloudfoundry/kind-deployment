@@ -44,8 +44,6 @@ jobs:
           make create-kind
           kubectl annotate node -l cloudfoundry.org/zone=z2 "cloudfoundry.org/placement-tags=isolated"
           make up
-          helm upgrade gorouter releases/routing/helm --reuse-values --set gorouter.routingTableShardingMode=shared-and-segments
-          helm install gorouter-iso-seg releases/routing/helm --values .github/gorouter-values.yaml
       - name: Login
         run: make login
       - name: Init
@@ -64,8 +62,6 @@ jobs:
       - name: Create nfs share
         run: |
           docker exec nfs-server sh -c "mkdir -p /exports/test-share && chown 1000:1000 /exports/test-share && chmod 777 /exports/test-share"
-      - name: Create shared domain for isolation segment
-        run: cf create-shared-domain iso-seg.127-0-0-1.nip.io
       - name: setup CF tests
         uses: ./.github/actions/setup-cf-tests
         with:

@@ -43,3 +43,7 @@ docker volume ls --filter name=^cache_ -q | xargs docker volume rm
 ```bash
 DISABLE_CACHE=true make up
 ```
+
+## Why aren't routing isolation segments feature complete?
+
+In kind, it is not possible to have two or more gateways with different IP addresses. This is necessary so that a gorouter assigned to an isolated segment cannot be reached by a spoofed host header (see `cf-acceptance-test` for routing isolation segments [one](https://github.com/cloudfoundry/cf-acceptance-tests/blob/e5fe6a71964d8b9d243df649567ef905a50ddc21/routing_isolation_segments/routing_isolation_segments.go#L147-L154) and [two](https://github.com/cloudfoundry/cf-acceptance-tests/blob/e5fe6a71964d8b9d243df649567ef905a50ddc21/routing_isolation_segments/routing_isolation_segments.go#L101-L110)).
