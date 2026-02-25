@@ -11,7 +11,9 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/p
 
 FROM gcr.io/distroless/static:latest
 
-COPY --from=builder /usr/local/bin/* /usr/local/bin/
+COPY --from=builder /usr/local/bin/policy-server /usr/local/bin/policy-server
+COPY --from=builder /usr/local/bin/policy-server-internal /usr/local/bin/policy-server-internal
+COPY --from=builder /usr/local/bin/policy-server-asg-syncer /usr/local/bin/policy-server-asg-syncer
 
 ENTRYPOINT [ "/usr/local/bin/policy-server" ]
 CMD [ "-config-file", "/policy-server/policy-server.json" ]

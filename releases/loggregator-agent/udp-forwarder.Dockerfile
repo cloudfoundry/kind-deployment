@@ -9,6 +9,6 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/u
 
 FROM gcr.io/distroless/static:latest
 
-COPY --from=builder /usr/local/bin/udp-forwarder /usr/local/bin
+COPY --from=builder /usr/local/bin/udp-forwarder /usr/local/bin/udp-forwarder
 
 ENTRYPOINT [ "/usr/local/bin/udp-forwarder" ]

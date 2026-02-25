@@ -11,8 +11,8 @@ FROM ubuntu:latest
 
 
 ENV DOWNSTREAM_INGRESS_PORT_GLOB="/ingress-globs/*.yml"
-COPY --from=builder /usr/local/bin/forwarder-agent /usr/local/bin
+COPY --from=builder /usr/local/bin/forwarder-agent /usr/local/bin/forwarder-agent
 
-RUN mkdir /ingress-globs && echo -e "---\ningress: 3460" > /ingress-globs/syslog.yml && echo -e "---\ningress: 3459" > /ingress-globs/loggregator.yml
+RUN mkdir /ingress-globs && echo "---\ningress: 3460" > /ingress-globs/syslog.yml && echo "---\ningress: 3459" > /ingress-globs/loggregator.yml
 
 ENTRYPOINT [ "/usr/local/bin/forwarder-agent" ]

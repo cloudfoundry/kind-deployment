@@ -9,6 +9,6 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/s
 
 FROM gcr.io/distroless/static:latest
 
-COPY --from=builder /usr/local/bin/syslog-agent /usr/local/bin
+COPY --from=builder /usr/local/bin/syslog-agent /usr/local/bin/syslog-agent
 
 ENTRYPOINT [ "/usr/local/bin/syslog-agent" ]
