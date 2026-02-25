@@ -20,7 +20,7 @@ data:
       ca_cert_path: "/etc/ssl/cf-tcp-router/ca.crt"
       client_private_key_path: "/etc/ssl/cf-tcp-router/tls.key"
     haproxy_pid_file: "/haproxy/haproxy.pid"
-    isolation_segments: []
+    isolation_segments: {{ .Values.tcpRouter.isolationSegments }}
     reserved_system_component_ports: []
     drain_wait: 20s
     backend_tls:

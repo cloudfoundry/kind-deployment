@@ -62,6 +62,7 @@ tcpRouter:
     port: 3001
   nodeSelector: ~
   tolerations: ~
+  isolationSegments: []
 
 routeRegistrar:
   image:
