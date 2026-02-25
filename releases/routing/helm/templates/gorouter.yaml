@@ -3,20 +3,20 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: gorouter
+  name: {{ .Values.gorouter.name }}
   labels:
-    app: gorouter
+    app: {{ .Values.gorouter.name }}
   annotations:
     checksum/config: {{ include (print $.Template.BasePath "/gorouter-configmap.yaml") . | sha256sum }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: gorouter
+      app: {{ .Values.gorouter.name }}
   template:
     metadata:
       labels:
-        app: gorouter
+        app: {{ .Values.gorouter.name }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/gorouter-configmap.yaml") . | sha256sum }}
     spec:
@@ -40,7 +40,7 @@ spec:
             .backends.cert_chain = strenv(TLS_CRT) |
             .backends.private_key = strenv(TLS_KEY)' /gorouter/gorouter.yaml > /tmp/gorouter.yaml
         volumeMounts:
-          - name: gorouter-config
+          - name: "{{ .Values.gorouter.name }}-config"
             mountPath: /gorouter
           - name: tmp
             mountPath: /tmp
@@ -68,7 +68,7 @@ spec:
           - -c
           - /tmp/gorouter.yaml
           volumeMounts:
-            - name: gorouter-config
+            - name: "{{ .Values.gorouter.name }}-config"
               mountPath: /gorouter
             - name: tmp
               mountPath: /tmp
@@ -114,9 +114,9 @@ spec:
       volumes:
         - name: tmp
           emptyDir: {}
-        - name: gorouter-config
+        - name: "{{ .Values.gorouter.name }}-config"
           configMap:
-            name: gorouter-configmap
+            name: "{{ .Values.gorouter.name }}-configmap"
         - name: udp-forwarder
           secret:
             secretName: {{ required "udpForwarder.certificateSecret is required" .Values.udpForwarder.certificateSecret }}
@@ -124,9 +124,9 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: gorouter
+  name: {{ .Values.gorouter.name }}
   labels:
-    app: gorouter
+    app: {{ .Values.gorouter.name }}
 spec:
   ports:
   - port: 443
@@ -134,19 +134,19 @@ spec:
     targetPort: 443
     appProtocol: kubernetes.io/h2c
   selector:
-    app: gorouter
+    app: {{ .Values.gorouter.name }}
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
-  name: gorouter-tls
+  name: {{ .Values.gorouter.name }}-tls
 spec:
   targetRefs:
     - kind: Service
       group: ""
-      name: gorouter
+      name: {{ .Values.gorouter.name }}
   validation:
-    hostname: "gorouter"
+    hostname: "{{ .Values.gorouter.hostname }}"
     caCertificateRefs:
       - kind: ConfigMap
         group: ""
@@ -155,7 +155,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: gorouter
+  name: {{ .Values.gorouter.name }}
 spec:
   parentRefs:
     - name: istio-gateway
@@ -163,6 +163,6 @@ spec:
     - "{{ .Values.gorouter.appsDomain }}"
   rules:
     - backendRefs:
-        - name: gorouter
+        - name: {{ .Values.gorouter.name }}
           port: 443
 {{- end }}

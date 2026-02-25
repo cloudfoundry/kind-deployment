@@ -1,8 +1,11 @@
 gorouter:
   enabled: true
   certificateSecret: ""
+  name: gorouter
   hostname: "gorouter.127-0-0-1.nip.io"
   appsDomain: "*.apps.127-0-0-1.nip.io"
+  isolationSegments: []
+  routingTableShardingMode: all
   image:
     repository: ghcr.io/cloudfoundry/k8s/gorouter
     tag: ""

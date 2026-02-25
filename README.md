@@ -53,6 +53,11 @@ You can configure the installation by setting following environment variables:
 | `ENABLE_TCP_ROUTING`    | `true`  | cf-tcp-router, routing-api                                             |
 | `ENABLE_NFS_VOLUME`     | `false` | nfsbroker                                                              |
 
+## Unsupported Features
+
+- Routing isolation segments are not fully feature complete since this relies on more than one gateway which is not possible to realize in a local kind setup (see [FAQ](./docs/faq.md))
+- TCP isolation segments are not configurable yet
+
 ## Read More Documentation
 
 - [Local Development Guide](docs/local-development-guide.md)

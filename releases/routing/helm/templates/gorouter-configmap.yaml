@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: gorouter-configmap
+  name: {{ .Values.gorouter.name }}-configmap
 data:
   gorouter.yaml: |-
     port: 8080
@@ -31,7 +31,7 @@ data:
     drain_wait: 20s
     drain_timeout: 900s
     healthcheck_user_agent: HTTP-Monitor/1.1
-    routing_table_sharding_mode: all
+    routing_table_sharding_mode: {{ .Values.gorouter.routingTableShardingMode }}
     route_services_timeout: 60s
     route_services_secret_decrypt_only: ''
     route_services_recommend_https: true
@@ -81,7 +81,7 @@ data:
     enable_ssl: true
     cipher_suites: ECDHE-RSA-AES128-GCM-SHA256:TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
     forwarded_client_cert: always_forward
-    isolation_segments: []
+    isolation_segments: {{ .Values.gorouter.isolationSegments }}
     ip_local_port_range: 1024 65535
     empty_pool_response_code_503: true
     enable_envelope_v1_metrics: true
