@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM golang:1-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:alpine AS builder
 
 ARG TARGETOS TARGETARCH
 
@@ -9,7 +9,7 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/b
 
 FROM gcr.io/distroless/static:latest
 
-COPY --from=builder /usr/local/bin/bbs /usr/local/bin
+COPY --from=builder /usr/local/bin/bbs /usr/local/bin/bbs
 
 ENTRYPOINT [ "/usr/local/bin/bbs" ]
 CMD [ "-config", "/bbs/bbs.json" ]

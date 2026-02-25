@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM golang:1-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:alpine AS builder
 
 ARG component TARGETOS TARGETARCH LOG_CACHE_RELEASE_VERSION
 
@@ -9,6 +9,6 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags "-X main.b
 
 FROM gcr.io/distroless/static:latest
 
-COPY --from=builder /usr/local/bin/cmd /usr/local/bin
+COPY --from=builder /usr/local/bin/cmd /usr/local/bin/cmd
 
 ENTRYPOINT [ "/usr/local/bin/cmd" ]
