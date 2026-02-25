@@ -5,7 +5,7 @@ ARG TARGETOS TARGETARCH
 COPY --from=src . /loggregator-release/src
 WORKDIR /loggregator-release/src
 
-RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/trafficcontroller/ ./trafficcontroller/
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/trafficcontroller ./trafficcontroller/
 
 FROM gcr.io/distroless/static:latest
 
