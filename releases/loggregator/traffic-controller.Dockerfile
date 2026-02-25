@@ -9,6 +9,6 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/t
 
 FROM gcr.io/distroless/static:latest
 
-COPY --from=builder /usr/local/bin/trafficcontroller/ /usr/local/bin
+COPY --from=builder /usr/local/bin/trafficcontroller/ /usr/local/bin/trafficcontroller
 
 ENTRYPOINT [ "/usr/local/bin/trafficcontroller" ]

@@ -8,7 +8,7 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/g
 
 FROM gcr.io/distroless/static:latest
 
-COPY --from=builder /usr/local/bin/gorouter /usr/local/bin
+COPY --from=builder /usr/local/bin/gorouter /usr/local/bin/gorouter
 
 ENTRYPOINT [ "/usr/local/bin/gorouter" ]
 CMD [ "-c", "/gorouter/gorouter.yaml" ]

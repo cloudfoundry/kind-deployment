@@ -9,7 +9,7 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/c
 
 FROM gcr.io/distroless/static:latest
 
-COPY --from=builder /usr/local/bin/cc-uploader /usr/local/bin
+COPY --from=builder /usr/local/bin/cc-uploader /usr/local/bin/cc-uploader
 
 ENTRYPOINT [ "/usr/local/bin/cc-uploader" ]
 CMD [ "-configPath", "/cc-uploader/cc-uploader.json" ]

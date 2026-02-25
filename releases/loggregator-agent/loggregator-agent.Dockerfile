@@ -10,6 +10,6 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/l
 
 FROM gcr.io/distroless/static:latest
 
-COPY --from=builder /usr/local/bin/loggregator-agent /usr/local/bin
+COPY --from=builder /usr/local/bin/loggregator-agent /usr/local/bin/loggregator-agent
 
 ENTRYPOINT [ "/usr/local/bin/loggregator-agent" ]

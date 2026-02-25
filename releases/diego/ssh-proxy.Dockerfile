@@ -9,7 +9,7 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/s
 
 FROM gcr.io/distroless/static:latest
 
-COPY --from=builder /usr/local/bin/ssh-proxy /usr/local/bin
+COPY --from=builder /usr/local/bin/ssh-proxy /usr/local/bin/ssh-proxy
 
 ENTRYPOINT [ "/usr/local/bin/ssh-proxy" ]
 CMD [ "-config", "/ssh-proxy/ssh-proxy.json" ]

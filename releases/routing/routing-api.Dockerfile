@@ -9,6 +9,6 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /usr/local/bin/r
 
 FROM gcr.io/distroless/static:latest
 
-COPY --from=builder /usr/local/bin/routing-api /usr/local/bin
+COPY --from=builder /usr/local/bin/routing-api /usr/local/bin/routing-api
 
 ENTRYPOINT [ "/usr/local/bin/routing-api" ]
