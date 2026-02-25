@@ -3,4 +3,4 @@ apiVersion: v2
 version: 0.6.0
 description: A Helm chart for deploying NFS Volume Release components
 # renovate: dataSource=docker depName=nfs-volume-release packageName=ghcr.io/cloudfoundry/k8s/nfsbroker
-appVersion: 7.50.0
+appVersion: 7.52.0
