@@ -42,7 +42,6 @@
         },
         "name": {
           "default": "gorouter",
-          "title": "name",
           "type": "string"
         },
         "image": {
