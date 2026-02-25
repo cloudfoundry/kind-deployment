@@ -1,3 +1,4 @@
+{{- $preset := env "COMPONENT_PRESET" | default "custom" -}}
 ---
 certsDir: "./temp/certs"
 
@@ -10,11 +11,11 @@ versions:
   cflinuxfs4: "1.312.0"
 
 optionalComponents:
-  enableLoggregator: {{ env "ENABLE_LOGGREGATOR" | default "true" }}
-  enablePolicySupport: {{ env "ENABLE_POLICY_SUPPORT" | default "true" }}
-  enableNfsVolume: {{ env "ENABLE_NFS_VOLUME" | default "false" }}
-  enableTcpRouting: {{ env "ENABLE_TCP_ROUTING" | default "true" }}
-
+  enableLoggregator: {{ env "ENABLE_LOGGREGATOR" | default (ne $preset "minimal") }}
+  enablePolicySupport: {{ env "ENABLE_POLICY_SUPPORT" | default (ne $preset "minimal") }}
+  enableNfsVolume: {{ env "ENABLE_NFS_VOLUME" | default (ne $preset "minimal") }}
+  enableTcpRouting: {{ env "ENABLE_TCP_ROUTING" | default (ne $preset "minimal") }}
+  enableCredhub: {{ env "ENABLE_CREDHUB" | default (ne $preset "minimal") }}
 secrets:
   dbPassword: {{ requiredEnv "DB_PASSWORD" }}
   blobstorePassword: {{ requiredEnv "BLOBSTORE_PASSWORD" }}

@@ -249,6 +249,7 @@ releases:
   - name: credhub
     namespace: default
     chart: ./releases/credhub/helm
+    installed: {{ .Values.optionalComponents.enableCredhub }}
     needs:
       - uaa
       - postgresql
@@ -392,7 +393,9 @@ releases:
     installed: {{ .Values.optionalComponents.enableNfsVolume }}
     needs:
       - uaa
+    {{ if .Values.optionalComponents.enableCredhub }}
       - credhub
+    {{ end }}
     values:
       - nfsbroker:
           enabled: true

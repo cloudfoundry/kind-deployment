@@ -44,14 +44,15 @@ make down
 
 ## Configuration
 
-You can configure the installation by setting following environment variables:
+You can configure the installation by setting the environment variable `COMPONENT_PRESET=minimal` to leave out all optional components or more granular by setting following environment variables:
 
 | environment variable    | default | component(s) to be installed                                           |
 | ----------------------- | ------- | ---------------------------------------------------------------------- |
 | `ENABLE_LOGGREGATOR`    | `true`  | Loggregator                                                            |
 | `ENABLE_POLICY_SUPPORT` | `true`  | policy-serverver, policy-agent, bosh-dns, service-discovery-controller |
 | `ENABLE_TCP_ROUTING`    | `true`  | cf-tcp-router, routing-api                                             |
-| `ENABLE_NFS_VOLUME`     | `false` | nfsbroker                                                              |
+| `ENABLE_NFS_VOLUME`     | `true` | nfsbroker                                                              |
+| `ENABLE_CREDHUB`        | `true` | credhub                                                              |
 
 ## Unsupported Features
 
