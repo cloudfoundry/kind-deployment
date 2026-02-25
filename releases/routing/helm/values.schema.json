@@ -277,6 +277,13 @@
         "certificateSecret": {
           "type": "string"
         },
+        "isolationSegments": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
         "enabled": {
           "default": true,
           "title": "enabled",
