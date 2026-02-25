@@ -44,8 +44,7 @@ jobs:
             exit 0
           fi
 
-          ACTUAL_TARGETS=$(docker buildx bake "$TARGET" --print --progress quiet | \
-            jq -r --arg t "$TARGET" 'if .group[$t] then .group[$t].targets | join(" ") else $t end')
+          ACTUAL_TARGETS=$(docker buildx bake "$TARGET" --print --progress quiet | jq -r '.target | keys | join(" ")')
 
           echo "target=$TARGET" >> $GITHUB_OUTPUT
           echo "targets=$ACTUAL_TARGETS" >> $GITHUB_OUTPUT
