@@ -1,7 +1,7 @@
 LOCAL = true
 TARGET_ARCH ?= $(if $(filter true,$(LOCAL)),$(shell go env GOARCH),amd64)
 # renovate: dataSource=github-releases depName=helmfile/helmfile
-HELMFILE_VERSION ?= v1.2.3
+HELMFILE_VERSION ?= "1.2.3"
 
 init: temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub temp/secrets.sh temp/secrets.env
 
@@ -15,7 +15,7 @@ install:
 		--env ENABLE_NFS_VOLUME \
 		--env ENABLE_POLICY_SUPPORT \
 		--env ENABLE_LOGGREGATOR \
-		-v "$$PWD/temp/certs:/certs" -v "$$PWD/temp/kubeconfig:/helm/.kube/config:ro" -v "$$PWD:/wd" --workdir /wd ghcr.io/helmfile/helmfile:$(HELMFILE_VERSION) helmfile sync
+		-v "$$PWD/temp/certs:/certs" -v "$$PWD/temp/kubeconfig:/helm/.kube/config:ro" -v "$$PWD:/wd" --workdir /wd ghcr.io/helmfile/helmfile:v$(HELMFILE_VERSION) helmfile sync
 
 login:
 	@ . temp/secrets.sh; \
