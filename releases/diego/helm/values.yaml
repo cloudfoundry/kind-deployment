@@ -67,7 +67,7 @@ routeEmitter:
   locketAddress: "locket.default.svc.cluster.local:8891"
   bbsAddress: "https://bbs.default.svc.cluster.local:8889"
   routingApi:
-    enabled: true
+    enabled: false
     certificateSecret: ""
     address: "https://routing-api.default.svc.cluster.local"
     port: 3001

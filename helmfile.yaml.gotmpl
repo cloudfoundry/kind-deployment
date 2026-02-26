@@ -173,11 +173,8 @@ releases:
     needs:
       - istio-system/istiod
     values:
-      - routingApi:
-          enabled: false
-      - tcpRouter:
-          enabled: false
       - gorouter:
+          enabled: true
           certificateSecret: all-in-one-tls
       - udpForwarder:
           certificateSecret: all-in-one-tls
@@ -192,8 +189,6 @@ releases:
       - uaa
       - postgresql
     values:
-      - gorouter:
-          enabled: false
       - routingApi:
           enabled: true
           dbPassword: {{ .Values.secrets.dbPassword }}
@@ -213,6 +208,8 @@ releases:
     needs:
       - istio-system/istiod
     values:
+      - loggregator:
+          enabled: true
       - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
       - doppler:
           certificateSecret: all-in-one-tls
@@ -398,8 +395,11 @@ releases:
       - credhub
     values:
       - nfsbroker:
+          enabled: true
           certificateSecret: all-in-one-tls
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
+      - nsfsv3driver:
+          enabled: true
 
   - name: cf-networking
     namespace: default
@@ -412,12 +412,15 @@ releases:
       - loggregator-agent
     values:
       - policyServer:
+          enabled: true
           dbPassword: {{ .Values.secrets.dbPassword }}
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
           certificateSecret: all-in-one-tls
       - serviceDiscoveryController:
+          enabled: true
           certificateSecret: all-in-one-tls
       - boshDnsAdapter:
+          enabled: true
           certificateSecret: all-in-one-tls
       - boshDns:
           certificateSecret: all-in-one-tls

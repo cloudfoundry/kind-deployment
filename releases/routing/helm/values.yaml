@@ -1,5 +1,5 @@
 gorouter:
-  enabled: true
+  enabled: false
   certificateSecret: ""
   name: gorouter
   hostname: "gorouter.127-0-0-1.nip.io"
@@ -22,7 +22,7 @@ udpForwarder:
     imagePullPolicy: IfNotPresent
 
 routingApi:
-  enabled: true
+  enabled: false
   certificateSecret: ""
   locketCertificateSecret: ""
   loggregatorCertificateSecret: ""
@@ -41,7 +41,7 @@ routingApi:
   tolerations: ~
 
 tcpRouter:
-  enabled: true
+  enabled: false
   certificateSecret: ""
   oauthClientsSecret: ""
   image:

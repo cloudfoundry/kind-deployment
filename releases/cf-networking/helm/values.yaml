@@ -1,5 +1,5 @@
 policyServer:
-  enabled: true
+  enabled: false
   resources: ~
   certificateSecret: ""
   hostname: "policy-server.127-0-0-1.nip.io"
@@ -16,7 +16,7 @@ policyServer:
   tolerations: ~
 
 serviceDiscoveryController:
-  enabled: true
+  enabled: false
   resources: ~
   certificateSecret: ""
   hostname: service-discovery-controller.default.svc.cluster.local
@@ -32,7 +32,7 @@ serviceDiscoveryController:
   tolerations: ~
 
 boshDnsAdapter:
-  enabled: true
+  enabled: false
   resources: ~
   certificateSecret: ""
   image:

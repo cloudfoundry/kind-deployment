@@ -1,5 +1,5 @@
 nfsbroker:
-  enabled: true
+  enabled: false
   certificateSecret: ""
   oauthClientsSecret: ""
   credhubURL: https://credhub.default.svc.cluster.local:8844
@@ -13,7 +13,7 @@ nfsbroker:
 
 
 nfsv3driver:
-  enabled: true
+  enabled: false
   image:
     repository: ghcr.io/cloudfoundry/k8s/nfsv3driver
     tag: ""
