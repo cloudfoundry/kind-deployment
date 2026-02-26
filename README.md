@@ -4,14 +4,10 @@ This repository provides a simple and fast way to run Cloud Foundry locally. It 
 
 ## Prerequisites
 
-The following tools need to be installed:
+- [Docker](https://docs.docker.com/engine/install/) (with Docker Compose), alternatives like colima or podman may also work.
+- [`cf` CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html) (v8.17.0+)
 
-- [`docker`](https://docs.docker.com/engine/install/)
-- [`kind`](https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries) (v0.31.0 or higher)
-- [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl) (v1.35.1 or higher)
-- `make`:
-  - It should be already installed on MacOS and Linux.
-  - For Windows installation see: <https://gnuwin32.sourceforge.net/packages/make.htm>
+All other tools (kind, kubectl, helm, helmfile) are bundled in the installer container.
 
 ## Run the Installation
 
@@ -46,12 +42,27 @@ make down
 
 You can configure the installation by setting following environment variables:
 
-| environment variable    | default | component(s) to be installed                                           |
-| ----------------------- | ------- | ---------------------------------------------------------------------- |
-| `ENABLE_LOGGREGATOR`    | `true`  | Loggregator                                                            |
-| `ENABLE_POLICY_SUPPORT` | `true`  | policy-serverver, policy-agent, bosh-dns, service-discovery-controller |
-| `ENABLE_TCP_ROUTING`    | `true`  | cf-tcp-router, routing-api                                             |
-| `ENABLE_NFS_VOLUME`     | `false` | nfsbroker                                                              |
+| Environment Variable | Default | Description |
+|---------------------|---------|-------------|
+| `ENABLE_LOGGREGATOR` | `true` | Install Loggregator |
+| `ENABLE_POLICY_SUPPORT` | `true` | Install policy-server, policy-agent, bosh-dns, service-discovery-controller |
+| `ENABLE_TCP_ROUTING` | `true` | Install cf-tcp-router, routing-api |
+| `ENABLE_NFS_VOLUME` | `false` | Install nfsbroker |
+| `DISABLE_CACHE` | `false` | Disable registry pull-through caches |
+| `DOCKER_SOCKET` | auto-detected | Path to Docker socket (override if auto-detection fails) |
+
+Example:
+
+```bash
+ENABLE_NFS_VOLUME=true make up
+```
+
+## Additional Commands
+
+| Command | Description |
+|---------|-------------|
+| `make shell` | Open a development shell (mounts local source code for development/testing) |
+| `make build-installer` | Build the installer container without running it |
 
 ## Unsupported Features
 

@@ -2,27 +2,30 @@
 
 set -euo pipefail
 
-mkdir -p temp/certs
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-OPENSSL="docker run --rm -v $(pwd)/temp/certs:/certs -v $(pwd)/certs/all-in-one.conf:/all-in-one.conf alpine/openssl"
-SSH_KEYGEN="docker run --rm -v $(pwd)/temp/certs:/certs --entrypoint /usr/bin/ssh-keygen linuxserver/openssh-server"
+mkdir -p "${ROOT_DIR}/temp/certs"
 
-$OPENSSL genrsa -traditional -out /certs/ca.key 4096
-$OPENSSL req -x509 -key /certs/ca.key -out /certs/ca.crt -days 365 -noenc -subj "/CN=ca/O=ca" \
-	-config /all-in-one.conf -extensions v3_ca > /dev/null 2>&1
-$OPENSSL req -new -keyout /certs/all-in-one.key -out /certs/all-in-one.csr -noenc -config /all-in-one.conf > /dev/null 2>&1
-$OPENSSL x509 -req -in /certs/all-in-one.csr -CA /certs/ca.crt -CAkey /certs/ca.key -CAcreateserial \
-	-out /certs/all-in-one.crt -days 365 -copy_extensions copy > /dev/null 2>&1
+CERTS_DIR="${ROOT_DIR}/temp/certs"
+CONF_FILE="${ROOT_DIR}/certs/all-in-one.conf"
 
-rm -f temp/certs/ssh_key temp/certs/ssh_key.pub
-$SSH_KEYGEN -t rsa -b 4096 -f /certs/ssh_key -N "" > /dev/null 2>&1
+openssl genrsa -traditional -out "${CERTS_DIR}/ca.key" 4096
+openssl req -x509 -key "${CERTS_DIR}/ca.key" -out "${CERTS_DIR}/ca.crt" -days 365 -noenc -subj "/CN=ca/O=ca" \
+	-config "${CONF_FILE}" -extensions v3_ca > /dev/null 2>&1
+openssl req -new -keyout "${CERTS_DIR}/all-in-one.key" -out "${CERTS_DIR}/all-in-one.csr" -noenc -config "${CONF_FILE}" > /dev/null 2>&1
+openssl x509 -req -in "${CERTS_DIR}/all-in-one.csr" -CA "${CERTS_DIR}/ca.crt" -CAkey "${CERTS_DIR}/ca.key" -CAcreateserial \
+	-out "${CERTS_DIR}/all-in-one.crt" -days 365 -copy_extensions copy > /dev/null 2>&1
 
-echo "export BLOBSTORE_PASSWORD=$($OPENSSL rand -hex 16)" > temp/secrets.sh
-echo "export DB_PASSWORD=$($OPENSSL rand -hex 16)" >> temp/secrets.sh
-echo "export OAUTH_CLIENTS_SECRET=$($OPENSSL rand -hex 16)" >> temp/secrets.sh
-echo "export DIEGO_SSH_CREDENTIALS=$($OPENSSL rand -hex 16)" >> temp/secrets.sh
-echo "export CC_ADMIN_PASSWORD=$($OPENSSL rand -hex 16)" >> temp/secrets.sh
-echo "export UAA_ADMIN_SECRET=$($OPENSSL rand -hex 16)" >> temp/secrets.sh
-echo "export SSH_PROXY_KEY_FINGERPRINT=$($SSH_KEYGEN -l -E md5 -f /certs/ssh_key.pub | cut -d' ' -f2 | cut -d: -f2-)" >> temp/secrets.sh
+rm -f "${CERTS_DIR}/ssh_key" "${CERTS_DIR}/ssh_key.pub"
+ssh-keygen -t rsa -b 4096 -f "${CERTS_DIR}/ssh_key" -N "" > /dev/null 2>&1
 
-sed 's/^export //g' temp/secrets.sh > temp/secrets.env
+echo "export BLOBSTORE_PASSWORD=$(openssl rand -hex 16)" > "${ROOT_DIR}/temp/secrets.sh"
+echo "export DB_PASSWORD=$(openssl rand -hex 16)" >> "${ROOT_DIR}/temp/secrets.sh"
+echo "export OAUTH_CLIENTS_SECRET=$(openssl rand -hex 16)" >> "${ROOT_DIR}/temp/secrets.sh"
+echo "export DIEGO_SSH_CREDENTIALS=$(openssl rand -hex 16)" >> "${ROOT_DIR}/temp/secrets.sh"
+echo "export CC_ADMIN_PASSWORD=$(openssl rand -hex 16)" >> "${ROOT_DIR}/temp/secrets.sh"
+echo "export UAA_ADMIN_SECRET=$(openssl rand -hex 16)" >> "${ROOT_DIR}/temp/secrets.sh"
+echo "export SSH_PROXY_KEY_FINGERPRINT=$(ssh-keygen -l -E md5 -f "${CERTS_DIR}/ssh_key.pub" | cut -d' ' -f2 | cut -d: -f2-)" >> "${ROOT_DIR}/temp/secrets.sh"
+
+sed 's/^export //g' "${ROOT_DIR}/temp/secrets.sh" > "${ROOT_DIR}/temp/secrets.env"
