@@ -1,4 +1,3 @@
-{{- $preset := env "COMPONENT_PRESET" | default "custom" -}}
 ---
 certsDir: "./temp/certs"
 
@@ -10,12 +9,7 @@ versions:
   # renovate: dataSource=docker depName=cloudfoundry/cflinuxfs4-release packageName=ghcr.io/cloudfoundry/k8s/cflinuxfs4
   cflinuxfs4: "1.312.0"
 
-optionalComponents:
-  enableLoggregator: {{ env "ENABLE_LOGGREGATOR" | default (ne $preset "minimal") }}
-  enablePolicySupport: {{ env "ENABLE_POLICY_SUPPORT" | default (ne $preset "minimal") }}
-  enableNfsVolume: {{ env "ENABLE_NFS_VOLUME" | default (ne $preset "minimal") }}
-  enableTcpRouting: {{ env "ENABLE_TCP_ROUTING" | default (ne $preset "minimal") }}
-  enableCredhub: {{ env "ENABLE_CREDHUB" | default (ne $preset "minimal") }}
+installOptionalComponents: {{ "INSTALL_OPTIONAL_COMPONENTS" | env | default "true" }}
 secrets:
   dbPassword: {{ requiredEnv "DB_PASSWORD" }}
   blobstorePassword: {{ requiredEnv "BLOBSTORE_PASSWORD" }}

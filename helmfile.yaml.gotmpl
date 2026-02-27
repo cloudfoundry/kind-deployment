@@ -182,7 +182,7 @@ releases:
   - name: tcp-routing
     namespace: default
     chart: ./releases/routing/helm
-    installed: {{ .Values.optionalComponents.enableTcpRouting }}
+    installed: {{ .Values.installOptionalComponents }}
     needs:
       - loggregator-agent
       - locket
@@ -204,7 +204,7 @@ releases:
   - name: loggregator
     namespace: default
     chart: ./releases/loggregator/helm
-    installed: {{ .Values.optionalComponents.enableLoggregator }}
+    installed: {{ .Values.installOptionalComponents }}
     needs:
       - istio-system/istiod
     values:
@@ -249,7 +249,7 @@ releases:
   - name: credhub
     namespace: default
     chart: ./releases/credhub/helm
-    installed: {{ .Values.optionalComponents.enableCredhub }}
+    installed: {{ .Values.installOptionalComponents }}
     needs:
       - uaa
       - postgresql
@@ -313,7 +313,7 @@ releases:
     needs:
       - diego
       - nats
-    {{ if .Values.optionalComponents.enablePolicySupport }}
+    {{ if .Values.installOptionalComponents }}
       - cf-networking
     {{ end }}
     values:
@@ -324,7 +324,7 @@ releases:
           enabled: true
           certificateSecret: all-in-one-tls
           routingApi:
-            enabled: {{ .Values.optionalComponents.enableTcpRouting }}
+            enabled: {{ .Values.installOptionalComponents }}
             certificateSecret: all-in-one-tls
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
           natsCertificateSecret: all-in-one-tls
@@ -332,8 +332,8 @@ releases:
           bbsCertificateSecret: all-in-one-tls
           locketCertificateSecret: all-in-one-tls
           uaaCertificateSecret: all-in-one-tls
-          enableInternalEmitter: {{ and .Values.optionalComponents.enablePolicySupport }}
-          enableTcpEmitter: {{ .Values.optionalComponents.enableTcpRouting }}
+          enableInternalEmitter: {{ and .Values.installOptionalComponents }}
+          enableTcpEmitter: {{ .Values.installOptionalComponents }}
 
   - name: k8s-rep
     namespace: default
@@ -369,7 +369,7 @@ releases:
       - minio
       - diego
       - postgresql
-      {{- if .Values.optionalComponents.enableTcpRouting }}
+      {{- if .Values.installOptionalComponents }}
       - tcp-routing
       {{- end }}
     values:
@@ -390,10 +390,10 @@ releases:
   - name: nfs-volume
     namespace: default
     chart: ./releases/nfs-volume/helm
-    installed: {{ .Values.optionalComponents.enableNfsVolume }}
+    installed: {{ .Values.installOptionalComponents }}
     needs:
       - uaa
-    {{ if .Values.optionalComponents.enableCredhub }}
+    {{ if .Values.installOptionalComponents }}
       - credhub
     {{ end }}
     values:
@@ -407,7 +407,7 @@ releases:
   - name: cf-networking
     namespace: default
     chart: ./releases/cf-networking/helm
-    installed: {{ .Values.optionalComponents.enablePolicySupport }}
+    installed: {{ .Values.installOptionalComponents }}
     needs:
       - capi
       - uaa
@@ -432,10 +432,10 @@ releases:
     namespace: default
     chart: cloudfoundry-k8s/policy-agent
     version: "{{ .Values.versions.policyAgent }}"
-    installed: {{ .Values.optionalComponents.enablePolicySupport }}
+    installed: {{ .Values.installOptionalComponents }}
     needs:
       - cf-networking
-    {{ if .Values.optionalComponents.enablePolicySupport }}
+    {{ if .Values.installOptionalComponents }}
     set:
       - name: certificateSecret
         value: all-in-one-tls
