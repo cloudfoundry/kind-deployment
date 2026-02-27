@@ -97,7 +97,7 @@ jobs:
           echo "===== CC_WORKER_CLOCK ====="
           kubectl get pod -l app.kubernetes.io/name=cc-worker-clock -o wide
           kubectl logs -l app.kubernetes.io/name=cc-worker-clock
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: report.json

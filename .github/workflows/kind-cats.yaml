@@ -81,7 +81,7 @@ jobs:
       - name: debug info
         if: failure()
         run: kubectl get events -A --sort-by='.lastTimestamp'
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: report
