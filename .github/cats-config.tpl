@@ -4,6 +4,7 @@
     "admin_user": "ccadmin",
     "api": "api.127-0-0-1.nip.io",
     "apps_domain": "apps.127-0-0-1.nip.io",
+    "comma_delim_asgs_enabled": true,
     "credhub_client": "credhub_admin_client",
     "credhub_location": "https://credhub.127-0-0-1.nip.io",
     "credhub_mode": "assisted",
