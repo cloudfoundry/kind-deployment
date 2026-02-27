@@ -398,7 +398,7 @@ releases:
           enabled: true
           certificateSecret: all-in-one-tls
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
-      - nsfsv3driver:
+      - nfsv3driver:
           enabled: true
 
   - name: cf-networking
