@@ -217,7 +217,7 @@ target "credhub" {
 
 variable "CFLINUXFS4_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/cflinuxfs4-release
-  default = "1.312.0"
+  default = "1.315.0"
 }
 
 target "cflinuxfs4" {
