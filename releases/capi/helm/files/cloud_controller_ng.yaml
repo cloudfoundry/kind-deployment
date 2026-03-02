@@ -224,7 +224,7 @@ default_staging_security_groups:
 default_running_security_groups:
   - dummy4
 security_groups:
-  enable_comma_delimited_destinations: false
+  enable_comma_delimited_destinations: {{ .Values.cloudController.enableCommaDelimitedDestinations }}
 allowed_cors_domains:
   - http://*.appspot.com
   - http://*.inblue.net

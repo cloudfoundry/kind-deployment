@@ -67,6 +67,7 @@ cloudController:
     address: nats.default.svc.cluster.local:4222
   nodeSelector: ~
   tolerations: ~
+  enableCommaDelimitedDestinations: false
 
 localWorker:
   image:
