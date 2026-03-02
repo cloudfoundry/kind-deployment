@@ -332,7 +332,7 @@ releases:
           bbsCertificateSecret: all-in-one-tls
           locketCertificateSecret: all-in-one-tls
           uaaCertificateSecret: all-in-one-tls
-          enableInternalEmitter: {{ and .Values.installOptionalComponents }}
+          enableInternalEmitter: {{ .Values.installOptionalComponents }}
           enableTcpEmitter: {{ .Values.installOptionalComponents }}
 
   - name: k8s-rep
