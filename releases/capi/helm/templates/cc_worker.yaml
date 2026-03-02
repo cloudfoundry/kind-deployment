@@ -33,6 +33,8 @@ spec:
           env:
             - name: INDEX
               value: "1"
+            - name: STORAGE_CLI_PATH
+              value: /usr/local/bin/storage-cli
           {{- if .Values.ccWorker.resources }}
           resources:
             {{- toYaml .Values.ccWorker.resources | nindent 12 }}

@@ -79,12 +79,12 @@ spec:
           env:
             - name: INDEX
               value: "1"
+            - name: STORAGE_CLI_PATH
+              value: /usr/local/bin/storage-cli
           {{- if .Values.cloudController.resources }}
           resources:
             {{- toYaml .Values.cloudController.resources | nindent 12 }}
           {{- end }}
-            - name: STORAGE_CLI_PATH
-              value: /usr/local/bin/storage-cli
           volumeMounts:
             - name: cloud-controller
               mountPath: /etc/ssl/certs/cloud-controller
