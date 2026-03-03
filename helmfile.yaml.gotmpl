@@ -437,6 +437,8 @@ releases:
     set:
       - name: certificateSecret
         value: all-in-one-tls
+      - name: pollInterval
+        value: "1s"
     hooks:
       - events: ["postsync"]
         showlogs: true
