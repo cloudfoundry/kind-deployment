@@ -369,9 +369,6 @@ releases:
       - minio
       - diego
       - postgresql
-      {{- if .Values.installOptionalComponents }}
-      - tcp-routing
-      {{- end }}
     values:
       - cloudController:
           enabled: true
@@ -392,10 +389,7 @@ releases:
     chart: ./releases/nfs-volume/helm
     installed: {{ .Values.installOptionalComponents }}
     needs:
-      - uaa
-    {{ if .Values.installOptionalComponents }}
-      - credhub
-    {{ end }}
+      - capi
     values:
       - nfsbroker:
           enabled: true
