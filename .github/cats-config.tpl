@@ -40,7 +40,7 @@
     "include_service_instance_sharing": true,
     "include_services": true,
     "include_ssh": true,
-    "include_sso": false,
+    "include_sso": true,
     "include_tasks": true,
     "include_tcp_routing": true,
     "include_user_provided_services": true,
