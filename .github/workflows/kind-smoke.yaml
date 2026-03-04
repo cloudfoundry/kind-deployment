@@ -5,6 +5,14 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      minimal:
+        description: 'Run minimal installation (skip optional components)'
+        type: boolean
+        required: false
+        default: true
+  schedule:
+    - cron: '0 7 * * 1'
 
 jobs:
   kind-smoke:
@@ -52,9 +60,14 @@ jobs:
           CF_CLI_VERSION: '8.14.1'
           KIND_VERSION: '0.30.0'
           HELMFILE_VERSION: '1.2.3'
-      - name: Run make up
-        if: steps.check_changes.outputs.skip != 'true'
+      - name: Run make up (default)
+        if: steps.check_changes.outputs.skip != 'true' && github.event_name == 'pull_request'
         run: make up
+      - name: Run make up
+        if: steps.check_changes.outputs.skip != 'true' && github.event_name != 'pull_request'
+        run: make up
+        env:
+          INSTALL_OPTIONAL_COMPONENTS: ${{ inputs.minimal }}  
       - name: Login
         if: steps.check_changes.outputs.skip != 'true'
         run: make login
