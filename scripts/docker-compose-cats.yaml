@@ -1,0 +1,48 @@
+services:
+  internal-service:
+    image: nginx:alpine
+    container_name: internal-service
+    restart: always
+    ports:
+      - "9024:9024"
+    networks:
+      - kind
+    command:
+      - sh
+      - -c
+      - |
+        # Generate self-signed certificate
+        apk add --no-cache openssl
+        mkdir -p /etc/nginx/ssl
+        openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+          -keyout /etc/nginx/ssl/nginx.key \
+          -out /etc/nginx/ssl/nginx.crt \
+          -subj "/CN=internal-service"
+        
+        # Create nginx config
+        cat > /etc/nginx/nginx.conf <<'EOF'
+        events {
+          worker_connections 1024;
+        }
+        http {
+          server {
+            listen 9024 ssl;
+            server_name internal-service;
+            
+            ssl_certificate /etc/nginx/ssl/nginx.crt;
+            ssl_certificate_key /etc/nginx/ssl/nginx.key;
+            
+            location / {
+              return 200 'cloud_controller_v3';
+              add_header Content-Type text/plain;
+            }
+          }
+        }
+        EOF
+        
+        # Start nginx
+        nginx -g 'daemon off;'
+
+networks:
+  kind:
+    external: true

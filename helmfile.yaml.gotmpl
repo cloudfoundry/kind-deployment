@@ -379,6 +379,7 @@ releases:
             storage_cli:
               aws_secret_access_key: {{ .Values.secrets.blobstorePassword }}
           sshProxyKeyFingerprint: {{ .Values.secrets.sshProxyKeyFingerprint | quote }}
+          enableCommaDelimitedDestinations: true
       - ccUploader:
           certificateSecret: all-in-one-tls
       - udpForwarder:
@@ -436,6 +437,8 @@ releases:
     set:
       - name: certificateSecret
         value: all-in-one-tls
+      - name: pollInterval
+        value: "5s"
     hooks:
       - events: ["postsync"]
         showlogs: true

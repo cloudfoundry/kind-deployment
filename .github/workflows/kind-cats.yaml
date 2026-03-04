@@ -62,6 +62,9 @@ jobs:
       - name: Create nfs share
         run: |
           docker exec nfs-server sh -c "mkdir -p /exports/test-share && chown 1000:1000 /exports/test-share && chmod 777 /exports/test-share"
+      - name: Start extra services
+        run: |
+          docker compose -p cats -f "scripts/docker-compose-cats.yaml" --progress plain up -d
       - name: setup CF tests
         uses: ./.github/actions/setup-cf-tests
         with:
