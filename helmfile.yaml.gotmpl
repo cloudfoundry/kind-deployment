@@ -429,7 +429,6 @@ releases:
     installed: {{ .Values.installOptionalComponents }}
     needs:
       - cf-networking
-    {{ if .Values.installOptionalComponents }}
     set:
       - name: certificateSecret
         value: all-in-one-tls
@@ -450,4 +449,3 @@ releases:
               }" "$COREFILE" | kubectl create configmap coredns -n kube-system --from-file=Corefile=/dev/stdin --dry-run=client -o yaml | kubectl apply -f -
               kubectl rollout restart deployment coredns -n kube-system
             }
-    {{ end }}
