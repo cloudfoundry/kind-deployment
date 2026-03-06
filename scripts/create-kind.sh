@@ -57,7 +57,7 @@ if [ "${DISABLE_CACHE}" != "true" ]; then
 fi
 
 
-if [ "${ENABLE_NFS_VOLUME}" = "true" ]; then
+if [ "${INSTALL_OPTIONAL_COMPONENTS}" != "false" ]; then
   echo "Setting up NFS server..."
 
   setup_nfs
