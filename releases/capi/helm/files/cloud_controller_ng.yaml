@@ -126,7 +126,7 @@ log_stream:
 uaa:
   url: "{{ .Values.cloudController.uaa.url }}"
   internal_url: https://uaa.default.svc.cluster.local
-  resource_id: "cloud_controller"
+  resource_id: "cloud_controller,cloud_controller_service_permissions"
   ca_file: "/etc/ssl/certs/cloud-controller/ca.crt"
   client_timeout: 60
 
