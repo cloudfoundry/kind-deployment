@@ -30,22 +30,24 @@ def check_cluster():
         sys.exit(1)
 
 
-if __name__ == "__main__":
-    check_cluster()
-
-    bake_config = get_bake_config()
-    targets = bake_config.get("group", {}).get("all", {}).get("targets", [])
-
-    targets.remove("cflinuxfs4")
-    targets.remove("fileserver")
-
-    release = questionary.select("Which release are you working on?", choices=targets).ask()
-    project = questionary.select("Which project are you working on?", choices=bake_config.get("group", {}).get(release, {}).get("targets", [])).ask()
-
+def get_image_name(project):
     tags = bake_config.get("target", {}).get(project, {}).get("tags", [])
     latest_tag = tags[0] if tags[0].endswith(":latest") else tags[1]
-    image_name = latest_tag.split(":")[0]
+    return latest_tag.split(":")[0]
 
+
+def build_instructions(project):
+    tags = bake_config.get("target", {}).get(project, {}).get("tags", [])
+    latest_tag = tags[0] if tags[0].endswith(":latest") else tags[1]
+    # image_name = latest_tag.split(":")[0]
+
+    update_values(project)
+
+    print(f"docker buildx bake {project} --set {project}.contexts.src=<path-to-{release}-release>/src")
+    print(f"kind load docker-image {latest_tag} --name cfk8s")
+
+
+def update_values(project):
     yaml = YAML()
     yaml.preserve_quotes = True
     yaml.representer.add_representer(type(None), lambda dumper, _: dumper.represent_scalar("tag:yaml.org,2002:null", "~"))
@@ -55,6 +57,7 @@ if __name__ == "__main__":
     with open(values_path, "r") as f:
         values = yaml.load(f)
 
+    image_name = get_image_name(project)
     for match in find_matches(values, image_name):
         keys = match.split(".")
         target = values
@@ -67,9 +70,34 @@ if __name__ == "__main__":
     with open(values_path, "w") as f:
         yaml.dump(values, f)
 
+
+if __name__ == "__main__":
+    check_cluster()
+
+    bake_config = get_bake_config()
+    all_releases = bake_config.get("group", {}).get("all", {}).get("targets", [])
+
+    all_releases.remove("cflinuxfs4")
+    all_releases.remove("fileserver")
+
+
+    release = questionary.select("Which release are you working on?", choices=all_releases).ask()
+
+    if release == "bosh-dns":
+        pass
+
+    all_projects = bake_config.get("group", {}).get(release, {}).get("targets", [])
+
+    # single project releases are not included in the release group
+    if not all_projects:
+        all_projects.append(release)
+
+    default_choices = [questionary.Choice(title=project, checked=True) for project in all_projects]
+    projects = questionary.checkbox("Which project(s) are you working on?", choices=default_choices).ask()
+
     print("Here are some instructions to build a local image and load it into the cluster. Make sure to replace <path-to-release> with the actual path to the release you are working on.")
     print("Docker will ask for confirmation to access the local file system, please allow it to do so.")
     print()
-    print(f"docker buildx bake {project} --set {project}.contexts.src=<path-to-{release}-release>/src")
-    print(f"kind load docker-image {latest_tag} --name cfk8s")
+    for project in projects:
+        build_instructions(project)
     print("make up")
