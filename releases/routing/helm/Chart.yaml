@@ -4,4 +4,4 @@ description: Helm chart for Gorouter components
 type: application
 apiVersion: v2
 # renovate: dataSource=docker depName=routing-release packageName=ghcr.io/cloudfoundry/k8s/gorouter
-appVersion: 0.367.0
+appVersion: 0.368.0
