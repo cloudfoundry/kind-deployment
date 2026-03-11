@@ -79,12 +79,10 @@ if __name__ == "__main__":
 
     all_releases.remove("cflinuxfs4")
     all_releases.remove("fileserver")
+    all_releases.remove("bosh-dns")
 
 
     release = questionary.select("Which release are you working on?", choices=all_releases).ask()
-
-    if release == "bosh-dns":
-        pass
 
     all_projects = bake_config.get("group", {}).get(release, {}).get("targets", [])
 
