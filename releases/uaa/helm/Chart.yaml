@@ -3,5 +3,4 @@ version: 0.15.0
 description: A Helm chart for UAA
 type: application
 apiVersion: v2
-# renovate: dataSource=docker depName=uaa-release packageName=ghcr.io/cloudfoundry/k8s/uaa
 appVersion: 78.8.0

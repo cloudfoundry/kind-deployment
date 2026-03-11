@@ -3,5 +3,4 @@ version: 0.11.0
 description: Helm chart for Log Cache components
 type: application
 apiVersion: v2
-# renovate: dataSource=docker depName=log-cache-release packageName=ghcr.io/cloudfoundry/k8s/gateway
 appVersion: 3.2.5

@@ -1,0 +1,61 @@
+name: Sync cf-deployment release versions
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  sync-versions:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get latest cf-deployment release tag
+        id: cf-release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=$(gh release view --repo cloudfoundry/cf-deployment --json tagName --jq '.tagName')
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Latest cf-deployment release: $TAG"
+
+      - name: Checkout cf-deployment
+        uses: actions/checkout@v4
+        with:
+          repository: cloudfoundry/cf-deployment
+          ref: ${{ steps.cf-release.outputs.tag }}
+          path: cf-deployment
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Extract release versions and generate versions.yaml
+        run: python3 scripts/extract-release-versions.py cf-deployment/cf-deployment.yml versions.yaml
+
+      - name: Show generated versions.yaml
+        run: cat versions.yaml
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet -- versions.yaml; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create pull request
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git checkout -b auto/sync-cf-deployment-versions
+          git add versions.yaml
+          git commit -m "chore: update BOSH release versions from cf-deployment"
+          git push -f origin auto/sync-cf-deployment-versions
+          gh pr create --fill --base main || echo "PR already exists"
