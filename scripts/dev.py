@@ -30,24 +30,20 @@ def check_cluster():
         sys.exit(1)
 
 
-def get_image_name(project):
-    tags = bake_config.get("target", {}).get(project, {}).get("tags", [])
-    latest_tag = tags[0] if tags[0].endswith(":latest") else tags[1]
-    return latest_tag.split(":")[0]
-
-
 def build_instructions(project):
     tags = bake_config.get("target", {}).get(project, {}).get("tags", [])
-    latest_tag = tags[0] if tags[0].endswith(":latest") else tags[1]
-    # image_name = latest_tag.split(":")[0]
+    latest_tag = next((tag for tag in tags if tag.endswith(":latest")), None)
+    if not latest_tag and len(tags) < 2:
+        raise ValueError(f"No tag ending with ':latest' found for project {project}")
+    image_name = latest_tag.split(":")[0]
 
-    update_values(project)
+    update_values(image_name)
 
     print(f"docker buildx bake {project} --set {project}.contexts.src=<path-to-{release}-release>/src")
     print(f"kind load docker-image {latest_tag} --name cfk8s")
 
 
-def update_values(project):
+def update_values(image_name):
     yaml = YAML()
     yaml.preserve_quotes = True
     yaml.representer.add_representer(type(None), lambda dumper, _: dumper.represent_scalar("tag:yaml.org,2002:null", "~"))
@@ -57,7 +53,6 @@ def update_values(project):
     with open(values_path, "r") as f:
         values = yaml.load(f)
 
-    image_name = get_image_name(project)
     for match in find_matches(values, image_name):
         keys = match.split(".")
         target = values
@@ -81,12 +76,11 @@ if __name__ == "__main__":
     all_releases.remove("fileserver")
     all_releases.remove("bosh-dns")
 
-
     release = questionary.select("Which release are you working on?", choices=all_releases).ask()
 
     all_projects = bake_config.get("group", {}).get(release, {}).get("targets", [])
 
-    # single project releases are not included in the release group
+    # single project releases are not included in the targets group
     if not all_projects:
         all_projects.append(release)
 
