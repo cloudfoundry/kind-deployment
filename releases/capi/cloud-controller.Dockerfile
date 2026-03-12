@@ -9,7 +9,7 @@ RUN STORAGE_CLI_RELEASE_VERSION=$(sed -n 's/.*storage_cli_version="\([^"]*\)".*/
     curl https://github.com/cloudfoundry/storage-cli/releases/download/v${STORAGE_CLI_RELEASE_VERSION}/storage-cli-${STORAGE_CLI_RELEASE_VERSION}-linux-amd64 -L -o /usr/local/bin/storage-cli && \
     chmod +x /usr/local/bin/storage-cli
 
-FROM ruby:3.2.9-slim
+FROM ruby:3.4.9-slim
 
 RUN apt update && apt install -y postgresql-client libpq-dev default-libmysqlclient-dev libyaml-dev build-essential zip git procps && useradd -u 1000 -d /nonexistent -s /sbin/nologin --no-create-home vcap && \
     rm -rf /var/lib/apt/lists/* 
