@@ -34,8 +34,8 @@ jobs:
           path: cf-deployment
           fetch-depth: 1
 
-      - name: Install PyYAML
-        run: pip install pyyaml
+      - name: Install Dependencies
+        run: pip install -r scripts/requirements.txt
 
       - name: Extract release versions and generate versions.yaml
         run: python3 scripts/sync-cf-deployment-releases.py cf-deployment/cf-deployment.yml
