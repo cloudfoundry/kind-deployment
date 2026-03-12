@@ -25,8 +25,7 @@ fileserver:
   hostname: "file-server.127-0-0-1.nip.io"
   image:
     repository: ghcr.io/cloudfoundry/k8s/fileserver
-    ## TODO uses # sync comment here
-    # renovate: dataSource=docker depName=cf-deployment packageName=ghcr.io/cloudfoundry/k8s/fileserver
+    # sync: release=cf-deployment
     tag: "54.11.0"
     imagePullPolicy: IfNotPresent
   nodeSelector: ~

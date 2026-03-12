@@ -51,9 +51,19 @@ def main():
     if not releases:
         print("No releases found in cf-deployment manifest", file=sys.stderr)
         sys.exit(1)
+        
+
  
     releases_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "releases")
     release_versions = {r["name"]: str(r["version"]) for r in releases}
+    
+    manifest_version = manifest.get("manifest_version")
+    if not manifest_version:
+        print("No manifest_version found in cf-deployment manifest", file=sys.stderr)
+        sys.exit(1)
+    else:
+        manifest_version = str(manifest_version).lstrip("v")
+        release_versions["cf-deployment"] = manifest_version
 
     for r in releases:
         helm_dir = os.path.join(releases_dir, r["name"], "helm")
