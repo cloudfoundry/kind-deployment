@@ -38,8 +38,8 @@ def replace_tag(release_versions, m):
 
 
 def main():
-    if len(sys.argv) < 1:
-        print("Usage: update-chart-appversion.py <cf-deployment.yml>", file=sys.stderr)
+    if len(sys.argv) != 2:
+        print("Usage: sync-cf-deployment-releases.py <cf-deployment.yml>", file=sys.stderr)
         sys.exit(1)
 
     input_path = sys.argv[1]
