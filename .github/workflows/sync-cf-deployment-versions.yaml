@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Get latest cf-deployment release tag
         id: cf-deployment-tag
@@ -30,6 +32,7 @@ jobs:
           repository: cloudfoundry/cf-deployment
           ref: ${{ steps.cf-deployment-tag.outputs.tag }}
           path: cf-deployment
+          fetch-depth: 1
 
       - name: Install PyYAML
         run: pip install pyyaml
