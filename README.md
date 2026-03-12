@@ -10,7 +10,7 @@ The following tools need to be installed:
 - [`kind`](https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries) (v0.31.0 or higher)
 - [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl) (v1.35.1 or higher)
 - `make`:
-  - It should be already installed on MacOS and Linux.
+  - It should be already installed on MacOS and Linux
   - For Windows installation see: <https://gnuwin32.sourceforge.net/packages/make.htm>
 
 ## Run the Installation
