@@ -57,9 +57,12 @@ jobs:
           curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=${CF_CLI_VERSION}&source=github" | tar -zx
           mv cf8 $HOME/.local/bin/cf
         env:
-          CF_CLI_VERSION: '8.14.1'
-          KIND_VERSION: '0.30.0'
-          HELMFILE_VERSION: '1.2.3'
+          # renovate: dataSource=github-releases depName=cloudfoundry/cli
+          CF_CLI_VERSION: "8.14.1"
+          # renovate: dataSource=github-releases depName=kubernetes-sigs/kind
+          KIND_VERSION: "0.30.0"
+          # renovate: dataSource=github-releases depName=helmfile/helmfile
+          HELMFILE_VERSION: "1.2.3"
       - name: Run make up (default)
         if: steps.check_changes.outputs.skip != 'true' && github.event_name == 'pull_request'
         run: make up
