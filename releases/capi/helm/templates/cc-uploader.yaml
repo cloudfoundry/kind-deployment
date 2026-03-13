@@ -25,7 +25,7 @@ spec:
           image: {{ .Values.ccUploader.image.repository }}:{{ default .Chart.AppVersion .Values.ccUploader.image.tag }}
           imagePullPolicy: {{ .Values.ccUploader.image.imagePullPolicy }}
           ports:
-            - containerPort: 9090
+            - containerPort: 9091
           {{- if .Values.ccUploader.resources }}
           resources:
             {{- toYaml .Values.ccUploader.resources | nindent 12 }}
@@ -59,8 +59,8 @@ metadata:
     app: cc-uploader
 spec:
   ports:
-    - port: 9090
-      targetPort: 9090
+    - port: 9091
+      targetPort: 9091
       name: tcp
       protocol: TCP
   selector:
