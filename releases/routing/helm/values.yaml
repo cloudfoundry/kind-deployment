@@ -68,5 +68,5 @@ routeRegistrar:
   image:
     repository: ghcr.io/cloudfoundry/k8s/route-registrar
     # sync: release=routing
-    tag: "0.367.0"
+    tag: "0.368.0"
     imagePullPolicy: IfNotPresent
