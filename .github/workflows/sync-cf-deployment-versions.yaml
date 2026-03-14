@@ -13,7 +13,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
           ref: main
@@ -28,7 +28,7 @@ jobs:
           echo "Latest cf-deployment release: $TAG"
 
       - name: Checkout cf-deployment
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: cloudfoundry/cf-deployment
           ref: ${{ steps.cf-deployment-tag.outputs.tag }}
