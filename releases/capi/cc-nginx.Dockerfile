@@ -1,6 +1,6 @@
 ARG NGINX_VERSION=1.28.0
 
-FROM debian:bookworm AS builder
+FROM debian:trixie AS builder
 ARG NGINX_VERSION
 
 WORKDIR /src
