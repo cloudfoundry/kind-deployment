@@ -17,6 +17,7 @@ jobs:
         with:
           fetch-depth: 1
           ref: main
+          token: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
 
       - name: Get latest cf-deployment release tag
         id: cf-deployment-tag
@@ -34,7 +35,6 @@ jobs:
           ref: ${{ steps.cf-deployment-tag.outputs.tag }}
           path: cf-deployment
           fetch-depth: 1
-          token: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
 
       - name: Install Dependencies
         run: pip install -r scripts/requirements.txt
