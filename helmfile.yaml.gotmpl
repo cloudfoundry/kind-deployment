@@ -353,6 +353,8 @@ releases:
       - loggregatorCertificateSecret: all-in-one-tls
       - locket:
           certificateSecret: all-in-one-tls
+      - fileServer:
+          address: http://fileserver.default.svc.cluster.local:8080
 
     hooks:
       - events: ["presync"]

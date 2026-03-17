@@ -22,7 +22,7 @@ bbs:
 
 fileserver:
   enabled: false
-  hostname: "file-server.127-0-0-1.nip.io"
+  hostname: "fileserver.127-0-0-1.nip.io"
   image:
     repository: ghcr.io/cloudfoundry/k8s/fileserver
     # sync: release=cf-deployment

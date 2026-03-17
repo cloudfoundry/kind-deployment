@@ -14,9 +14,9 @@ fi
 
 for buildpack in "${buildpacks[@]}"; do
   if [[ $INSTALLED_BUILPACKS =~ "#$buildpack#" ]]; then
-    cf update-buildpack "$buildpack" -p "http://file-server.127-0-0-1.nip.io/${buildpack}-cflinuxfs4.zip"
+    cf update-buildpack "$buildpack" -p "http://fileserver.127-0-0-1.nip.io/${buildpack}-cflinuxfs4.zip"
   else
-    cf create-buildpack "$buildpack" "http://file-server.127-0-0-1.nip.io/${buildpack}-cflinuxfs4.zip" "$position"
+    cf create-buildpack "$buildpack" "http://fileserver.127-0-0-1.nip.io/${buildpack}-cflinuxfs4.zip" "$position"
   fi
   ((position++))
 done
