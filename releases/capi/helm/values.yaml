@@ -58,7 +58,7 @@ cloudController:
       aws_access_key_id: admin
       aws_secret_access_key: ~
   diego:
-    fileServerUrl: https://file-server.127-0-0-1.nip.io
+    fileServerUrl: https://fileserver.127-0-0-1.nip.io
     ccUploaderUrl: https://cc-uploader.default.svc.cluster.local:9091
   credhubApi:
     internalUrl: https://credhub.127-0-0-1.nip.io
