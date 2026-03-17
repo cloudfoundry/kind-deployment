@@ -62,7 +62,7 @@ jobs:
           # renovate: dataSource=github-releases depName=kubernetes-sigs/kind
           KIND_VERSION: "0.30.0"
           # renovate: dataSource=github-releases depName=helmfile/helmfile
-          HELMFILE_VERSION: "1.2.3"
+          HELMFILE_VERSION: "1.4.2"
       - name: Run make up (default)
         if: steps.check_changes.outputs.skip != 'true' && github.event_name == 'pull_request'
         run: make up
