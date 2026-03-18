@@ -155,41 +155,75 @@ quota_definitions:
     total_routes: 1000
     total_services: -1
 default_quota_definition: default
+{{- if .Values.cloudController.blobstore.storage_cli }}
 storage_cli_config_file_droplets: /etc/cloud-controller/storage_cli_config_droplets.json
 storage_cli_config_file_packages: /etc/cloud-controller/storage_cli_config_packages.json
 storage_cli_config_file_buildpacks: /etc/cloud-controller/storage_cli_config_buildpacks.json
 storage_cli_config_file_resource_pool: /etc/cloud-controller/storage_cli_config_resource_pool.json
+{{- end }}
 resource_pool:
+{{- if .Values.cloudController.blobstore.fog_connection }}
+  blobstore_type: fog
+  minimum_size: 65536
+  maximum_size: 536870912
+  resource_directory_key: {{ .Values.cloudController.blobstore.resource_directory_key }}
+  fog_connection:
+  {{- toYaml .Values.cloudController.blobstore.fog_connection | nindent 4 }}
+{{- else }}
   blobstore_provider: AWS
   blobstore_type: storage-cli
   minimum_size: 65536
   maximum_size: 536870912
   resource_directory_key: ""
   fog_connection: {}
+{{- end }}
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}
 packages:
+{{- if .Values.cloudController.blobstore.fog_connection }}
+  blobstore_type: fog
+  app_package_directory_key: {{ .Values.cloudController.blobstore.app_package_directory_key }}
+  max_valid_packages_stored: 5
+  max_package_size: 1073741824
+  fog_connection:
+  {{- toYaml .Values.cloudController.blobstore.fog_connection | nindent 4 }}
+{{- else }}
   blobstore_provider: AWS
   blobstore_type: storage-cli
   app_package_directory_key: ""
   max_valid_packages_stored: 5
   max_package_size: 1073741824
   fog_connection: {}
+{{- end }}
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}
 droplets:
+{{- if .Values.cloudController.blobstore.fog_connection }}
+  blobstore_type: fog
+  droplet_directory_key: {{ .Values.cloudController.blobstore.droplet_directory_key }}
+  fog_connection:
+  {{- toYaml .Values.cloudController.blobstore.fog_connection | nindent 4 }}
+{{- else }}
   blobstore_provider: AWS
   blobstore_type: storage-cli
   droplet_directory_key: ""
   fog_connection: {}
+{{- end }}
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}
   max_staged_droplets_stored: 5
 buildpacks:
+{{- if .Values.cloudController.blobstore.fog_connection }}
+  blobstore_type: fog
+  buildpack_directory_key: {{ .Values.cloudController.blobstore.buildpack_directory_key }}
+  fog_connection:
+  {{- toYaml .Values.cloudController.blobstore.fog_connection | nindent 4 }}
+{{- else }}
   blobstore_provider: AWS
   blobstore_type: storage-cli
   buildpack_directory_key: ""
   fog_connection: {}
+{{- end }}
   fog_aws_storage_options: {}
   fog_gcp_storage_options: {}
 db_encryption_key: "asdfasdfasdf"

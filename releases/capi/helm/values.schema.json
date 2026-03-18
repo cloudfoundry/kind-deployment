@@ -200,6 +200,9 @@
             "droplet_directory_key": {
               "type": "string"
             },
+            "fog_connection": {
+              "type": ["object", "null"]
+            },
             "storage_cli": {
               "type": ["object", "null"]
             },
@@ -207,6 +210,16 @@
               "type": "string"
             }
           },
+          "oneOf": [
+            {
+              "required": ["fog_connection"],
+              "not": { "required": ["storage_cli"] }
+            },
+            {
+              "required": ["storage_cli"],
+              "not": { "required": ["fog_connection"] }
+            }
+          ],
           "type": "object"
         },
         "certificateSecret": {
