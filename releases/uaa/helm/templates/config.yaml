@@ -6,6 +6,12 @@ metadata:
   name: uaa-spring-configmap
 data:
   application.yml: |-
+    spring.ssl.bundle.pem:
+      uaa-ssl:
+        reload-on-update: true
+        keystore:    
+          certificate: file:/ssl/tls.crt
+          private-key: file:/ssl/tls.key
     server:
       http:
         port: 8080
@@ -34,11 +40,10 @@ data:
           pattern: "%h %l %u %t &quot;%m %U %H&quot; %s %{Content-Length}i %b &quot;X-Vcap-Request-Id: %{X-Vcap-Request-Id}i&quot; %I"
       ssl:
         enabled: true
+        bundle: uaa-ssl
         enabled-protocols: "TLSv1.2,TLSv1.3"
         ciphers: "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256,TLS_DHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_AES_128_GCM_SHA256,TLS_AES_256_GCM_SHA384"
         protocol: TLS
-        certificate: file:/ssl/tls.crt
-        certificate-private-key: file:/ssl/tls.key
 ---
 apiVersion: v1
 kind: Secret
