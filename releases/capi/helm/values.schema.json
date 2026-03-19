@@ -203,23 +203,16 @@
             "fog_connection": {
               "type": ["object", "null"]
             },
+            "resource_directory_key": {
+              "type": "string"
+            },
             "storage_cli": {
               "type": ["object", "null"]
             },
-            "resource_directory_key": {
+            "type": {
               "type": "string"
             }
           },
-          "oneOf": [
-            {
-              "required": ["fog_connection"],
-              "not": { "required": ["storage_cli"] }
-            },
-            {
-              "required": ["storage_cli"],
-              "not": { "required": ["fog_connection"] }
-            }
-          ],
           "type": "object"
         },
         "certificateSecret": {
