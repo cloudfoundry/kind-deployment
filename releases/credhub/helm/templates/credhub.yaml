@@ -36,25 +36,16 @@ spec:
         env:
         - name: TRUST_STORE_PASSWORD
           value: changeit
-        - name: KEY_STORE_PASSWORD
-          value: changeit
-        - name: ENCRYPTION_PASSWORD
-          value: changeit
-        - name: SERVER_CA_PRIVATE_KEY_PATH
-          value: /etc/ssl/ca/tls.key
-        - name: SERVER_CA_CERT_PATH
-          value: /etc/ssl/ca/tls.crt
-        - name: UAA_CA_PATH
-          value: /etc/ssl/ca/tls.crt
-        - name: UAA_URL
-          value: https://uaa.{{ .Release.Namespace }}.svc.cluster.local
-        - name: SUBJECT_ALTERNATIVE_NAMES
-          value: "DNS:{{ .Values.hostname }},DNS:credhub.{{ .Release.Namespace }}.svc.cluster.local,DNS:credhub.{{ .Release.Namespace }}.svc,DNS:credhub.{{ .Release.Namespace }},DNS:credhub"
+        - name: TRUST_STORE_PATH
+          value: /ssl/trust_store.jks
         volumeMounts:
         - name: config
-          mountPath: /app/config
-        - name: ca
-          mountPath: /etc/ssl/ca
+          mountPath: /application.yml
+          subPath: application.yml
+        - name: ssl
+          mountPath: /ssl
+        - name: tmp
+          mountPath: /tmp
       {{- if .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml .Values.nodeSelector | nindent 8 }}
@@ -67,9 +58,11 @@ spec:
       - name: config
         configMap:
           name: credhub-config
-      - name: ca
+      - name: tmp
+        emptyDir: {}
+      - name: ssl
         secret:
-          secretName: {{ required "caCertificateSecret is required" .Values.caCertificateSecret }}
+          secretName: {{ required "certificateSecret is required" .Values.certificateSecret }}
 ---
 apiVersion: v1
 kind: Service

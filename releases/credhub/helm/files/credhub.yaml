@@ -1,8 +1,8 @@
 {{ $_ := required ".Values.dbPassword must be provided" .Values.dbPassword }}
 auth-server:
   url: {{ .Values.uaa.address }}
-  trust_store: /app/stores/trust_store.jks
-  trust_store_password: changeit
+  trust_store: ${TRUST_STORE_PATH}
+  trust_store_password: ${TRUST_STORE_PASSWORD}
 encryption:
   key_creation_enabled: true
   providers:
@@ -46,17 +46,34 @@ server:
   port: 8844
   ssl:
     enabled: true
-    key_store: /app/stores/key_store.jks
-    key_store_password: changeit
-    key_password: changeit
-    key_alias: cert
+    bundle: credhub
     ciphers: TLS_DHE_RSA_WITH_AES_128_GCM_SHA256,TLS_DHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_AES_128_GCM_SHA256,TLS_AES_256_GCM_SHA384
     client_auth: want
-    trust_store: /app/stores/trust_store.jks
-    trust_store_password: changeit
-    trust_store_type: JKS
     enabled_protocols: TLSv1.2,TLSv1.3
+  tomcat:
+    accesslog:
+      enabled: true
+      pattern: '%h %l %u %t "%r" %s %b %D'
+      directory: /dev
+      prefix: stdout
+      suffix:
+      file-date-format:
+      buffered: false
+      rotate: false
 spring:
+  ssl:
+    bundle:
+      pem:
+        credhub:
+          reload-on-update: true
+          keystore:
+            certificate: file:/ssl/tls.crt
+            private-key: file:/ssl/tls.key
+          truststore:
+            certificate: file:/ssl/ca.crt
+      watch:
+        file:
+          quiet-period: 1s
   flyway:
     enabled: true
     locations:
