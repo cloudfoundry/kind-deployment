@@ -103,6 +103,96 @@ spec:
     port: 32004
     protocol: TCP
     targetPort: 32004
+  - appProtocol: tcp
+    name: tcp-route-6
+    nodePort: 32005
+    port: 32005
+    protocol: TCP
+    targetPort: 32005
+  - appProtocol: tcp
+    name: tcp-route-7
+    nodePort: 32006
+    port: 32006
+    protocol: TCP
+    targetPort: 32006
+  - appProtocol: tcp
+    name: tcp-route-8
+    nodePort: 32007
+    port: 32007
+    protocol: TCP
+    targetPort: 32007
+  - appProtocol: tcp
+    name: tcp-route-9
+    nodePort: 32008
+    port: 32008
+    protocol: TCP
+    targetPort: 32008
+  - appProtocol: tcp
+    name: tcp-route-10
+    nodePort: 32009
+    port: 32009
+    protocol: TCP
+    targetPort: 32009
+  - appProtocol: tcp
+    name: tcp-route-11
+    nodePort: 32010
+    port: 32010
+    protocol: TCP
+    targetPort: 32010
+  - appProtocol: tcp
+    name: tcp-route-12
+    nodePort: 32011
+    port: 32011
+    protocol: TCP
+    targetPort: 32011
+  - appProtocol: tcp
+    name: tcp-route-13
+    nodePort: 32012
+    port: 32012
+    protocol: TCP
+    targetPort: 32012
+  - appProtocol: tcp
+    name: tcp-route-14
+    nodePort: 32013
+    port: 32013
+    protocol: TCP
+    targetPort: 32013
+  - appProtocol: tcp
+    name: tcp-route-15
+    nodePort: 32014
+    port: 32014
+    protocol: TCP
+    targetPort: 32014
+  - appProtocol: tcp
+    name: tcp-route-16
+    nodePort: 32015
+    port: 32015
+    protocol: TCP
+    targetPort: 32015
+  - appProtocol: tcp
+    name: tcp-route-17
+    nodePort: 32016
+    port: 32016
+    protocol: TCP
+    targetPort: 32016
+  - appProtocol: tcp
+    name: tcp-route-18
+    nodePort: 32017
+    port: 32017
+    protocol: TCP
+    targetPort: 32017
+  - appProtocol: tcp
+    name: tcp-route-19
+    nodePort: 32018
+    port: 32018
+    protocol: TCP
+    targetPort: 32018
+  - appProtocol: tcp
+    name: tcp-route-20
+    nodePort: 32019
+    port: 32019
+    protocol: TCP
+    targetPort: 32019
   selector:
     gateway.networking.k8s.io/gateway-name: istio-gateway
   type: NodePort
@@ -269,6 +359,141 @@ spec:
         from: All
     name: tcp-route-5
     port: 32004
+    protocol: TCP
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: tcp-route-6
+    port: 32005
+    protocol: TCP
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: tcp-route-7
+    port: 32006
+    protocol: TCP
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: tcp-route-8
+    port: 32007
+    protocol: TCP
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: tcp-route-9
+    port: 32008
+    protocol: TCP
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: tcp-route-10
+    port: 32009
+    protocol: TCP
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: tcp-route-11
+    port: 32010
+    protocol: TCP
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: tcp-route-12
+    port: 32011
+    protocol: TCP
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: tcp-route-13
+    port: 32012
+    protocol: TCP
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: tcp-route-14
+    port: 32013
+    protocol: TCP
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: tcp-route-15
+    port: 32014
+    protocol: TCP
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: tcp-route-16
+    port: 32015
+    protocol: TCP
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: tcp-route-17
+    port: 32016
+    protocol: TCP
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: tcp-route-18
+    port: 32017
+    protocol: TCP
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: tcp-route-19
+    port: 32018
+    protocol: TCP
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: TCPRoute
+      namespaces:
+        from: All
+    name: tcp-route-20
+    port: 32019
     protocol: TCP
 ---
 apiVersion: gateway.networking.k8s.io/v1

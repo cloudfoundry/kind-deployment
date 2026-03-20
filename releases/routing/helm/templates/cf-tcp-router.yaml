@@ -148,6 +148,51 @@ spec:
     - name: tcp-5
       port: 32004
       targetPort: 32004
+    - name: tcp-6
+      port: 32005
+      targetPort: 32005
+    - name: tcp-7
+      port: 32006
+      targetPort: 32006
+    - name: tcp-8
+      port: 32007
+      targetPort: 32007
+    - name: tcp-9
+      port: 32008
+      targetPort: 32008
+    - name: tcp-10
+      port: 32009
+      targetPort: 32009
+    - name: tcp-11
+      port: 32010
+      targetPort: 32010
+    - name: tcp-12
+      port: 32011
+      targetPort: 32011
+    - name: tcp-13
+      port: 32012
+      targetPort: 32012
+    - name: tcp-14
+      port: 32013
+      targetPort: 32013
+    - name: tcp-15
+      port: 32014
+      targetPort: 32014
+    - name: tcp-16
+      port: 32015
+      targetPort: 32015
+    - name: tcp-17
+      port: 32016
+      targetPort: 32016
+    - name: tcp-18
+      port: 32017
+      targetPort: 32017
+    - name: tcp-19
+      port: 32018
+      targetPort: 32018
+    - name: tcp-20
+      port: 32019
+      targetPort: 32019
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: TCPRoute
@@ -213,4 +258,199 @@ spec:
     - backendRefs:
       - name: cf-tcp-router
         port: 32004
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-6
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-6
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32005
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-7
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-7
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32006
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-8
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-8
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32007
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-9
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-9
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32008
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-10
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-10
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32009
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-11
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-11
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32010
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-12
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-12
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32011
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-13
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-13
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32012
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-14
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-14
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32013
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-15
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-15
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32014
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-16
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-16
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32015
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-17
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-17
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32016
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-18
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-18
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32017
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-19
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-19
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32018
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-20
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-20
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: 32019
 {{- end }}

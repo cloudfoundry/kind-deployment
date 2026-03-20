@@ -23,7 +23,7 @@ data:
     statsd_client_flush_interval: 300ms
     router_groups:
     - name: default-tcp
-      reservable_ports: 32000-32004
+      reservable_ports: 32000-32019
       type: tcp
     reserved_system_component_ports: []
     fail_on_router_port_conflicts: false
