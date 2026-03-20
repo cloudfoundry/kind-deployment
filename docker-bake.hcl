@@ -206,7 +206,7 @@ target "uaa" {
 
 variable "CREDHUB_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=pivotal/credhub-release
-  default = "2.15.1"
+  default = "2.15.2"
 }
 
 target "credhub" {
