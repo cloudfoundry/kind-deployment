@@ -15,34 +15,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          fetch-depth: 1
           ref: main
           token: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
 
-      - name: Get latest cf-deployment release tag
-        id: cf-deployment-tag
-        env:
-          GH_TOKEN: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
-        run: |
-          TAG=$(gh release view --repo cloudfoundry/cf-deployment --json tagName --jq '.tagName')
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "Latest cf-deployment release: $TAG"
-
-      - name: Checkout cf-deployment
-        uses: actions/checkout@v6
-        with:
-          repository: cloudfoundry/cf-deployment
-          ref: ${{ steps.cf-deployment-tag.outputs.tag }}
-          path: cf-deployment
-          fetch-depth: 1
-
-      - name: Install Dependencies
-        run: pip install -r scripts/requirements.txt
-
       - name: Extract release versions and generate versions.yaml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python3 scripts/sync-cf-deployment-versions.py cf-deployment/cf-deployment.yml
-          rm -rf cf-deployment
+          pip3 install pyyaml requests
+          python3 scripts/sync-cf-deployment-versions.py
 
       - name: Create pull request
         env:
