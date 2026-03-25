@@ -1,7 +1,7 @@
 LOCAL = true
 TARGET_ARCH ?= $(if $(filter true,$(LOCAL)),$(shell go env GOARCH),amd64)
 # renovate: dataSource=github-releases depName=helmfile/helmfile
-HELMFILE_VERSION ?= "1.4.2"
+HELMFILE_VERSION ?= "1.4.3"
 
 init: temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub temp/secrets.sh temp/secrets.env
 
