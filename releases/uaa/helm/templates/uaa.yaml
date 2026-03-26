@@ -96,14 +96,14 @@ metadata:
     app: uaa
 spec:
   ports:
-    - port: 443
+    - port: 8443
       name: https
       targetPort: 8443
   selector:
     app: uaa
 ---
 apiVersion: gateway.networking.k8s.io/v1
-kind: TLSRoute
+kind: HTTPRoute
 metadata:
   name: uaa
 spec:
@@ -111,7 +111,24 @@ spec:
     - name: istio-gateway
   hostnames:
     - "{{ .Values.hostname }}"
+    - "{{ .Values.loginAddress | trimPrefix "https://" }}"
   rules:
     - backendRefs:
         - name: uaa
-          port: 443
+          port: 8443
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: uaa
+spec:
+  targetRefs:
+    - kind: Service
+      group: ""
+      name: uaa
+  validation:
+    hostname: uaa.default.svc.cluster.local
+    caCertificateRefs:
+      - kind: ConfigMap
+        group: ""
+        name: ca

@@ -6,7 +6,7 @@
     "apps_domain": "apps.127-0-0-1.nip.io",
     "comma_delim_asgs_enabled": true,
     "credhub_client": "credhub_admin_client",
-    "credhub_location": "https://credhub.127-0-0-1.nip.io",
+    "credhub_location": "https://credhub.default.svc.cluster.local:8844",
     "credhub_mode": "assisted",
     "credhub_secret": "${OAUTH_CLIENTS_SECRET}",
     "internal_cc_address": "internal-service",

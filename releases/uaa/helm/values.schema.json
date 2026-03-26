@@ -5,6 +5,9 @@
     "address": {
       "type": "string"
     },
+    "loginAddress": {
+      "type": "string"
+    },
     "ccAdminPassword": {
       "type": ["string", "null"]
     },

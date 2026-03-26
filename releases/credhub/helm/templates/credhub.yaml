@@ -89,18 +89,3 @@ spec:
     protocol: TCP
   selector:
     app: credhub
----
-kind: TLSRoute
-apiVersion: gateway.networking.k8s.io/v1
-metadata:
-  name: credhub
-  namespace: default
-spec:
-  parentRefs:
-    - name: istio-gateway
-  hostnames:
-  - "{{ .Values.hostname }}"
-  rules:
-  - backendRefs:
-    - name: credhub
-      port: 8844
