@@ -26,7 +26,7 @@ data:
       "enable_diego_auth": true,
       "diego_credentials": {{ required ".Values.diegoSSHCredentials must be provided" .Values.diegoSSHCredentials | quote }},
       "enable_cf_auth": true,
-      "uaa_token_url": "https://uaa.{{ .Release.Namespace }}.svc.cluster.local/oauth/token",
+      "uaa_token_url": "https://uaa.{{ .Release.Namespace }}.svc.cluster.local:8443/oauth/token",
       "uaa_password": {{ required ".Values.sshProxy.oauthClientsSecret must be provided" .Values.sshProxy.oauthClientsSecret | quote }},
       "uaa_username": "ssh-proxy",
       "uaa_ca_cert": "/etc/ssl/certs/ssh-proxy/ca.crt",

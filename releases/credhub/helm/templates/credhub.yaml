@@ -47,7 +47,7 @@ spec:
         - name: UAA_CA_PATH
           value: /etc/ssl/ca/tls.crt
         - name: UAA_URL
-          value: https://uaa.{{ .Release.Namespace }}.svc.cluster.local
+          value: https://uaa.{{ .Release.Namespace }}.svc.cluster.local:8443
         - name: SUBJECT_ALTERNATIVE_NAMES
           value: "DNS:{{ .Values.hostname }},DNS:credhub.{{ .Release.Namespace }}.svc.cluster.local,DNS:credhub.{{ .Release.Namespace }}.svc,DNS:credhub.{{ .Release.Namespace }},DNS:credhub"
         volumeMounts:

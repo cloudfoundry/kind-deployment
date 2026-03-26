@@ -23,6 +23,9 @@
     "hostname": {
       "type": "string"
     },
+    "uaaConfigOverrides": {
+      "type": ["object", "null"]
+    },
     "image": {
       "additionalProperties": false,
       "properties": {

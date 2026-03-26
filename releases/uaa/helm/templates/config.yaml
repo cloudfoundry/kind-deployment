@@ -56,4 +56,6 @@ stringData:
         admin:
           secret: {{ .Values.uaaAdminSecret | quote }}
   uaa.yml: |-
-  {{- tpl (.Files.Get "files/uaa.yml") . | nindent 4 }}
+  {{- $base := tpl (.Files.Get "files/uaa.yml") . | fromYaml }}
+  {{- $overrides := .Values.uaaConfigOverrides | default dict }}
+  {{- toYaml (mergeOverwrite $base $overrides) | nindent 4 }}

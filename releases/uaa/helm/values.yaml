@@ -15,3 +15,5 @@ uaaAdminSecret: ~
 ccAdminPassword: ~
 oauthClientsSecret: ~
 dbPassword: ~
+
+uaaConfigOverrides: {}
