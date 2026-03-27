@@ -62,5 +62,5 @@
     "go_buildpack_name": "go_buildpack",
     "python_buildpack_name": "python_buildpack",
 
-    "catnip_docker_app_image": "ghcr.io/cloudfoundry/catnip-app@sha256:03caa16f3a7e70f577e72527bde8ff42fadf166a22544efa58f22eaf9e355b52"
+    "catnip_docker_app_image": "ghcr.io/cloudfoundry/catnip-app:latest"
 }
