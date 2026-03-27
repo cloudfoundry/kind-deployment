@@ -79,7 +79,7 @@ spec:
           - name: LOG_ADMIN_CLIENT_SECRET
             value: {{ .Values.oauthClientsSecret | quote }}
           - name: LOG_ADMIN_ADDR
-            value: "https://uaa.{{ .Release.Namespace }}.svc.cluster.local"
+            value: "https://uaa.{{ .Release.Namespace }}.svc.cluster.local:8443"
           - name: LOG_ADMIN_CA_PATH
             value: /etc/ssl/certs/reverse-log-proxy-gateway/ca.crt
           - name: LOGS_PROVIDER_ADDR
@@ -138,7 +138,7 @@ spec:
           - name: TRAFFIC_CONTROLLER_SKIP_CERT_VERIFY
             value: "true"
           - name: TRAFFIC_CONTROLLER_UAA_HOST
-            value: "https://uaa.{{ .Release.Namespace }}.svc.cluster.local"
+            value: "https://uaa.{{ .Release.Namespace }}.svc.cluster.local:8443"
           - name: TRAFFIC_CONTROLLER_UAA_CLIENT
             value: doppler
           - name: TRAFFIC_CONTROLLER_UAA_CLIENT_SECRET

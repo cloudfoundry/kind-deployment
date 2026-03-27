@@ -35,7 +35,7 @@ spec:
             - name: CAPI_CA_PATH
               value: /etc/ssl/certs/log-cache-api/ca.crt
             - name: UAA_ADDR
-              value: "https://uaa.{{ .Release.Namespace }}.svc.cluster.local"
+              value: "https://uaa.{{ .Release.Namespace }}.svc.cluster.local:8443"
             - name: UAA_CA_PATH
               value: /etc/ssl/certs/log-cache-api/ca.crt
             - name: PROMQL_UNIMPLEMENTED

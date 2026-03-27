@@ -253,24 +253,6 @@ spec:
         name: all-in-one-tls
       mode: Terminate
   - allowedRoutes:
-      namespaces:
-        from: All
-    hostname: credhub.127-0-0-1.nip.io
-    name: tls-credhub
-    port: 443
-    protocol: TLS
-    tls:
-      mode: Passthrough
-  - allowedRoutes:
-      namespaces:
-        from: All
-    hostname: uaa.127-0-0-1.nip.io
-    name: tls-uaa
-    port: 443
-    protocol: TLS
-    tls:
-      mode: Passthrough
-  - allowedRoutes:
       kinds:
       - group: gateway.networking.k8s.io
         kind: TCPRoute

@@ -35,7 +35,7 @@ cloudController:
   systemDomain: system.127-0-0-1.nip.io
   appSSHEndpoint: ssh.127-0-0-1.nip.io:2222
   sshProxyKeyFingerprint: ""
-  loginUrl: https://uaa.127-0-0-1.nip.io
+  loginUrl: https://login.127-0-0-1.nip.io
   image:
     repository: ghcr.io/cloudfoundry/k8s/cloud-controller
     tag: ""
@@ -64,8 +64,8 @@ cloudController:
     fileServerUrl: https://fileserver.127-0-0-1.nip.io
     ccUploaderUrl: https://cc-uploader.default.svc.cluster.local:9091
   credhubApi:
-    internalUrl: https://credhub.127-0-0-1.nip.io
-    externalUrl: https://credhub.127-0-0-1.nip.io
+    internalUrl: https://credhub.default.svc.cluster.local:8844
+    externalUrl: ""
   nats:
     address: nats.default.svc.cluster.local:4222
   nodeSelector: ~

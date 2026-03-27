@@ -47,7 +47,7 @@ spec:
         - name: UAA_CA_PATH
           value: /etc/ssl/ca/tls.crt
         - name: UAA_URL
-          value: https://uaa.{{ .Release.Namespace }}.svc.cluster.local
+          value: https://uaa.{{ .Release.Namespace }}.svc.cluster.local:8443
         - name: SUBJECT_ALTERNATIVE_NAMES
           value: "DNS:{{ .Values.hostname }},DNS:credhub.{{ .Release.Namespace }}.svc.cluster.local,DNS:credhub.{{ .Release.Namespace }}.svc,DNS:credhub.{{ .Release.Namespace }},DNS:credhub"
         volumeMounts:
@@ -89,18 +89,3 @@ spec:
     protocol: TCP
   selector:
     app: credhub
----
-kind: TLSRoute
-apiVersion: gateway.networking.k8s.io/v1alpha2
-metadata:
-  name: credhub
-  namespace: default
-spec:
-  parentRefs:
-    - name: istio-gateway
-  hostnames:
-  - "{{ .Values.hostname }}"
-  rules:
-  - backendRefs:
-    - name: credhub
-      port: 8844

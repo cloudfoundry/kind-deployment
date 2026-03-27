@@ -5,6 +5,9 @@
     "address": {
       "type": "string"
     },
+    "loginAddress": {
+      "type": "string"
+    },
     "ccAdminPassword": {
       "type": ["string", "null"]
     },
@@ -19,6 +22,9 @@
     },
     "hostname": {
       "type": "string"
+    },
+    "uaaConfigOverrides": {
+      "type": ["object", "null"]
     },
     "image": {
       "additionalProperties": false,

@@ -7,12 +7,15 @@ disableInternalUserManagement: false
 issuer:
   uri: {{ .Values.address }}
 login:
-  url: {{ .Values.address }}
+  url: {{ .Values.loginAddress }}
   idpDiscoveryEnabled: false
   accountChooserEnabled: false
   aliasEntitiesEnabled: false
   checkOriginEnabled: false
   allowOriginLoop: true
+  entityBaseURL: {{ .Values.loginAddress }}
+  entityID: {{ .Values.loginAddress | trimPrefix "https://" }}
+  selfServiceLinksEnabled: true
   authorize:
     url: {{ .Values.address }}/oauth/authorize
   prompt:
@@ -21,6 +24,13 @@ login:
     password:
       text: Password
   saml:
+    socket:
+      connectionManagerTimeout: 10000
+      soTimeout: 10000
+    signMetaData: true
+    signRequest: true
+    wantAssertionSigned: true
+    disableInResponseToCheck: false
     activeKeyId: key1
     keys:
       key1:
@@ -63,12 +73,6 @@ login:
           -----END CERTIFICATE-----
 uaa:
   url: {{ .Values.address }}
-  token:
-    url: {{ .Values.address }}/oauth/token
-  approvals:
-    url: {{ .Values.address }}/approvals
-  login:
-    url: {{ .Values.address }}/authenticate
   limitedFunctionality:
     statusFile: "/tmp/bbr_limited_mode.lock"
     whitelist:

@@ -12,7 +12,7 @@ group "default" {
 
 variable "ROUTING_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/routing-release
-  default = "0.371.0"
+  default = "0.372.0"
 }
 
 target "routing" {
@@ -32,7 +32,7 @@ target "routing" {
 
 variable "CF_NETWORKING_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/cf-networking-release
-  default = "3.107.0"
+  default = "3.108.0"
 }
 
 target "cf-networking" {
@@ -70,7 +70,7 @@ target "bosh-dns" {
 
 variable "CAPI_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/capi-release
-  default = "1.230.0"
+  default = "1.231.0"
 }
 
 target "capi" {
@@ -90,7 +90,7 @@ target "capi" {
 
 variable "DIEGO_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/diego-release
-  default = "2.132.0"
+  default = "2.133.0"
 }
 
 target "diego" {
@@ -171,7 +171,7 @@ target "log-cache" {
 
 variable "CF_DEPLOYMENT_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/cf-deployment
-  default = "54.14.0"
+  default = "55.1.0"
 }
 
 target "fileserver" {
@@ -188,7 +188,7 @@ target "fileserver" {
 
 variable "UAA_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/uaa-release
-  default = "78.9.0"
+  default = "78.10.0"
 }
 
 target "uaa" {
@@ -217,7 +217,7 @@ target "credhub" {
 
 variable "CFLINUXFS4_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/cflinuxfs4-release
-  default = "1.320.0"
+  default = "1.321.0"
 }
 
 target "cflinuxfs4" {

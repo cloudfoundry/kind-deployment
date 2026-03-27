@@ -32,7 +32,7 @@ routingApi:
   locketAddress: locket.default.svc.cluster.local:8891
   uaa:
     address: uaa.default.svc.cluster.local
-    port: 443
+    port: 8443
   image:
     repository: ghcr.io/cloudfoundry/k8s/routing-api
     tag: ""
@@ -56,7 +56,7 @@ tcpRouter:
     resources: ~
   uaa:
     address: uaa.default.svc.cluster.local
-    port: 443
+    port: 8443
   routingApi:
     address: https://routing-api.default.svc.cluster.local
     port: 3001

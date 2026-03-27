@@ -1,3 +1,4 @@
+---
 apiVersion: cilium.io/v2
 kind: CiliumClusterwideNetworkPolicy
 metadata:
@@ -17,6 +18,27 @@ spec:
           - 192.168.0.0/16
     - toEndpoints:
         - matchLabels:
+            io.kubernetes.pod.namespace: default
+            service.istio.io/canonical-name: istio-gateway-istio
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "80"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: dns
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: cloudfoundry.org/app-guid
+        operator: Exists
+  egress:
+    - toEndpoints:
+        - matchLabels:
             io.kubernetes.pod.namespace: kube-system
             k8s-app: kube-dns
       toPorts:
@@ -25,13 +47,41 @@ spec:
               protocol: UDP
             - port: "53"
               protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: credhub
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: cloudfoundry.org/app-guid
+        operator: Exists
+  egress:
     - toEndpoints:
         - matchLabels:
-            io.kubernetes.pod.namespace: default
-            service.istio.io/canonical-name: istio-gateway-istio
+            io.kubernetes.pod.namespace: {{ .Release.Namespace }}
+            app: credhub
       toPorts:
         - ports:
-            - port: "443"
+            - port: "8844"
               protocol: TCP
-            - port: "80"
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: uaa
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: cloudfoundry.org/app-guid
+        operator: Exists
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: {{ .Release.Namespace }}
+            app: uaa
+      toPorts:
+        - ports:
+            - port: "8443"
               protocol: TCP

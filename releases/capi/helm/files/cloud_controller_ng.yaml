@@ -125,7 +125,7 @@ log_stream:
   url: "{{ .Values.cloudController.logStream.url }}"
 uaa:
   url: "{{ .Values.cloudController.uaa.url }}"
-  internal_url: https://uaa.default.svc.cluster.local
+  internal_url: https://uaa.default.svc.cluster.local:8443
   resource_id: "cloud_controller,cloud_controller_service_permissions"
   ca_file: "/etc/ssl/certs/cloud-controller/ca.crt"
   client_timeout: 60
@@ -325,7 +325,9 @@ pending_builds:
   frequency_in_seconds: 300
 credhub_api:
   internal_url: {{ .Values.cloudController.credhubApi.internalUrl }}
+  {{- if .Values.cloudController.credhubApi.externalUrl }}
   external_url: {{ .Values.cloudController.credhubApi.externalUrl }}
+  {{- end }}
   ca_cert_path: "/etc/ssl/certs/cloud-controller/ca.crt"
 credential_references:
   interpolate_service_bindings: true

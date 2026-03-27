@@ -71,7 +71,7 @@ routeEmitter:
     certificateSecret: ""
     address: "https://routing-api.default.svc.cluster.local"
     port: 3001
-  uaaAddress: "https://uaa.default.svc.cluster.local:443"
+  uaaAddress: "https://uaa.default.svc.cluster.local:8443"
   enableInternalEmitter: true
   enableTcpEmitter: true
   image:
