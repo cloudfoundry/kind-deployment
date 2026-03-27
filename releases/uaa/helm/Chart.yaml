@@ -3,4 +3,4 @@ version: 0.16.0
 description: A Helm chart for UAA
 type: application
 apiVersion: v2
-appVersion: 78.8.0
+appVersion: 78.10.0
