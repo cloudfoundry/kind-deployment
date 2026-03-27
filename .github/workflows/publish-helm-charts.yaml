@@ -57,11 +57,16 @@ jobs:
         for CHART_DIR in releases/*/; do
           CHART_NAME=$(basename "$CHART_DIR")
           CHART_PATH="releases/$CHART_NAME/helm/Chart.yaml"
-          
+
           if [ -f "$CHART_PATH" ]; then
             CHART_VERSION=$(yq eval '.version' "$CHART_PATH")
             APP_VERSION=$(yq eval '.appVersion' "$CHART_PATH")
             
+            yq eval -n \
+              ".\"$CHART_NAME\".chartVersion = \"$CHART_VERSION\" | \
+               .\"$CHART_NAME\".appVersion = \"$APP_VERSION\"" \
+              >> versions.yaml
+
             # Check if this chart was updated
             if echo "$UPDATED_CHARTS" | tr ',' '\n' | grep -q "^${CHART_NAME}$"; then
               echo "* $CHART_NAME $CHART_VERSION ($APP_VERSION) **update**" >> changelog.txt
@@ -89,3 +94,4 @@ jobs:
         tag_name: ${{ env.NEW_VERSION }}
         body_path: changelog.txt
         token: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
+        files: versions.yaml
