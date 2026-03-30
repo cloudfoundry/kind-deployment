@@ -19,11 +19,14 @@ jobs:
           token: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
 
       - name: Extract release versions and generate versions.yaml
+        id: bump-versions
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          TAG=$(gh release view --repo cloudfoundry/kind-deployment --json tagName --jq '.tagName')
           pip3 install pyyaml requests
-          python3 scripts/sync-cf-deployment-versions.py
+          python3 scripts/sync-cf-deployment-versions.py $TAG
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
       - name: Create pull request
         env:
@@ -38,6 +41,6 @@ jobs:
           fi
 
           git add -A
-          git commit -m "chore: update BOSH release versions from cf-deployment ${{ steps.cf-deployment-tag.outputs.tag }}"
+          git commit -m "chore: update BOSH release versions from cf-deployment ${{ steps.bump-versions.outputs.tag }}"
           git push -f -u origin auto/sync-cf-deployment-versions
           gh pr create --fill --base main || echo "PR already exists"
