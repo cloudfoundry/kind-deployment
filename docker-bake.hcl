@@ -109,7 +109,7 @@ target "diego" {
 
 variable "LOGGREGATOR_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/loggregator-release
-  default = "107.0.25"
+  default = "107.0.26"
 }
 
 target "loggregator" {
