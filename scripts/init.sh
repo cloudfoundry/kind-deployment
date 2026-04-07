@@ -4,8 +4,11 @@ set -euo pipefail
 
 mkdir -p temp/certs
 
-OPENSSL="docker run --rm -v $(pwd)/temp/certs:/certs -v $(pwd)/certs/all-in-one.conf:/all-in-one.conf alpine/openssl"
-SSH_KEYGEN="docker run --rm -v $(pwd)/temp/certs:/certs --entrypoint /usr/bin/ssh-keygen linuxserver/openssh-server"
+# Auto-detect Docker or Podman
+source "$(dirname "$0")/detect-runtime.sh"
+
+OPENSSL="${CONTAINER_RUNTIME} run --rm -v $(pwd)/temp/certs:/certs -v $(pwd)/certs/all-in-one.conf:/all-in-one.conf alpine/openssl"
+SSH_KEYGEN="${CONTAINER_RUNTIME} run --rm -v $(pwd)/temp/certs:/certs --entrypoint /usr/bin/ssh-keygen linuxserver/openssh-server"
 
 $OPENSSL genrsa -traditional -out /certs/ca.key 4096
 $OPENSSL req -x509 -key /certs/ca.key -out /certs/ca.crt -days 365 -noenc -subj "/CN=ca/O=ca" \

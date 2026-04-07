@@ -14,10 +14,43 @@ spec:
       labels:
         app: nfsv3driver
     spec:
+      initContainers:
+        - name: init-rpcbind-dir
+          image: {{ .Values.nfsv3driver.image.repository }}:{{ default .Chart.AppVersion .Values.nfsv3driver.image.tag }}
+          imagePullPolicy: {{ .Values.nfsv3driver.image.imagePullPolicy }}
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              mkdir -p /run/rpcbind
+              # rpcbind init script checks 'stat -c "%U"' == "root" (by name).
+              chown root:root /run/rpcbind
+              chmod 0755 /run/rpcbind
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          volumeMounts:
+            - name: rpcbind-run
+              mountPath: /run/rpcbind
       containers:
         - name: nfsv3driver
           image: {{ .Values.nfsv3driver.image.repository }}:{{ default .Chart.AppVersion .Values.nfsv3driver.image.tag }}
           imagePullPolicy: {{ .Values.nfsv3driver.image.imagePullPolicy }}
+          # nfsv3driver.sh (v7.53.0+) calls 'service rpcbind start' which fails
+          # in containers because the Ubuntu init script requires /run/rpcbind
+          # to be owned by root *before* it is created by the service wrapper.
+          # We bypass nfsv3driver.sh entirely: start rpcbind directly with -w
+          # (warm start / no daemon-ize check) and exec the driver binary.
+          command:
+            - /bin/bash
+            - -c
+            - |
+              mkdir -p /run/rpcbind
+              chown root:root /run/rpcbind
+              chmod 0755 /run/rpcbind
+              /sbin/rpcbind -w
+              exec /usr/local/bin/nfsv3driver "$@"
+            - --
           env:
             - name: POD_IP
               valueFrom:
@@ -46,8 +79,12 @@ spec:
             - name: nfs-mounts
               mountPath: /var/lib/rep/volumes/nfs
               mountPropagation: Bidirectional
+            - name: rpcbind-run
+              mountPath: /run/rpcbind
           securityContext:
             privileged: true
+            runAsUser: 0
+            runAsGroup: 0
       {{- if .Values.nfsv3driver.nodeSelector }}
       nodeSelector:
         {{- toYaml .Values.nfsv3driver.nodeSelector | nindent 8 }}
@@ -63,4 +100,6 @@ spec:
         - name: nfs-mounts
           hostPath:
             path: /var/lib/rep/volumes/nfs
+        - name: rpcbind-run
+          emptyDir: {}
 {{- end }}

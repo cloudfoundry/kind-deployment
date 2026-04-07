@@ -1,7 +1,7 @@
 ---
 helmDefaults:
   wait: true
-  timeout: 600
+  timeout: 1200
   recreatePods: false
   force: false
   createNamespace: true
@@ -381,6 +381,7 @@ releases:
   - name: capi
     namespace: {{ .Values.systemNamespace }}
     chart: ./releases/capi/helm
+    timeout: 1200
     needs:
       - minio
       - diego
@@ -408,6 +409,7 @@ releases:
     namespace: {{ .Values.systemNamespace }}
     chart: ./releases/nfs-volume/helm
     installed: {{ .Values.installOptionalComponents }}
+    timeout: 900
     needs:
       - capi
     values:
