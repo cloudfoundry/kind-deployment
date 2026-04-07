@@ -1,7 +1,7 @@
 ---
 helmDefaults:
   wait: true
-  timeout: 600
+  timeout: 1200
   recreatePods: false
   force: false
   createNamespace: true
@@ -407,6 +407,7 @@ releases:
     namespace: {{ .Values.systemNamespace }}
     chart: {{ .Values.charts.nfsVolume.url }}
     installed: {{ .Values.installOptionalComponents }}
+    timeout: 900
     needs:
       - capi
     values:

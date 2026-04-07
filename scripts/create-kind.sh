@@ -2,6 +2,9 @@
 
 set -e
 
+# Auto-detect Docker or Podman
+source "$(dirname "$0")/detect-runtime.sh"
+
 configure_registry_mirror() {
   local cache_name=$1
   local remote_url=$2
@@ -11,10 +14,10 @@ configure_registry_mirror() {
     echo "Configuring cache ${cache_name} on all nodes..."
     for node in $(kind get nodes --name cfk8s); do
         # Create containerd registry config directories
-        docker exec "$node" mkdir -p /etc/containerd/certs.d/${registry_uri}
+        ${CONTAINER_RUNTIME} exec "$node" mkdir -p /etc/containerd/certs.d/${registry_uri}
 
         # Configure registry to use cache as mirror (expand variables!)
-        cat <<EOF | docker exec -i "$node" sh -c "cat > /etc/containerd/certs.d/${registry_uri}/hosts.toml"
+        cat <<EOF | ${CONTAINER_RUNTIME} exec -i "$node" sh -c "cat > /etc/containerd/certs.d/${registry_uri}/hosts.toml"
 server = "${remote_url}"
 
 [host."http://${cache_name}:5000"]
@@ -24,9 +27,18 @@ EOF
     done
 }
 
+evaluate_progress_option() {
+    # Podman compose does not support --progress
+    if [ "${IS_PODMAN}" = "true" ]; then
+      echo ""
+    else
+      echo "--progress plain"
+    fi
+}
+
 setup_registry_caches() {
-    echo "Starting registry pull-through caches with docker-compose..."
-    docker compose -p cache -f "${script_full_path}/docker-compose-registries.yaml" --progress plain up -d
+    echo "Starting registry pull-through caches with ${COMPOSE_CMD}..."
+    ${COMPOSE_CMD} -p cache -f "${script_full_path}/docker-compose-registries.yaml" $(evaluate_progress_option) up -d
 
     configure_registry_mirror "docker-io" "https://registry-1.docker.io" "docker.io"
     configure_registry_mirror "ghcr-io" "https://ghcr.io" "ghcr.io"
@@ -34,11 +46,17 @@ setup_registry_caches() {
 }
 
 setup_nfs() {
-    echo "Starting NFS server with docker-compose..."
-    docker compose -p nfs -f "${script_full_path}/docker-compose-nfs.yaml" --progress plain up -d
+    echo "Starting NFS server with ${COMPOSE_CMD}..."
+    ${COMPOSE_CMD} -p nfs -f "${script_full_path}/docker-compose-nfs.yaml" $(evaluate_progress_option) up -d
 }
 
 script_full_path=$(dirname "$0")
+
+# When running under Podman, ensure the Podman VM is ready (NFS modules, inotify, …)
+if [ "${IS_PODMAN}" = "true" ]; then
+  echo "Podman detected – ensuring Podman VM is configured..."
+  "${script_full_path}/setup-podman-vm.sh"
+fi
 
 if kind get clusters | grep -q "cfk8s"; then
   echo "Kind cluster 'cfk8s' already exists."

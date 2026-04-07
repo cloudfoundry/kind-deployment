@@ -41,6 +41,15 @@
         "resources": {
           "type": ["object", "null"]
         },
+        "rpcbindStartMode": {
+          "default": "auto",
+          "enum": [
+            "auto",
+            "direct",
+            "service"
+          ],
+          "type": "string"
+        },
         "tolerations": {
           "type": ["array", "null"],
           "items": {
@@ -98,6 +107,15 @@
         },
         "resources": {
           "type": ["object", "null"]
+        },
+        "rpcbindStartMode": {
+          "default": "auto",
+          "enum": [
+            "auto",
+            "direct",
+            "service"
+          ],
+          "type": "string"
         },
         "tolerations": {
           "type": ["array", "null"],
