@@ -52,7 +52,17 @@ def replace_tag(release_versions, m):
     return f"# sync: release={release_name}\n{indent}tag: {quote}{version}{quote}"
 
 
-def cf_deployment_manifest(version: str) -> dict:
+def latest_cf_deployment_release() -> str:
+    headers = {"Authorization": f"Bearer {os.environ.get('GITHUB_TOKEN')}"}
+    response = requests.get("https://api.github.com/repos/cloudfoundry/cf-deployment/releases/latest", headers=headers)
+    response.raise_for_status()
+    latest_version = response.json()["tag_name"]
+    print(f"Latest cf-deployment release: {latest_version}")
+    return latest_version
+
+
+def cf_deployment_manifest() -> dict:
+    version = latest_cf_deployment_release()
     headers = {"Authorization": f"Bearer {os.environ.get('GITHUB_TOKEN')}"}
     response = requests.get(f"https://raw.githubusercontent.com/cloudfoundry/cf-deployment/refs/tags/{version}/cf-deployment.yml", headers=headers)
     response.raise_for_status()
@@ -71,11 +81,7 @@ def is_image_available(tag) -> bool:
 
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: sync-cf-deployment-versions.py <kind-deployment-tag>")
-        sys.exit(1)
-
-    manifest = cf_deployment_manifest(sys.argv[1])
+    manifest = cf_deployment_manifest()
 
     releases = manifest.get("releases", [])
     if not releases:
