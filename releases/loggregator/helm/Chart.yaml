@@ -3,4 +3,4 @@ version: 0.13.0
 description: Helm chart for Loggregator components
 type: application
 apiVersion: v2
-appVersion: 107.0.25
+appVersion: 107.0.26
