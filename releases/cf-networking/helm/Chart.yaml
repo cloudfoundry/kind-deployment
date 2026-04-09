@@ -3,4 +3,4 @@ version: 0.14.0
 description: Helm chart for CF Networking components
 type: application
 apiVersion: v2
-appVersion: 3.107.0
+appVersion: 3.109.0
