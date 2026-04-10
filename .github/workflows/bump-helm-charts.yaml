@@ -41,7 +41,7 @@ jobs:
     - name: Bump minor version in respective Chart.yaml
       if: steps.check_commit.outputs.skip != 'true'
       id: bump-version
-      uses: actions/github-script@v8
+      uses: actions/github-script@v9
       env:
         CHANGED_CHARTS: ${{ env.CHANGED_CHARTS }}
       with:
