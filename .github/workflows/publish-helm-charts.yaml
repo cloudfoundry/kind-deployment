@@ -86,7 +86,7 @@ jobs:
         echo "OLD_VERSION=$OLD_VERSION" >> $GITHUB_ENV
         echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
     - name: Create GitHub Release
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v3
       if: steps.check_commit.outputs.skip != 'true'
       env:
         NEW_VERSION: ${{ env.NEW_VERSION }}
