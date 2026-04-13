@@ -1,5 +1,5 @@
 {{ if .Values.cloudController.enabled }}
-{{ $_ := required ".Values.dbPassword must be provided" .Values.dbPassword }}
+{{ $_ := required ".Values.ccdb.password must be provided" .Values.ccdb.password }}
 ---
 apiVersion: v1
 kind: Secret
@@ -9,8 +9,8 @@ metadata:
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-weight": "-2"
 stringData:
-  DB: postgres
-  DB_CONNECTION_STRING: postgres://postgres:{{ .Values.dbPassword }}@postgresql.{{ .Release.Namespace }}.svc.cluster.local:5432/cc
+  DB: {{ .Values.ccdb.name }}
+  DB_CONNECTION_STRING: postgres://{{ .Values.ccdb.user }}:{{ .Values.ccdb.password }}@{{ .Values.ccdb.address }}:{{ .Values.ccdb.port }}/{{ .Values.ccdb.name }}
   CLOUD_CONTROLLER_NG_CONFIG: /etc/cloud-controller/config.yaml
   RAILS_ENV: production
 ---

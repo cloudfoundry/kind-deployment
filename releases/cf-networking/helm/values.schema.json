@@ -98,8 +98,26 @@
         "certificateSecret": {
           "type": "string"
         },
-        "dbPassword": {
-          "type": "string"
+        "networkpolicydb": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "user": {
+              "type": "string"
+            },
+            "password": {
+              "type": ["string", "null"]
+            },
+            "address": {
+              "type": "string"
+            },
+            "port": {
+              "type": "integer"
+            }
+          },
+          "type": "object"
         },
         "enabled": {
           "type": "boolean"

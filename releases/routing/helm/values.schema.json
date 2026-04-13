@@ -180,10 +180,26 @@
         "locketAddress": {
           "type": "string"
         },
-        "dbPassword": {
-          "default": "postgres",
-          "title": "dbPassword",
-          "type": "string"
+        "sqldb": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "user": {
+              "type": "string"
+            },
+            "password": {
+              "type": ["string", "null"]
+            },
+            "address": {
+              "type": "string"
+            },
+            "port": {
+              "type": "integer"
+            }
+          },
+          "type": "object"
         },
         "enabled": {
           "default": true,
@@ -263,7 +279,6 @@
         "enabled",
         "certificateSecret",
         "systemDomain",
-        "dbPassword",
         "image",
         "nodeSelector",
         "tolerations"

@@ -189,7 +189,8 @@ releases:
     values:
       - routingApi:
           enabled: true
-          dbPassword: {{ .Values.secrets.dbPassword }}
+          sqldb:
+            password: {{ .Values.secrets.dbPassword }}
           certificateSecret: all-in-one-tls
           locketCertificateSecret: all-in-one-tls
           loggregatorCertificateSecret: all-in-one-tls
@@ -239,7 +240,8 @@ releases:
       - istio-system/istiod
     values:
       - ccAdminPassword: {{ .Values.secrets.ccAdminPassword }}
-      - dbPassword: {{ .Values.secrets.dbPassword }}
+      - uaadb:
+          password: {{ .Values.secrets.dbPassword }}
       - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
       - uaaAdminSecret: {{ .Values.secrets.uaaAdminSecret }}
       - certificateSecret: all-in-one-tls
@@ -262,7 +264,8 @@ releases:
       - loggregator-agent
       - postgresql
     values:
-      - dbPassword: {{ .Values.secrets.dbPassword }}
+      - locketdb:
+          password: {{ .Values.secrets.dbPassword }}
       - locket:
           enabled: true
           certificateSecret: all-in-one-tls
@@ -275,7 +278,8 @@ releases:
       - uaa
       - loggregator-agent
     values:
-      - dbPassword: {{ .Values.secrets.dbPassword }}
+      - diegodb:
+          password: {{ .Values.secrets.dbPassword }}
       - diegoSSHCredentials: {{ .Values.secrets.diegoSSHCredentials }}
       - sshProxy:
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
@@ -302,7 +306,6 @@ releases:
       - tpsWatcher:
           enabled: true
           certificateSecret: all-in-one-tls
-      - dbPassword: ""
       - oauthClientsSecret: ""
 
   - name: route-emitter
@@ -317,7 +320,6 @@ releases:
     values:
       - diegoSSHCredentials: ""
       - sshProxyHostKey: ""
-      - dbPassword: ""
       - routeEmitter:
           enabled: true
           certificateSecret: all-in-one-tls
@@ -384,7 +386,8 @@ releases:
           certificateSecret: all-in-one-tls
       - udpForwarder:
           certificateSecret: all-in-one-tls
-      - dbPassword: {{ .Values.secrets.dbPassword }}
+      - ccdb:
+          password: {{ .Values.secrets.dbPassword }}
       - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
 
   - name: nfs-volume
@@ -413,7 +416,8 @@ releases:
     values:
       - policyServer:
           enabled: true
-          dbPassword: {{ .Values.secrets.dbPassword }}
+          networkpolicydb:
+            password: {{ .Values.secrets.dbPassword }}
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
           certificateSecret: all-in-one-tls
       - serviceDiscoveryController:

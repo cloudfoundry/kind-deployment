@@ -1,4 +1,5 @@
 {{- if .Values.routingApi.enabled }}
+{{ $_ := required ".Values.routingApi.sqldb.password must be provided" .Values.routingApi.sqldb.password }}
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -37,12 +38,12 @@ data:
       mtls_server_cert_file: "/etc/ssl/routing-api/tls.crt"
       mtls_server_key_file: "/etc/ssl/routing-api/tls.key"
     sqldb:
-      host: postgresql.{{ .Release.Namespace }}.svc.cluster.local
-      port: 5432
+      host: {{ .Values.routingApi.sqldb.address }}
+      port: {{ .Values.routingApi.sqldb.port }}
       type: postgres
       schema: routing_api
-      username: postgres
-      password: {{ .Values.routingApi.dbPassword }}
+      username: {{ .Values.routingApi.sqldb.user }}
+      password: {{ .Values.routingApi.sqldb.password | quote }}
       skip_hostname_validation: false
       skip_ssl_validation: true
       max_open_connections: 200

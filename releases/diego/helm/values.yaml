@@ -86,6 +86,19 @@ routeEmitter:
       value: "true"
       effect: NoSchedule
 
-dbPassword: ~
+diegodb:
+  name: diego
+  password: ~
+  user: postgres
+  port: 5432
+  address: postgresql.default.svc.cluster.local
+
+locketdb:
+  name: locket
+  password: ~
+  user: postgres
+  port: 5432
+  address: postgresql.default.svc.cluster.local
+
 sshProxyHostKey: ~
 diegoSSHCredentials: ~

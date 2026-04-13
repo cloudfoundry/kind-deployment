@@ -363,8 +363,26 @@
       },
       "type": "object"
     },
-    "dbPassword": {
-      "type": ["string", "null"]
+    "ccdb": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "user": {
+          "type": "string"
+        },
+        "password": {
+          "type": ["string", "null"]
+        },
+        "address": {
+          "type": "string"
+        },
+        "port": {
+          "type": "integer"
+        }
+      },
+      "type": "object"
     },
     "global": {
       "type": "object"

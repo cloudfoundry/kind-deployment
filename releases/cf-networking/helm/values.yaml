@@ -9,7 +9,12 @@ policyServer:
     tag: ""
     imagePullPolicy: IfNotPresent
   oauthClientsSecret: ""
-  dbPassword: ""
+  networkpolicydb:
+    name: network_policy
+    password: ~
+    user: postgres
+    port: 5432
+    address: postgresql.default.svc.cluster.local
   nats:
     address: nats.default.svc.cluster.local:4222
   nodeSelector: ~

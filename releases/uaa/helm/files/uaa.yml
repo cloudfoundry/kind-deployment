@@ -1,6 +1,6 @@
 {{ $_ := required ".Values.oauthClientsSecret must be provided" .Values.oauthClientsSecret }}
 {{ $_ := required ".Values.ccAdminPassword must be provided" .Values.ccAdminPassword }}
-{{ $_ := required ".Values.dbPassword must be provided" .Values.dbPassword }}
+{{ $_ := required ".Values.uaadb.password must be provided" .Values.uaadb.password }}
 name: uaa
 disableInternalAuth: false
 disableInternalUserManagement: false
@@ -106,9 +106,9 @@ database:
   removeabandoned: false
   logabandoned: true
   abandonedtimeout: 300
-  username: postgres
-  password: {{ .Values.dbPassword | quote }}
-  url: jdbc:postgresql://postgresql.{{ .Release.Namespace }}.svc.cluster.local:5432/uaa?sslmode=disable
+  username: {{ .Values.uaadb.user | quote }}
+  password: {{ .Values.uaadb.password | quote }}
+  url: jdbc:postgresql://{{ .Values.uaadb.address }}:{{ .Values.uaadb.port }}/{{ .Values.uaadb.name }}?sslmode=disable
 scim:
   userids_enabled: true
   user:

@@ -28,7 +28,12 @@ routingApi:
   loggregatorCertificateSecret: ""
   uaaCertificateSecret: ""
   systemDomain: "127-0-0-1.nip.io"
-  dbPassword: "postgres"
+  sqldb:
+    name: routing_api
+    password: ~
+    user: postgres
+    port: 5432
+    address: postgresql.default.svc.cluster.local
   locketAddress: locket.default.svc.cluster.local:8891
   uaa:
     address: uaa.default.svc.cluster.local
