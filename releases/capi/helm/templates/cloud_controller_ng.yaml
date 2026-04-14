@@ -52,7 +52,7 @@ metadata:
   labels:
     app.kubernetes.io/name: cloud-controller
   annotations:
-    checksum/config: {{ cat (include (print $.Template.BasePath "/cloud-controller-configmap.yaml") .) (include (print $.Template.BasePath "/cloud-controller-route-registrar-configmap.yaml") .) (include (print $.Template.BasePath "/nginx-configmap.yaml") .) | sha256sum }}
+    checksum/config: {{ cat (include (print $.Template.BasePath "/cloud-controller-config.yaml") .) (include (print $.Template.BasePath "/cloud-controller-route-registrar-config.yaml") .) (include (print $.Template.BasePath "/nginx-config.yaml") .) | sha256sum }}
 spec:
   # This is a singleton.
   replicas: 1
@@ -66,7 +66,7 @@ spec:
       labels:
         app.kubernetes.io/name: cloud-controller
       annotations:
-        checksum/config: {{ cat (include (print $.Template.BasePath "/cloud-controller-configmap.yaml") .) (include (print $.Template.BasePath "/cloud-controller-route-registrar-configmap.yaml") .) (include (print $.Template.BasePath "/nginx-configmap.yaml") .) | sha256sum }}
+        checksum/config: {{ cat (include (print $.Template.BasePath "/cloud-controller-config.yaml") .) (include (print $.Template.BasePath "/cloud-controller-route-registrar-config.yaml") .) (include (print $.Template.BasePath "/nginx-config.yaml") .) | sha256sum }}
     spec:
       containers:
         - name: cloud-controller
@@ -224,14 +224,14 @@ spec:
           secret:
             secretName: {{ required "cloudController.certificateSecret is required" .Values.cloudController.certificateSecret }}
         - name: etc-cloud-controller
-          configMap:
-            name: cloud-controller-configmap
+          secret:
+            secretName: cloud-controller-config
         - name: etc-route-registrar
           configMap:
-            name: cloud-controller-route-registrar-configmap
+            name: cloud-controller-route-registrar-config
         - name: nginx-config
           configMap:
-            name: nginx-configmap
+            name: nginx-config
         - name: udp-forwarder
           secret:
             secretName: {{ required "udpForwarder.certificateSecret is required" .Values.udpForwarder.certificateSecret }}

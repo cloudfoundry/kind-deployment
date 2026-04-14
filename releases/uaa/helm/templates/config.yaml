@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: uaa-spring-configmap
+  name: uaa-spring-config
 data:
   application.yml: |-
     spring.ssl.bundle.pem:

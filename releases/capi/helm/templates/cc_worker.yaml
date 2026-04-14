@@ -5,7 +5,7 @@ kind: Deployment
 metadata:
   name: cc-worker
   annotations:
-    checksum/config: {{ include (print $.Template.BasePath "/cloud-controller-configmap.yaml") . | sha256sum }}
+    checksum/config: {{ include (print $.Template.BasePath "/cloud-controller-config.yaml") . | sha256sum }}
   labels:
     app.kubernetes.io/name: cc-worker
 spec:
@@ -18,7 +18,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/cloud-controller-configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/cloud-controller-config.yaml") . | sha256sum }}
       labels:
         app.kubernetes.io/name: cc-worker
     spec:
@@ -59,8 +59,8 @@ spec:
           secret:
             secretName: {{ required "cloudController.certificateSecret is required" .Values.cloudController.certificateSecret }}
         - name: etc-cloud-controller
-          configMap:
-            name: cloud-controller-configmap
+          secret:
+            secretName: cloud-controller-config
         - name: tmpdir
           emptyDir: {}
 {{ end }}

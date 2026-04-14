@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: cc-uploader-configmap
+  name: cc-uploader-config
 data:
   cc-uploader.json: |-
     {

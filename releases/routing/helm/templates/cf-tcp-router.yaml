@@ -7,8 +7,8 @@ metadata:
   labels:
     app: cf-tcp-router
   annotations:
-    checksum/cf-tcp-router-config: {{ include (print $.Template.BasePath "/cf-tcp-router-configmap.yaml") . | sha256sum }}
-    checksum/haproxy-config: {{ include (print $.Template.BasePath "/haproxy-configmap.yaml") . | sha256sum }}
+    checksum/cf-tcp-router-config: {{ include (print $.Template.BasePath "/cf-tcp-router-config.yaml") . | sha256sum }}
+    checksum/haproxy-config: {{ include (print $.Template.BasePath "/haproxy-config.yaml") . | sha256sum }}
 spec:
   replicas: 1
   selector:
@@ -19,8 +19,8 @@ spec:
       labels:
         app: cf-tcp-router
       annotations:
-        checksum/cf-tcp-router-config: {{ include (print $.Template.BasePath "/cf-tcp-router-configmap.yaml") . | sha256sum }}
-        checksum/haproxy-config: {{ include (print $.Template.BasePath "/haproxy-configmap.yaml") . | sha256sum }}
+        checksum/cf-tcp-router-config: {{ include (print $.Template.BasePath "/cf-tcp-router-config.yaml") . | sha256sum }}
+        checksum/haproxy-config: {{ include (print $.Template.BasePath "/haproxy-config.yaml") . | sha256sum }}
     spec:
       shareProcessNamespace: true
       initContainers:
@@ -113,11 +113,11 @@ spec:
           secret:
             secretName: {{ required "tcpRouter.certificateSecret is required" .Values.tcpRouter.certificateSecret }}
         - name: cf-tcp-router-config
-          configMap:
-            name: cf-tcp-router-configmap
+          secret:
+            secretName: cf-tcp-router-config
         - name: haproxy-config
           configMap:
-            name: haproxy-configmap
+            name: haproxy-config
         - name: shared
           emptyDir: {}
         - name: tmp

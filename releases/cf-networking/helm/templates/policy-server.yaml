@@ -7,7 +7,7 @@ metadata:
   labels:
     app: policy-server
   annotations:
-    checksum/config: {{ cat (include (print $.Template.BasePath "/policy-server-configmap.yaml") .) (include (print $.Template.BasePath "/policy-server-route-registrar-configmap.yaml") .) | sha256sum }}
+    checksum/config: {{ cat (include (print $.Template.BasePath "/policy-server-config.yaml") .) (include (print $.Template.BasePath "/policy-server-route-registrar-config.yaml") .) | sha256sum }}
 spec:
   replicas: 1
   selector:
@@ -18,7 +18,7 @@ spec:
       labels:
         app: policy-server
       annotations:
-        checksum/config: {{ cat (include (print $.Template.BasePath "/policy-server-configmap.yaml") .) (include (print $.Template.BasePath "/policy-server-route-registrar-configmap.yaml") .) | sha256sum }}
+        checksum/config: {{ cat (include (print $.Template.BasePath "/policy-server-config.yaml") .) (include (print $.Template.BasePath "/policy-server-route-registrar-config.yaml") .) | sha256sum }}
     spec:
       containers:
         - name: policy-server
@@ -101,14 +101,14 @@ spec:
       {{- end }}
       volumes:
         - name: policy-server-config
-          configMap:
-            name: policy-server-configmap
+          secret:
+            secretName: policy-server-config
         - name: policy-server
           secret:
             secretName: {{ required "policyServer.certificateSecret is required" .Values.policyServer.certificateSecret }}
         - name: etc-route-registrar
           configMap:
-            name: policy-server-route-registrar-configmap
+            name: policy-server-route-registrar-config
         - name: tmpdir
           emptyDir: {}
 ---

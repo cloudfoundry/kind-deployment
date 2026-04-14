@@ -81,7 +81,7 @@ spec:
             secretName: uaa-config
         - name: uaa-spring-config
           configMap:
-            name: uaa-spring-configmap
+            name: uaa-spring-config
         - name: uaa
           secret:
             secretName: {{ required "certificateSecret is required" .Values.certificateSecret }}

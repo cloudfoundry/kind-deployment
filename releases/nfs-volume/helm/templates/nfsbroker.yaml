@@ -18,7 +18,7 @@ metadata:
   labels:
     app: nfsbroker
   annotations:
-    checksum/config: {{ include (print $.Template.BasePath "/nfsbroker-configmap.yaml") . | sha256sum }}
+    checksum/config: {{ include (print $.Template.BasePath "/nfsbroker-config.yaml") . | sha256sum }}
 spec:
   replicas: 1
   selector:
@@ -29,7 +29,7 @@ spec:
       labels:
         app: nfsbroker
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/nfsbroker-configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/nfsbroker-config.yaml") . | sha256sum }}
     spec:
       containers:
         - name: nfsbroker
@@ -71,7 +71,7 @@ spec:
       volumes:
         - name: services-config
           configMap:
-            name: nfsbroker-configmap
+            name: nfsbroker-config
         - name: server-certs
           secret:
             secretName: {{ required "nfsbroker.certificateSecret is required" .Values.nfsbroker.certificateSecret }}

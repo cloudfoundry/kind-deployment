@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: routing-api-route-registrar-configmap
+  name: routing-api-route-registrar-config
 data:
   route-registrar.json: |-
     {

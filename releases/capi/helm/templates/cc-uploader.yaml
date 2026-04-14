@@ -7,7 +7,7 @@ metadata:
   labels:
     app: cc-uploader
   annotations:
-    checksum/config: {{ include (print $.Template.BasePath "/cc-uploader-configmap.yaml") . | sha256sum }}
+    checksum/config: {{ include (print $.Template.BasePath "/cc-uploader-config.yaml") . | sha256sum }}
 spec:
   replicas: 1
   selector:
@@ -18,7 +18,7 @@ spec:
       labels:
         app: cc-uploader
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/cc-uploader-configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/cc-uploader-config.yaml") . | sha256sum }}
     spec:
       containers:
         - name: cc-uploader
@@ -49,7 +49,7 @@ spec:
             secretName: {{ required "ccUploader.certificateSecret is required" .Values.ccUploader.certificateSecret }}
         - name: cc-uploader-config
           configMap:
-            name: cc-uploader-configmap
+            name: cc-uploader-config
 ---
 kind: Service
 apiVersion: v1

@@ -7,7 +7,7 @@ metadata:
   labels:
     app: routing-api
   annotations:
-    checksum/config: {{ include (print $.Template.BasePath "/routing-api-configmap.yaml") . | sha256sum }}
+    checksum/config: {{ include (print $.Template.BasePath "/routing-api-config.yaml") . | sha256sum }}
 spec:
   replicas: 1
   selector:
@@ -18,7 +18,7 @@ spec:
       labels:
         app: routing-api
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/routing-api-configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/routing-api-config.yaml") . | sha256sum }}
     spec:
       shareProcessNamespace: true
       containers:
@@ -76,11 +76,11 @@ spec:
           secret:
             secretName: {{ required "routingApi.locketCertificateSecret is required" .Values.routingApi.locketCertificateSecret }}
         - name: routing-api-config
-          configMap:
-            name: routing-api-configmap
+          secret:
+            secretName: routing-api-config
         - name: etc-route-registrar
           configMap:
-            name: routing-api-route-registrar-configmap
+            name: routing-api-route-registrar-config
         - name: tmpdir
           emptyDir: {}
 ---

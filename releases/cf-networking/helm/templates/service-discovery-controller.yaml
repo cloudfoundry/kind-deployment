@@ -7,7 +7,7 @@ metadata:
   labels:
     app: service-discovery-controller
   annotations:
-    checksum/config: {{ include (print $.Template.BasePath "/service-discovery-controller-configmap.yaml") . | sha256sum }}
+    checksum/config: {{ include (print $.Template.BasePath "/service-discovery-controller-config.yaml") . | sha256sum }}
 spec:
   replicas: 1
   selector:
@@ -18,7 +18,7 @@ spec:
       labels:
         app: service-discovery-controller
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/service-discovery-controller-configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/service-discovery-controller-config.yaml") . | sha256sum }}
     spec:
       containers:
         - name: service-discovery-controller
@@ -47,7 +47,7 @@ spec:
             secretName: {{ required "serviceDiscoveryController.certificateSecret is required" .Values.serviceDiscoveryController.certificateSecret }}
         - name: service-discovery-controller-config
           configMap:
-            name: service-discovery-controller-configmap
+            name: service-discovery-controller-config
 ---
 kind: Service
 apiVersion: v1

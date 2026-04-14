@@ -2,10 +2,10 @@
 {{ $_ := required ".Values.locketdb.password must be provided" .Values.locketdb.password }}
 ---
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
-  name: locket-configmap
-data:
+  name: locket-config
+stringData:
   locket.json: |-
     {
       "report_interval": "1m",

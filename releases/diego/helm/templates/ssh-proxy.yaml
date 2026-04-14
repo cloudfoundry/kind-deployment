@@ -7,7 +7,7 @@ metadata:
   labels:
     app: ssh-proxy
   annotations:
-    checksum/config: {{ include (print $.Template.BasePath "/ssh-proxy-configmap.yaml") . | sha256sum }}
+    checksum/config: {{ include (print $.Template.BasePath "/ssh-proxy-config.yaml") . | sha256sum }}
 spec:
   replicas: 1
   selector:
@@ -18,7 +18,7 @@ spec:
       labels:
         app: ssh-proxy
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/ssh-proxy-configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/ssh-proxy-config.yaml") . | sha256sum }}
     spec:
       containers:
         - name: ssh-proxy
@@ -48,8 +48,8 @@ spec:
           secret:
             secretName: {{ required "sshProxy.certificateSecret is required" .Values.sshProxy.certificateSecret }}
         - name: ssh-proxy-config
-          configMap:
-            name: ssh-proxy-configmap
+          secret:
+            secretName: ssh-proxy-config
 ---
 kind: Service
 apiVersion: v1

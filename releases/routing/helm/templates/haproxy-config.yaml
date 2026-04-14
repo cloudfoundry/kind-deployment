@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: haproxy-configmap
+  name: haproxy-config
 data:
   haproxy.conf: |+
     global
