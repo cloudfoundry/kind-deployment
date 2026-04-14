@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: tps-watcher-configmap
+  name: tps-watcher-config
 data:
   tps-watcher.json: |-
     {

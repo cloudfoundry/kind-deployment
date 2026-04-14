@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: cloud-controller-route-registrar-configmap
+  name: cloud-controller-route-registrar-config
 data:
   route-registrar.json: |-
     {

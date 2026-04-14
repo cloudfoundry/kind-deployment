@@ -2,10 +2,10 @@
 {{ $_ := required ".Values.policyServer.networkpolicydb.password must be provided" .Values.policyServer.networkpolicydb.password }}
 ---
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
-  name: policy-server-configmap
-data:
+  name: policy-server-config
+stringData:
   policy-server.json: |-
     {
       "listen_host": "0.0.0.0",

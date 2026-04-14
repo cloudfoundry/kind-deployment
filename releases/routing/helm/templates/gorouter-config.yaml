@@ -1,10 +1,10 @@
 {{- if .Values.gorouter.enabled }}
 ---
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
-  name: {{ .Values.gorouter.name }}-configmap
-data:
+  name: {{ .Values.gorouter.name }}-config
+stringData:
   gorouter.yaml: |-
     port: 8080
     ssl_port: 443

@@ -39,6 +39,6 @@ spec:
           secret:
             secretName: {{ required "cloudController.certificateSecret is required" .Values.cloudController.certificateSecret }}
         - name: etc-cloud-controller
-          configMap:
-            name: cloud-controller-configmap
+          secret:
+            secretName: cloud-controller-config
 {{- end }}

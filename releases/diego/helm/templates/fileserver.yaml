@@ -20,7 +20,7 @@ metadata:
   labels:
     app.kubernetes.io/name: fileserver
   annotations:
-    checksum/config: {{ include (print $.Template.BasePath "/fileserver-configmap.yaml") . | sha256sum }}
+    checksum/config: {{ include (print $.Template.BasePath "/fileserver-config.yaml") . | sha256sum }}
 spec:
   # This is a singleton.
   replicas: 1
@@ -34,7 +34,7 @@ spec:
       labels:
         app.kubernetes.io/name: fileserver
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/fileserver-configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/fileserver-config.yaml") . | sha256sum }}
     spec:
       containers:
         - name: nginx
@@ -63,7 +63,7 @@ spec:
       volumes:
         - name: nginx-config
           configMap:
-            name: fileserver-configmap
+            name: fileserver-config
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute

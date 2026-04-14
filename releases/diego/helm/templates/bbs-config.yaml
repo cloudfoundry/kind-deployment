@@ -2,10 +2,10 @@
 {{ $_ := required ".Values.diegodb.password must be provided" .Values.diegodb.password }}
 ---
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
-  name: bbs-configmap
-data:
+  name: bbs-config
+stringData:
   bbs.json: |-
     {
       "session_name": "bbs",

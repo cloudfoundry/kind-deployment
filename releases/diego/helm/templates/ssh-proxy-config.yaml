@@ -1,10 +1,10 @@
 {{- if .Values.sshProxy.enabled }}
 ---
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
-  name: ssh-proxy-configmap
-data:
+  name: ssh-proxy-config
+stringData:
   ssh-proxy.json: |-
     {
       "address": "0.0.0.0:2222",

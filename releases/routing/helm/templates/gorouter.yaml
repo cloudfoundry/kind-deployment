@@ -7,7 +7,7 @@ metadata:
   labels:
     app: {{ .Values.gorouter.name }}
   annotations:
-    checksum/config: {{ include (print $.Template.BasePath "/gorouter-configmap.yaml") . | sha256sum }}
+    checksum/config: {{ include (print $.Template.BasePath "/gorouter-config.yaml") . | sha256sum }}
 spec:
   replicas: 1
   selector:
@@ -18,7 +18,7 @@ spec:
       labels:
         app: {{ .Values.gorouter.name }}
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/gorouter-configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/gorouter-config.yaml") . | sha256sum }}
     spec:
       initContainers:
       - name: gorouter-init
@@ -115,8 +115,8 @@ spec:
         - name: tmp
           emptyDir: {}
         - name: "{{ .Values.gorouter.name }}-config"
-          configMap:
-            name: "{{ .Values.gorouter.name }}-configmap"
+          secret:
+            secretName: "{{ .Values.gorouter.name }}-config"
         - name: udp-forwarder
           secret:
             secretName: {{ required "udpForwarder.certificateSecret is required" .Values.udpForwarder.certificateSecret }}

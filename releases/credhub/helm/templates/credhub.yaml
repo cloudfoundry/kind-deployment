@@ -6,7 +6,7 @@ metadata:
   labels:
     app: credhub
   annotations:
-    checksum/config: {{ include (print $.Template.BasePath "/credhub-configmap.yaml") . | sha256sum }}
+    checksum/config: {{ include (print $.Template.BasePath "/credhub-config.yaml") . | sha256sum }}
 spec:
   replicas: 1
   selector:
@@ -18,7 +18,7 @@ spec:
       labels:
         app: credhub
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/credhub-configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/credhub-config.yaml") . | sha256sum }}
     spec:
       containers:
       - name: credhub-server
@@ -65,8 +65,8 @@ spec:
       {{- end }}
       volumes:
       - name: config
-        configMap:
-          name: credhub-config
+        secret:
+          secretName: credhub-config
       - name: ca
         secret:
           secretName: {{ required "caCertificateSecret is required" .Values.caCertificateSecret }}

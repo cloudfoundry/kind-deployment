@@ -1,9 +1,9 @@
 {{- if .Values.tcpRouter.enabled }}
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
-  name: cf-tcp-router-configmap
-data:
+  name: cf-tcp-router-config
+stringData:
   cf-tcp-router.yaml: |-
     oauth:
       token_endpoint: {{ .Values.tcpRouter.uaa.address }}
