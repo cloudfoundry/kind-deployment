@@ -18,7 +18,7 @@ RUN mkdir /boot
 
 # Install war from build image
 COPY --from=builder /uaa/uaa/build/libs/cloudfoundry-identity-uaa-${UAA_RELEASE_VERSION}.war /boot/uaa-boot.war
-COPY --from=builder /uaa/k8s/templates/log4j2.properties /log4j2.properties
+COPY --from=builder /uaa/scripts/boot/log4j2.properties /log4j2.properties
 
 EXPOSE 8080
 ENTRYPOINT ["/entrypoint.sh"]
