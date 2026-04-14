@@ -188,7 +188,7 @@ target "fileserver" {
 
 variable "UAA_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/uaa-release
-  default = "78.10.0"
+  default = "78.11.0"
 }
 
 target "uaa" {
