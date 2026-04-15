@@ -258,11 +258,11 @@ releases:
       - uaa
       - postgresql
     values:
-      - caCertificateSecret: all-in-one-tls
+      - caCertificateSecret: instance-identity
       - db:
           password: {{ .Values.secrets.dbPassword }}
-          caCertificateSecret: all-in-one-tls
-          skipSSLVerify: false
+          # caCertificateSecret: all-in-one-tls
+          skipSSLVerify: true
 
   - name: locket
     namespace: default

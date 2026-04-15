@@ -68,7 +68,7 @@ spring:
   datasource:
     username: {{ .Values.db.user | quote }}
     password: {{ .Values.db.password | quote }}
-    url: jdbc:postgresql://{{ .Values.db.address }}:{{ .Values.db.port }}/{{ .Values.db.name }}?autoReconnect=true&{{- if .Values.db.skipSSLVerify }}ssl=false&sslmode=allow{{- else }}ssl=true&sslmode=verify-full&sslrootcert=/etc/ssl/certs/postgres/ca.crt{{- end }}
+    url: jdbc:postgresql://{{ .Values.db.address }}:{{ .Values.db.port }}/{{ .Values.db.name }}?autoReconnect=true&{{- if not .Values.db.skipSSLVerify }}ssl=true&sslmode=require&sslrootcert=/etc/ssl/certs/postgres/ca.crt{{- else }}ssl=false&sslmode=allow{{- end }}
   profiles:
     active: prod
 certificates:
