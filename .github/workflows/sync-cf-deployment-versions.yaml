@@ -18,6 +18,15 @@ jobs:
           ref: main
           token: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
 
+      - name: Get latest cf-deployment release tag
+        id: cf-deployment-tag
+        env:
+          GH_TOKEN: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
+        run: |
+          TAG=$(gh release view --repo cloudfoundry/cf-deployment --json tagName --jq '.tagName')
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Latest cf-deployment release: $TAG"
+
       - name: Extract release versions and generate versions.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
