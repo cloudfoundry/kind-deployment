@@ -261,8 +261,8 @@ releases:
       - caCertificateSecret: instance-identity
       - db:
           password: {{ .Values.secrets.dbPassword }}
-          # caCertificateSecret: all-in-one-tls
-          skipSSLVerify: true
+          caCertificateSecret: all-in-one-tls
+          skipSSLVerify: false
 
   - name: locket
     namespace: default
