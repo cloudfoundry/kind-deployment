@@ -210,9 +210,14 @@ variable "CREDHUB_RELEASE_VERSION" {
 }
 
 target "credhub" {
+  dockerfile = "releases/credhub/credhub.Dockerfile"
+
   tags = [ "${REGISTRY_PREFIX}credhub:latest", "${REGISTRY_PREFIX}credhub:${CREDHUB_RELEASE_VERSION}" ]
 
-  context = "https://github.com/pivotal/credhub-release.git#${CREDHUB_RELEASE_VERSION}:src/credhub"
+  contexts = {
+    src = "https://github.com/pivotal/credhub-release.git#${CREDHUB_RELEASE_VERSION}:src/credhub"
+    "files" = "releases/credhub/files"
+  }
 }
 
 variable "CFLINUXFS4_VERSION" {
