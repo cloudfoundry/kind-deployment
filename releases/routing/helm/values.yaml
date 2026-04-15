@@ -34,6 +34,8 @@ routingApi:
     user: postgres
     port: 5432
     address: postgresql.default.svc.cluster.local
+    caCertificateSecret: ""
+    skipSSLVerify: true
   locketAddress: locket.default.svc.cluster.local:8891
   uaa:
     address: uaa.default.svc.cluster.local

@@ -92,6 +92,8 @@ diegodb:
   user: postgres
   port: 5432
   address: postgresql.default.svc.cluster.local
+  caCertificateSecret: ""
+  skipSSLVerify: true
 
 locketdb:
   name: locket
@@ -99,6 +101,8 @@ locketdb:
   user: postgres
   port: 5432
   address: postgresql.default.svc.cluster.local
+  caCertificateSecret: ""
+  skipSSLVerify: true
 
 sshProxyHostKey: ~
 diegoSSHCredentials: ~

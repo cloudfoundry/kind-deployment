@@ -44,8 +44,12 @@ stringData:
       schema: routing_api
       username: {{ .Values.routingApi.sqldb.user }}
       password: {{ .Values.routingApi.sqldb.password | quote }}
-      skip_hostname_validation: false
-      skip_ssl_validation: true
+      skip_hostname_validation: {{ .Values.routingApi.sqldb.skipSSLVerify }}
+      skip_ssl_validation: {{ .Values.routingApi.sqldb.skipSSLVerify }}
+      {{- if not .Values.routingApi.sqldb.skipSSLVerify }}
+      ca_cert: |-
+        $DB_CA_CRT
+      {{- end }}
       max_open_connections: 200
       max_idle_connections: 10
       connections_max_lifetime_seconds: 3600

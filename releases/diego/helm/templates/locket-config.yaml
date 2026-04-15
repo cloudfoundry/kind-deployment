@@ -19,6 +19,10 @@ stringData:
       "max_database_connection_lifetime": "1h",
       "database_connection_string": "postgres://{{ .Values.locketdb.user }}:{{ .Values.locketdb.password }}@{{ .Values.locketdb.address }}:{{ .Values.locketdb.port }}/{{ .Values.locketdb.name }}",
       "database_driver": "postgres",
+      "sql_enable_identity_verification": {{ not .Values.locketdb.skipSSLVerify }},
+      {{- if not .Values.locketdb.skipSSLVerify }}
+      "sql_ca_cert_file": "/etc/ssl/certs/postgres/ca.crt",
+      {{- end }}
       "db_connection_timeout": "30s",
       "db_read_timeout": "600s",
       "db_write_timeout": "600s",

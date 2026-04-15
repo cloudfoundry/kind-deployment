@@ -287,10 +287,13 @@ max_migration_statement_runtime_in_seconds: 30
 migration_psql_concurrent_statement_timeout_in_seconds: 1800
 db:
   log_level: "info"
-  ssl_verify_hostname: false
+  ssl_verify_hostname: {{ not .Values.ccdb.skipSSLVerify }}
   max_connections: 42
   pool_timeout: 60
   log_db_queries: false
+  {{- if not .Values.ccdb.skipSSLVerify }}
+  ca_cert_path: "/etc/ssl/certs/postgres/ca.crt"
+  {{- end }}
   read_timeout: 3600
   connection_validation_timeout: 3600
   enable_paginate_window: true

@@ -33,8 +33,11 @@ spec:
           volumeMounts:
             - name: bbs
               mountPath: /etc/ssl/certs/bbs
+            {{- if not .Values.diegodb.skipSSLVerify }}
             - name: postgres-tls
               mountPath: /etc/ssl/certs/postgres
+              readOnly: true
+            {{- end }}
             - name: bbs-config
               mountPath: /bbs
       {{- if .Values.bbs.nodeSelector }}
@@ -49,9 +52,11 @@ spec:
         - name: bbs
           secret:
             secretName: {{ required "bbs.certificateSecret is required" .Values.bbs.certificateSecret }}
+        {{- if not .Values.diegodb.skipSSLVerify }}
         - name: postgres-tls
           secret:
-            secretName: {{ required "bbs.certificateSecret is required" .Values.bbs.certificateSecret }}
+            secretName: {{ required "diegodb.caCertificateSecret is required when diegodb.skipSSLVerify is false" .Values.diegodb.caCertificateSecret }}
+        {{- end }}
         - name: bbs-config
           secret:
             secretName: bbs-config

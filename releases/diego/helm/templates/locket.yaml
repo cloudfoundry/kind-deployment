@@ -33,8 +33,11 @@ spec:
           volumeMounts:
             - name: locket
               mountPath: /etc/ssl/certs/locket
+            {{- if not .Values.locketdb.skipSSLVerify }}
             - name: postgres-tls
               mountPath: /etc/ssl/certs/postgres
+              readOnly: true
+            {{- end }}
             - name: locket-config
               mountPath: /locket
       {{- if .Values.locket.nodeSelector }}
@@ -49,9 +52,11 @@ spec:
         - name: locket
           secret:
             secretName: {{ required "locket.certificateSecret is required" .Values.locket.certificateSecret }}
+        {{- if not .Values.locketdb.skipSSLVerify }}
         - name: postgres-tls
           secret:
-            secretName: {{ required "locket.certificateSecret is required" .Values.locket.certificateSecret }}
+            secretName: {{ required "locketdb.caCertificateSecret is required when locketdb.skipSSLVerify is false" .Values.locketdb.caCertificateSecret }}
+        {{- end }}
         - name: locket-config
           secret:
             secretName: locket-config

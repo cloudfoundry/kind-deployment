@@ -65,6 +65,11 @@ spec:
             - name: uaa
               mountPath: /ssl
               readOnly: true
+            {{- if not .Values.uaadb.skipSSLVerify }}
+            - name: postgres-ca
+              mountPath: /etc/ssl/certs/postgres
+              readOnly: true
+            {{- end }}
             - name: tmp
               mountPath: /tmp
       {{- if .Values.nodeSelector }}
@@ -85,6 +90,11 @@ spec:
         - name: uaa
           secret:
             secretName: {{ required "certificateSecret is required" .Values.certificateSecret }}
+        {{- if not .Values.uaadb.skipSSLVerify }}
+        - name: postgres-ca
+          secret:
+            secretName: {{ required "uaadb.caCertificateSecret is required when uaadb.skipSSLVerify is false" .Values.uaadb.caCertificateSecret }}
+        {{- end }}
         - name: tmp
           emptyDir: {}
 ---

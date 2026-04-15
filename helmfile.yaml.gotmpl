@@ -191,6 +191,8 @@ releases:
           enabled: true
           sqldb:
             password: {{ .Values.secrets.dbPassword }}
+            caCertificateSecret: all-in-one-tls
+            skipSSLVerify: false
           certificateSecret: all-in-one-tls
           locketCertificateSecret: all-in-one-tls
           loggregatorCertificateSecret: all-in-one-tls
@@ -242,6 +244,8 @@ releases:
       - ccAdminPassword: {{ .Values.secrets.ccAdminPassword }}
       - uaadb:
           password: {{ .Values.secrets.dbPassword }}
+          caCertificateSecret: all-in-one-tls
+          skipSSLVerify: false
       - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
       - uaaAdminSecret: {{ .Values.secrets.uaaAdminSecret }}
       - certificateSecret: all-in-one-tls
@@ -254,8 +258,11 @@ releases:
       - uaa
       - postgresql
     values:
-      - dbPassword: {{ .Values.secrets.dbPassword }}
-      - caCertificateSecret: instance-identity
+      - caCertificateSecret: all-in-one-tls
+      - db:
+          password: {{ .Values.secrets.dbPassword }}
+          caCertificateSecret: all-in-one-tls
+          skipSSLVerify: false
 
   - name: locket
     namespace: default
@@ -266,6 +273,8 @@ releases:
     values:
       - locketdb:
           password: {{ .Values.secrets.dbPassword }}
+          caCertificateSecret: all-in-one-tls
+          skipSSLVerify: false
       - locket:
           enabled: true
           certificateSecret: all-in-one-tls
@@ -280,6 +289,8 @@ releases:
     values:
       - diegodb:
           password: {{ .Values.secrets.dbPassword }}
+          caCertificateSecret: all-in-one-tls
+          skipSSLVerify: false
       - diegoSSHCredentials: {{ .Values.secrets.diegoSSHCredentials }}
       - sshProxy:
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
@@ -388,6 +399,8 @@ releases:
           certificateSecret: all-in-one-tls
       - ccdb:
           password: {{ .Values.secrets.dbPassword }}
+          caCertificateSecret: all-in-one-tls
+          skipSSLVerify: false
       - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
 
   - name: nfs-volume
@@ -418,6 +431,8 @@ releases:
           enabled: true
           networkpolicydb:
             password: {{ .Values.secrets.dbPassword }}
+            caCertificateSecret: all-in-one-tls
+            skipSSLVerify: false
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
           certificateSecret: all-in-one-tls
       - serviceDiscoveryController:

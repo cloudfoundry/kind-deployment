@@ -34,10 +34,20 @@ spec:
               mountPath: /etc/cloud-controller
             - name: cloud-controller
               mountPath: /etc/ssl/certs/cloud-controller
+            {{- if not .Values.ccdb.skipSSLVerify }}
+            - name: postgres-ca
+              mountPath: /etc/ssl/certs/postgres
+              readOnly: true
+            {{- end }}
       volumes:
         - name: cloud-controller
           secret:
             secretName: {{ required "cloudController.certificateSecret is required" .Values.cloudController.certificateSecret }}
+        {{- if not .Values.ccdb.skipSSLVerify }}
+        - name: postgres-ca
+          secret:
+            secretName: {{ required "ccdb.caCertificateSecret is required when ccdb.skipSSLVerify is false" .Values.ccdb.caCertificateSecret }}
+        {{- end }}
         - name: etc-cloud-controller
           secret:
             secretName: cloud-controller-config

@@ -34,6 +34,11 @@ spec:
             - name: policy-server
               mountPath: /etc/ssl/certs/policy-server
               readOnly: true
+            {{- if not .Values.policyServer.networkpolicydb.skipSSLVerify }}
+            - name: postgres-ca
+              mountPath: /etc/ssl/certs/postgres
+              readOnly: true
+            {{- end }}
           {{- if .Values.policyServer.resources }}
           resources:
             {{- toYaml .Values.policyServer.resources | nindent 12 }}
@@ -51,6 +56,11 @@ spec:
             - name: policy-server
               mountPath: /etc/ssl/certs/policy-server
               readOnly: true
+            {{- if not .Values.policyServer.networkpolicydb.skipSSLVerify }}
+            - name: postgres-ca
+              mountPath: /etc/ssl/certs/postgres
+              readOnly: true
+            {{- end }}
           {{- if .Values.policyServer.resources }}
           resources:
             {{- toYaml .Values.policyServer.resources | nindent 12 }}
@@ -68,6 +78,11 @@ spec:
             - name: policy-server
               mountPath: /etc/ssl/certs/policy-server
               readOnly: true
+            {{- if not .Values.policyServer.networkpolicydb.skipSSLVerify }}
+            - name: postgres-ca
+              mountPath: /etc/ssl/certs/postgres
+              readOnly: true
+            {{- end }}
           {{- if .Values.policyServer.resources }}
           resources:
             {{- toYaml .Values.policyServer.resources | nindent 12 }}
@@ -106,6 +121,11 @@ spec:
         - name: policy-server
           secret:
             secretName: {{ required "policyServer.certificateSecret is required" .Values.policyServer.certificateSecret }}
+        {{- if not .Values.policyServer.networkpolicydb.skipSSLVerify }}
+        - name: postgres-ca
+          secret:
+            secretName: {{ required "policyServer.networkpolicydb.caCertificateSecret is required when policyServer.networkpolicydb.skipSSLVerify is false" .Values.policyServer.networkpolicydb.caCertificateSecret }}
+        {{- end }}
         - name: etc-route-registrar
           configMap:
             name: policy-server-route-registrar-config

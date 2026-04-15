@@ -139,6 +139,12 @@
         },
         "port": {
           "type": "integer"
+        },
+        "caCertificateSecret": {
+          "type": "string"
+        },
+        "skipSSLVerify": {
+          "type": "boolean"
         }
       },
       "type": "object"
@@ -160,6 +166,12 @@
         },
         "port": {
           "type": "integer"
+        },
+        "caCertificateSecret": {
+          "type": "string"
+        },
+        "skipSSLVerify": {
+          "type": "boolean"
         }
       },
       "type": "object"

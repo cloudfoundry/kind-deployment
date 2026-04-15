@@ -197,6 +197,12 @@
             },
             "port": {
               "type": "integer"
+            },
+            "caCertificateSecret": {
+              "type": "string"
+            },
+            "skipSSLVerify": {
+              "type": "boolean"
             }
           },
           "type": "object"

@@ -32,9 +32,11 @@ stringData:
         "port": {{ .Values.policyServer.networkpolicydb.port }},
         "timeout": 120,
         "database_name": "{{ .Values.policyServer.networkpolicydb.name }}",
-        "require_ssl": true,
-        "ca_cert": "/etc/ssl/certs/policy-server/ca.crt",
-        "skip_hostname_validation": false
+        "require_ssl": {{ not .Values.policyServer.networkpolicydb.skipSSLVerify }},
+        {{- if not .Values.policyServer.networkpolicydb.skipSSLVerify }}
+        "ca_cert": "/etc/ssl/certs/postgres/ca.crt",
+        {{- end }}
+        "skip_hostname_validation": {{ .Values.policyServer.networkpolicydb.skipSSLVerify }}
       },
       "database_migration_timeout": 600,
       "max_idle_connections": 10,
@@ -66,9 +68,11 @@ stringData:
         "port": {{ .Values.policyServer.networkpolicydb.port }},
         "timeout": 120,
         "database_name": "{{ .Values.policyServer.networkpolicydb.name }}",
-        "require_ssl": true,
-        "ca_cert": "/etc/ssl/certs/policy-server/ca.crt",
-        "skip_hostname_validation": false
+        "require_ssl": {{ not .Values.policyServer.networkpolicydb.skipSSLVerify }},
+        {{- if not .Values.policyServer.networkpolicydb.skipSSLVerify }}
+        "ca_cert": "/etc/ssl/certs/postgres/ca.crt",
+        {{- end }}
+        "skip_hostname_validation": {{ .Values.policyServer.networkpolicydb.skipSSLVerify }}
       },
       "max_idle_connections": 10,
       "max_open_connections": 200,
@@ -92,9 +96,11 @@ stringData:
           "port": {{ .Values.policyServer.networkpolicydb.port }},
           "timeout": 120,
           "database_name": "{{ .Values.policyServer.networkpolicydb.name }}",
-          "require_ssl": true,
-          "ca_cert": "/etc/ssl/certs/policy-server/ca.crt",
-          "skip_hostname_validation": false
+          "require_ssl": {{ not .Values.policyServer.networkpolicydb.skipSSLVerify }},
+            {{- if not .Values.policyServer.networkpolicydb.skipSSLVerify }}
+            "ca_cert": "/etc/ssl/certs/postgres/ca.crt",
+            {{- end }}
+          "skip_hostname_validation": {{ .Values.policyServer.networkpolicydb.skipSSLVerify }}
       },
       "uaa_client": "network-policy",
       "uaa_client_secret": {{ .Values.policyServer.oauthClientsSecret | quote }},

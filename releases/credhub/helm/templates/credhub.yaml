@@ -55,6 +55,11 @@ spec:
           mountPath: /app/config
         - name: ca
           mountPath: /etc/ssl/ca
+        {{- if not .Values.db.skipSSLVerify }}
+        - name: postgres-ca
+          mountPath: /etc/ssl/certs/postgres
+          readOnly: true
+        {{- end }}
       {{- if .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml .Values.nodeSelector | nindent 8 }}
@@ -70,6 +75,11 @@ spec:
       - name: ca
         secret:
           secretName: {{ required "caCertificateSecret is required" .Values.caCertificateSecret }}
+      {{- if not .Values.db.skipSSLVerify }}
+      - name: postgres-ca
+        secret:
+          secretName: {{ required "db.caCertificateSecret is required when db.skipSSLVerify is false" .Values.db.caCertificateSecret }}
+      {{- end }}
 ---
 apiVersion: v1
 kind: Service

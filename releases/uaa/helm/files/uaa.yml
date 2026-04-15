@@ -108,7 +108,7 @@ database:
   abandonedtimeout: 300
   username: {{ .Values.uaadb.user | quote }}
   password: {{ .Values.uaadb.password | quote }}
-  url: jdbc:postgresql://{{ .Values.uaadb.address }}:{{ .Values.uaadb.port }}/{{ .Values.uaadb.name }}?sslmode=disable
+  url: jdbc:postgresql://{{ .Values.uaadb.address }}:{{ .Values.uaadb.port }}/{{ .Values.uaadb.name }}?{{- if .Values.uaadb.skipSSLVerify }}sslmode=disable{{- else }}sslmode=verify-full&sslrootcert=/etc/ssl/certs/postgres/ca.crt{{- end }}
 scim:
   userids_enabled: true
   user:

@@ -40,7 +40,10 @@ stringData:
       "rep_client_cert": "/etc/ssl/certs/bbs/tls.crt",
       "rep_client_key": "/etc/ssl/certs/bbs/tls.key",
       "rep_ca_cert": "/etc/ssl/certs/bbs/ca.crt",
+      "sql_enable_identity_verification": {{ not .Values.diegodb.skipSSLVerify }},
+      {{- if not .Values.diegodb.skipSSLVerify }}
       "sql_ca_cert_file": "/etc/ssl/certs/postgres/ca.crt",
+      {{- end }}
       "max_open_database_connections": 200,
       "max_idle_database_connections": 200,
       "db_connection_timeout": "30s",

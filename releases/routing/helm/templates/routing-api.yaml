@@ -21,6 +21,27 @@ spec:
         checksum/config: {{ include (print $.Template.BasePath "/routing-api-config.yaml") . | sha256sum }}
     spec:
       shareProcessNamespace: true
+      initContainers:
+        - name: routing-api-init
+          image: bitnami/kubectl:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              yq '.sqldb.ca_cert = strenv(DB_CA_CRT)' /routing-api/routing-api.yaml > /tmp/routing-api.yaml
+          env:
+            - name: DB_CA_CRT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "routingApi.sqldb.caCertificateSecret is required when routingApi.sqldb.skipSSLVerify is false" .Values.routingApi.sqldb.caCertificateSecret }}
+                  key: ca.crt
+          volumeMounts:
+            - name: routing-api-config
+              mountPath: /routing-api
+            - name: tmpdir
+              mountPath: /tmp
       containers:
         - name: routing-api
           image: {{ .Values.routingApi.image.repository }}:{{ default .Chart.AppVersion .Values.routingApi.image.tag }}
@@ -31,7 +52,7 @@ spec:
                 fieldRef:
                   fieldPath: status.podIP
           args:
-          - -config=/routing-api/routing-api.yaml
+          - -config=/tmp/routing-api.yaml
           - -ip=$(POD_IP)
           {{- if .Values.routingApi.resources }}
           resources:
@@ -46,6 +67,10 @@ spec:
               mountPath: /etc/ssl/locket
             - name: routing-api-config
               mountPath: /routing-api
+            {{- if not .Values.routingApi.sqldb.skipSSLVerify }}
+            - name: tmpdir
+              mountPath: /tmp
+            {{- end }}
         - name: route-registrar
           image: {{ .Values.routeRegistrar.image.repository }}:{{ .Values.routeRegistrar.image.tag }}
           imagePullPolicy: {{ .Values.routeRegistrar.image.imagePullPolicy }}

@@ -10,6 +10,13 @@ image:
 nodeSelector: ~
 tolerations: ~
 
-dbPassword: ~
-
 caCertificateSecret: ""
+
+db:
+  name: credhub
+  password: ~
+  user: postgres
+  port: 5432
+  address: postgresql.default.svc.cluster.local
+  caCertificateSecret: ""
+  skipSSLVerify: true

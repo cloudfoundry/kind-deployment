@@ -1,4 +1,4 @@
-{{ $_ := required ".Values.dbPassword must be provided" .Values.dbPassword }}
+{{ $_ := required ".Values.db.password must be provided" .Values.db.password }}
 auth-server:
   url: {{ .Values.uaa.address }}
   trust_store: /app/stores/trust_store.jks
@@ -66,9 +66,9 @@ spring:
     hibernate:
       ddl-auto: validate
   datasource:
-    username: postgres
-    password: {{ .Values.dbPassword | quote }}
-    url: jdbc:postgresql://postgresql.{{ .Release.Namespace }}.svc.cluster.local:5432/credhub?autoReconnect=true&ssl=false&sslmode=allow
+    username: {{ .Values.db.user | quote }}
+    password: {{ .Values.db.password | quote }}
+    url: jdbc:postgresql://{{ .Values.db.address }}:{{ .Values.db.port }}/{{ .Values.db.name }}?autoReconnect=true&{{- if .Values.db.skipSSLVerify }}ssl=false&sslmode=allow{{- else }}ssl=true&sslmode=verify-full&sslrootcert=/etc/ssl/certs/postgres/ca.crt{{- end }}
   profiles:
     active: prod
 certificates:
