@@ -1,5 +1,5 @@
 {
-    "provider": "s3",
+    "provider": "{{ .Values.cloudController.blobstore.provider }}",
     "bucket_name": "{{ .Values.cloudController.blobstore.resource_directory_key }}",
     "credentials_source": "static",
     "access_key_id": "{{ .Values.cloudController.blobstore.storage_cli.aws_access_key_id }}",

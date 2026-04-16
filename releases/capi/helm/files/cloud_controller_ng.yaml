@@ -163,7 +163,7 @@ storage_cli_config_file_resource_pool: /etc/cloud-controller/storage_cli_config_
 {{- end }}
 resource_pool:
   blobstore_type: {{ .Values.cloudController.blobstore.type }}
-  blobstore_provider: s3
+  blobstore_provider: {{ .Values.cloudController.blobstore.provider }}
   minimum_size: 65536
   maximum_size: 536870912
   resource_directory_key: {{ .Values.cloudController.blobstore.resource_directory_key }}
@@ -173,7 +173,7 @@ resource_pool:
   fog_gcp_storage_options: {}
 packages:
   blobstore_type: {{ .Values.cloudController.blobstore.type }}
-  blobstore_provider: s3
+  blobstore_provider: {{ .Values.cloudController.blobstore.provider }}
   app_package_directory_key: {{ .Values.cloudController.blobstore.app_package_directory_key }}
   max_valid_packages_stored: 5
   max_package_size: 1073741824
@@ -183,7 +183,7 @@ packages:
   fog_gcp_storage_options: {}
 droplets:
   blobstore_type: {{ .Values.cloudController.blobstore.type }}
-  blobstore_provider: s3
+  blobstore_provider: {{ .Values.cloudController.blobstore.provider }}
   droplet_directory_key: {{ .Values.cloudController.blobstore.droplet_directory_key }}
   fog_connection:
   {{- toYaml .Values.cloudController.blobstore.fog_connection | nindent 4 }}
@@ -192,7 +192,7 @@ droplets:
   max_staged_droplets_stored: 5
 buildpacks:
   blobstore_type: {{ .Values.cloudController.blobstore.type }}
-  blobstore_provider: s3
+  blobstore_provider: {{ .Values.cloudController.blobstore.provider }}
   buildpack_directory_key: {{ .Values.cloudController.blobstore.buildpack_directory_key }}
   fog_connection:
   {{- toYaml .Values.cloudController.blobstore.fog_connection | nindent 4 }}
