@@ -1,5 +1,5 @@
 name: nfs-volume-release
 apiVersion: v2
-version: 0.8.0
+version: 0.9.0
 description: A Helm chart for deploying NFS Volume Release components
 appVersion: 7.53.0
