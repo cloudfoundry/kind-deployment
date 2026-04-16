@@ -137,7 +137,7 @@ spec:
       group: ""
       name: uaa
   validation:
-    hostname: uaa.default.svc.cluster.local
+    hostname: uaa.{{ .Release.Namespace }}.svc.cluster.local
     caCertificateRefs:
       - kind: ConfigMap
         group: ""

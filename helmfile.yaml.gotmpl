@@ -44,52 +44,20 @@ releases:
             kubectl wait --for=condition=Ready nodes --all --timeout=300s
 
             corefile=$(kubectl -n kube-system get configmap coredns -o jsonpath='{.data.Corefile}' | sed '/kubernetes/i \
-                rewrite name regex (.*)\\.127-0-0-1\\.nip\\.io istio-gateway-istio.default.svc.cluster.local answer auto\
+              rewrite name regex (.*)\\.127-0-0-1\\.nip\\.io istio-gateway-istio.{{ .Values.systemNamespace }}.svc.cluster.local answer auto\
             ')
             kubectl -n kube-system patch configmap coredns --type=json \
               -p="$(jq -n --arg cf "$corefile" '[{"op":"replace","path":"/data/Corefile","value":$cf}]')"
             kubectl -n kube-system rollout restart deployment/coredns
-
-  - name: base
-    namespace: default
-    chart: ./assets/base-chart
-    needs:
-      - kube-system/cilium
-    set:
-      - name: caCert
-        file: {{ .Values.certsDir }}/ca.crt
-      - name: caKey
-        file: {{ .Values.certsDir }}/ca.key
-      - name: tlsCert
-        file: {{ .Values.certsDir }}/all-in-one.crt
-      - name: tlsKey
-        file: {{ .Values.certsDir }}/all-in-one.key
-
-  - name: nats
-    namespace: default
-    chart: nats/nats
-    version: 2.12.4
-    needs:
-      - default/base
-    values:
-      - ./assets/values/nats.yaml
 
   - name: istio-base
     namespace: istio-system
     chart: istio/base
     version: 1.29.1
     needs:
-      - default/base
+      - kube-system/cilium
     values:
       - defaultRevision: minimal
-    hooks:
-      - events: ["postsync"]
-        showlogs: true
-        command: "/bin/sh"
-        args:
-          - "-c"
-          - |
-            kubectl apply --server-side --filename assets/gateway-api.yaml
 
   - name: istiod
     namespace: istio-system
@@ -97,7 +65,6 @@ releases:
     version: 1.29.1
     needs:
       - istio-base
-      - default/base
     values:
       - ./assets/values/istiod.yaml
     hooks:
@@ -108,31 +75,58 @@ releases:
           - "-c"
           - |
             kubectl delete validatingwebhookconfiguration istio-validator-istio-system --ignore-not-found=true
-      - events: ["postsync"]
+  
+  - name: base
+    namespace: {{ .Values.systemNamespace }}
+    chart: ./assets/base-chart
+    needs:
+      - kube-system/cilium
+      - istio-system/istiod
+    set:
+      - name: caCert
+        file: {{ .Values.certsDir }}/ca.crt
+      - name: caKey
+        file: {{ .Values.certsDir }}/ca.key
+      - name: tlsCert
+        file: {{ .Values.certsDir }}/all-in-one.crt
+      - name: tlsKey
+        file: {{ .Values.certsDir }}/all-in-one.key
+    hooks:
+      - events: ["presync"]
         showlogs: true
         command: "/bin/sh"
         args:
           - "-c"
           - |
-            kubectl apply --filename assets/gateway.yaml
+            kubectl apply --server-side --filename assets/gateway-api.yaml
+
+  - name: nats
+    namespace: {{ .Values.systemNamespace }}
+    chart: nats/nats
+    version: 2.12.4
+    needs:
+      - "{{ .Values.systemNamespace }}/base"
+    values:
+      - ./assets/values/nats.yaml
+
 
   - name: postgresql
-    namespace: default
+    namespace: {{ .Values.systemNamespace }}
     chart: bitnami/postgresql
     version: 16.7.27
     needs:
-      - default/base
+      - "{{ .Values.systemNamespace }}/base"
     values:
       - ./assets/values/postgresql.yaml
       - auth:
           password: {{ .Values.secrets.dbPassword }}
 
   - name: minio
-    namespace: default
+    namespace: {{ .Values.systemNamespace }}
     chart: bitnami/minio
     version: 17.0.21
     needs:
-      - default/base
+      - "{{ .Values.systemNamespace }}/base"
     values:
       - extraEnvVars:
           - name: MINIO_DOMAIN
@@ -149,10 +143,10 @@ releases:
             allowInsecureImages: true
 
   - name: loggregator-agent
-    namespace: default
+    namespace: {{ .Values.systemNamespace }}
     chart: ./releases/loggregator-agent/helm
     needs:
-      - istio-system/istiod
+      - {{ .Values.systemNamespace }}/base
     values:
       - syslogBindingCache:
           enabled: true
@@ -166,10 +160,11 @@ releases:
           certificateSecret: all-in-one-tls
 
   - name: gorouter
-    namespace: default
+    namespace: {{ .Values.systemNamespace }}
     chart: ./releases/routing/helm
     needs:
-      - istio-system/istiod
+      - {{ .Values.systemNamespace }}/base
+      - {{ .Values.systemNamespace }}/nats
     values:
       - gorouter:
           enabled: true
@@ -178,7 +173,7 @@ releases:
           certificateSecret: all-in-one-tls
 
   - name: tcp-routing
-    namespace: default
+    namespace: {{ .Values.systemNamespace }}
     chart: ./releases/routing/helm
     installed: {{ .Values.installOptionalComponents }}
     needs:
@@ -203,11 +198,11 @@ releases:
           certificateSecret: all-in-one-tls
 
   - name: loggregator
-    namespace: default
+    namespace: {{ .Values.systemNamespace }}
     chart: ./releases/loggregator/helm
     installed: {{ .Values.installOptionalComponents }}
     needs:
-      - istio-system/istiod
+      - {{ .Values.systemNamespace }}/base
     values:
       - loggregator:
           enabled: true
@@ -222,11 +217,10 @@ releases:
           certificateSecret: all-in-one-tls
 
   - name: log-cache
-    namespace: default
+    namespace: {{ .Values.systemNamespace }}
     chart: ./releases/log-cache/helm
     needs:
-      - default/base
-      - istio-system/istiod
+      - "{{ .Values.systemNamespace }}/base"
       - uaa
     values:
       - logCacheApi:
@@ -235,11 +229,11 @@ releases:
           certificateSecret: all-in-one-tls
 
   - name: uaa
-    namespace: default
+    namespace: {{ .Values.systemNamespace }}
     chart: ./releases/uaa/helm
     needs:
       - postgresql
-      - istio-system/istiod
+      - {{ .Values.systemNamespace }}/base
     values:
       - ccAdminPassword: {{ .Values.secrets.ccAdminPassword }}
       - uaadb:
@@ -251,7 +245,7 @@ releases:
       - certificateSecret: all-in-one-tls
 
   - name: credhub
-    namespace: default
+    namespace: {{ .Values.systemNamespace }}
     chart: ./releases/credhub/helm
     installed: {{ .Values.installOptionalComponents }}
     needs:
@@ -265,7 +259,7 @@ releases:
           skipSSLVerify: false
 
   - name: locket
-    namespace: default
+    namespace: {{ .Values.systemNamespace }}
     chart: ./releases/diego/helm
     needs:
       - loggregator-agent
@@ -280,7 +274,7 @@ releases:
           certificateSecret: all-in-one-tls
 
   - name: diego
-    namespace: default
+    namespace: {{ .Values.systemNamespace }}
     chart: ./releases/diego/helm
     needs:
       - locket
@@ -309,7 +303,7 @@ releases:
           certificateSecret: all-in-one-tls
 
   - name: tps-watcher
-    namespace: default
+    namespace: {{ .Values.systemNamespace }}
     chart: ./releases/capi/helm
     needs:
       - capi
@@ -320,7 +314,7 @@ releases:
       - oauthClientsSecret: ""
 
   - name: route-emitter
-    namespace: default
+    namespace: {{ .Values.systemNamespace }}
     chart: ./releases/diego/helm
     needs:
       - diego
@@ -347,7 +341,7 @@ releases:
           enableTcpEmitter: {{ .Values.installOptionalComponents }}
 
   - name: k8s-rep
-    namespace: default
+    namespace: {{ .Values.systemNamespace }}
     chart: cloudfoundry-k8s/k8s-rep
     version: "{{ .Values.versions.k8sRep }}"
     needs:
@@ -357,6 +351,7 @@ releases:
 {{ readFile (printf "%s/ca.crt" .Values.certsDir) | indent 10 }}
       - stacks:
           cflinuxfs4: ghcr.io/cloudfoundry/k8s/cflinuxfs4:{{ .Values.versions.cflinuxfs4 }}
+      - workloadsNamespace: {{ .Values.workloadsNamespace }}
       - containerProxyVerifySubjectAltName: 
           - gorouter
           - ssh-proxy
@@ -365,7 +360,7 @@ releases:
       - locket:
           certificateSecret: all-in-one-tls
       - fileServer:
-          address: http://fileserver.default.svc.cluster.local:8080
+          address: http://fileserver.{{ .Values.systemNamespace }}.svc.cluster.local:8080
 
     hooks:
       - events: ["presync"]
@@ -374,11 +369,11 @@ releases:
         args:
           - "-c"
           - |
-            kubectl create namespace cf-workloads --dry-run=client -o yaml | kubectl apply -f -
-            kubectl create configmap trusted-system-certs --namespace cf-workloads --from-file=trusted-ca-1.crt={{ .Values.certsDir }}/ca.crt --dry-run=client -o yaml | kubectl apply -f -
+            kubectl create namespace {{ .Values.workloadsNamespace }} --dry-run=client -o yaml | kubectl apply -f -
+            kubectl create configmap trusted-system-certs --namespace {{ .Values.workloadsNamespace }} --from-file=trusted-ca-1.crt={{ .Values.certsDir }}/ca.crt --dry-run=client -o yaml | kubectl apply -f -
 
   - name: capi
-    namespace: default
+    namespace: {{ .Values.systemNamespace }}
     chart: ./releases/capi/helm
     needs:
       - minio
@@ -404,7 +399,7 @@ releases:
       - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
 
   - name: nfs-volume
-    namespace: default
+    namespace: {{ .Values.systemNamespace }}
     chart: ./releases/nfs-volume/helm
     installed: {{ .Values.installOptionalComponents }}
     needs:
@@ -418,7 +413,7 @@ releases:
           enabled: true
 
   - name: cf-networking
-    namespace: default
+    namespace: {{ .Values.systemNamespace }}
     chart: ./releases/cf-networking/helm
     installed: {{ .Values.installOptionalComponents }}
     needs:
@@ -445,7 +440,7 @@ releases:
           certificateSecret: all-in-one-tls
 
   - name: policy-agent
-    namespace: default
+    namespace: {{ .Values.systemNamespace }}
     chart: cloudfoundry-k8s/policy-agent
     version: "{{ .Values.versions.policyAgent }}"
     installed: {{ .Values.installOptionalComponents }}
@@ -465,7 +460,7 @@ releases:
           - |
             kubectl get configmap coredns -n kube-system -o jsonpath='{.data.Corefile}' | grep -q "apps.internal:53" || {
               echo "Patching CoreDNS to forward apps.internal to bosh-dns"
-              BOSH_DNS_IP=$(kubectl get svc bosh-dns -n default -o jsonpath='{.spec.clusterIP}')
+              BOSH_DNS_IP=$(kubectl get svc bosh-dns -n {{ .Values.systemNamespace }} -o jsonpath='{.spec.clusterIP}')
               COREFILE=$(kubectl get configmap coredns -n kube-system -o jsonpath='{.data.Corefile}')
               printf '%s\n\n%s' "apps.internal:53 {
                 errors

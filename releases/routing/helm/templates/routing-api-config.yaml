@@ -16,7 +16,7 @@ stringData:
     metrics_reporting_interval: 30s
     statsd_endpoint: localhost:8125
     oauth:
-      token_endpoint: {{ .Values.routingApi.uaa.address }}
+      token_endpoint: {{ tpl .Values.routingApi.uaa.address . }}
       port: {{ .Values.routingApi.uaa.port }}
       skip_ssl_validation: false
       ca_certs: "/etc/ssl/uaa/ca.crt"
@@ -38,7 +38,7 @@ stringData:
       mtls_server_cert_file: "/etc/ssl/routing-api/tls.crt"
       mtls_server_key_file: "/etc/ssl/routing-api/tls.key"
     sqldb:
-      host: {{ .Values.routingApi.sqldb.address }}
+      host: {{ tpl .Values.routingApi.sqldb.address . }}
       port: {{ .Values.routingApi.sqldb.port }}
       type: postgres
       schema: routing_api
@@ -56,7 +56,7 @@ stringData:
     lock_ttl: 10s
     retry_interval: 5s
     locket:
-      locket_address: {{ .Values.routingApi.locketAddress }}
+      locket_address: {{ tpl .Values.routingApi.locketAddress . }}
       locket_ca_cert_file: "/etc/ssl/locket/ca.crt"
       locket_client_cert_file: "/etc/ssl/locket/tls.crt"
       locket_client_key_file: "/etc/ssl/locket/tls.key"

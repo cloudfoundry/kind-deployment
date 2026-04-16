@@ -11,7 +11,7 @@ ccWorker:
 ccUploader:
   resources: ~
   certificateSecret: ""
-  hostname: "cc-uploader.default.svc.cluster.local"
+  hostname: "cc-uploader.{{ .Release.Namespace }}.svc.cluster.local"
   image:
     repository: ghcr.io/cloudfoundry/k8s/cc-uploader
     tag: ""
@@ -30,8 +30,8 @@ cloudController:
   certificateSecret: ""
   appDomain: apps.127-0-0-1.nip.io
   externalDomain: api.127-0-0-1.nip.io
-  internalDomain: cloud-controller.default.svc.cluster.local
-  internalServiceHostname: cloud-controller.default.svc.cluster.local
+  internalDomain: cloud-controller.{{ .Release.Namespace }}.svc.cluster.local
+  internalServiceHostname: cloud-controller.{{ .Release.Namespace }}.svc.cluster.local
   systemDomain: system.127-0-0-1.nip.io
   appSSHEndpoint: ssh.127-0-0-1.nip.io:2222
   sshProxyKeyFingerprint: ""
@@ -63,12 +63,12 @@ cloudController:
       provider: ~
   diego:
     fileServerUrl: https://fileserver.127-0-0-1.nip.io
-    ccUploaderUrl: https://cc-uploader.default.svc.cluster.local:9091
+    ccUploaderUrl: https://cc-uploader.{{ .Release.Namespace }}.svc.cluster.local:9091
   credhubApi:
-    internalUrl: https://credhub.default.svc.cluster.local:8844
+    internalUrl: https://credhub.{{ .Release.Namespace }}.svc.cluster.local:8844
     externalUrl: ""
   nats:
-    address: nats.default.svc.cluster.local:4222
+    address: nats.{{ .Release.Namespace }}.svc.cluster.local:4222
   nodeSelector: ~
   tolerations: ~
   enableCommaDelimitedDestinations: false
@@ -108,7 +108,7 @@ tpsWatcher:
   enabled: false
   resources: ~
   certificateSecret: ""
-  hostname: tps.default.svc.cluster.local
+  hostname: tps.{{ .Release.Namespace }}.svc.cluster.local
   image:
     repository: ghcr.io/cloudfoundry/k8s/tps-watcher
     tag: ""
@@ -121,7 +121,7 @@ ccdb:
   password: ~
   user: postgres
   port: 5432
-  address: postgresql.default.svc.cluster.local
+  address: postgresql.{{ .Release.Namespace }}.svc.cluster.local
   caCertificateSecret: ""
   skipSSLVerify: true
 

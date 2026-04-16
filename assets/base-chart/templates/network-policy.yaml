@@ -18,7 +18,7 @@ spec:
           - 192.168.0.0/16
     - toEndpoints:
         - matchLabels:
-            io.kubernetes.pod.namespace: default
+            io.kubernetes.pod.namespace: {{ .Release.Namespace }}
             service.istio.io/canonical-name: istio-gateway-istio
       toPorts:
         - ports:

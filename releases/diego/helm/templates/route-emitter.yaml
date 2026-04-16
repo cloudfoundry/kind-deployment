@@ -29,7 +29,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: route-emitter
-  namespace: default
+  namespace: {{ .Release.Namespace }}
 ---
 kind: DaemonSet
 apiVersion: apps/v1

@@ -10,7 +10,7 @@ metadata:
     "helm.sh/hook-weight": "-2"
 stringData:
   DB: {{ .Values.ccdb.name }}
-  DB_CONNECTION_STRING: postgres://{{ .Values.ccdb.user }}:{{ .Values.ccdb.password }}@{{ .Values.ccdb.address }}:{{ .Values.ccdb.port }}/{{ .Values.ccdb.name }}
+  DB_CONNECTION_STRING: postgres://{{ .Values.ccdb.user }}:{{ .Values.ccdb.password }}@{{ tpl .Values.ccdb.address . }}:{{ .Values.ccdb.port }}/{{ .Values.ccdb.name }}
   CLOUD_CONTROLLER_NG_CONFIG: /etc/cloud-controller/config.yaml
   RAILS_ENV: production
 ---

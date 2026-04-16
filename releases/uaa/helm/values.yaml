@@ -19,7 +19,7 @@ uaadb:
   password: ~
   user: postgres
   port: 5432
-  address: postgresql.default.svc.cluster.local
+  address: postgresql.{{ .Release.Namespace }}.svc.cluster.local
   caCertificateSecret: ""
   skipSSLVerify: true
 

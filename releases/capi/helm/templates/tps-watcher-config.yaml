@@ -11,7 +11,7 @@ data:
       "bbs_client_key": "/etc/ssl/certs/tps-watcher/tls.key",
       "bbs_ca_cert": "/etc/ssl/certs/tps-watcher/ca.crt",
       "bbs_api_url": "https://bbs.{{ .Release.Namespace }}.svc.cluster.local:8889",
-      "cc_base_url": "https://cloud-controller.{{ .Release.Namespace }}.svc.cluster.local:9023",
+      "cc_base_url": "https://{{ tpl .Values.cloudController.internalServiceHostname . }}:9023",
       "cc_client_cert": "/etc/ssl/certs/tps-watcher/tls.crt",
       "cc_client_key": "/etc/ssl/certs/tps-watcher/tls.key",
       "cc_ca_cert": "/etc/ssl/certs/tps-watcher/ca.crt",

@@ -17,7 +17,7 @@ stringData:
       "log_level": "info",
       "max_open_database_connections": 200,
       "max_database_connection_lifetime": "1h",
-      "database_connection_string": "postgres://{{ .Values.locketdb.user }}:{{ .Values.locketdb.password }}@{{ .Values.locketdb.address }}:{{ .Values.locketdb.port }}/{{ .Values.locketdb.name }}",
+      "database_connection_string": "postgres://{{ .Values.locketdb.user }}:{{ .Values.locketdb.password }}@{{ tpl .Values.locketdb.address . }}:{{ .Values.locketdb.port }}/{{ .Values.locketdb.name }}",
       "database_driver": "postgres",
       "sql_enable_identity_verification": {{ not .Values.locketdb.skipSSLVerify }},
       {{- if not .Values.locketdb.skipSSLVerify }}

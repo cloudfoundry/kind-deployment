@@ -43,7 +43,7 @@ spec:
           args:
             - --listenAddr=0.0.0.0:8080
             - --servicesConfig=/services.json
-            - --credhubURL={{ .Values.nfsbroker.credhubURL }}
+            - --credhubURL={{ tpl .Values.nfsbroker.credhubURL . }}
             - --credhubCACertPath=/ssl/ca.crt
             - --storeID=nfsbroker
             - --logLevel=info

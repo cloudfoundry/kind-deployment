@@ -71,7 +71,7 @@ spec:
             - name: AGENT_DISABLE_UDP
               value: "true"
             - name: ROUTER_ADDR
-              value: "{{ .Values.loggregatorAgent.doppler.address }}"
+              value: "{{ tpl .Values.loggregatorAgent.doppler.address . }}"
           volumeMounts:
             - name: loggregator-agent
               mountPath: /etc/ssl/certs/loggregator-agent
@@ -98,7 +98,7 @@ spec:
             - name: METRICS_KEY_FILE_PATH
               value: /etc/ssl/certs/syslog-agent/tls.key
             - name: CACHE_URL
-              value: "{{ .Values.syslogAgent.syslogBindingCache.address }}"
+              value: "{{ tpl .Values.syslogAgent.syslogBindingCache.address . }}"
             - name: CACHE_COMMON_NAME
               value: "{{ .Values.syslogBindingCache.cache.commonName }}"
             - name: CACHE_CA_FILE_PATH

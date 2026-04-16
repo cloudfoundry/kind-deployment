@@ -8,7 +8,7 @@ metadata:
     gateway.istio.io/managed: istio.io-gateway-controller
     gateway.networking.k8s.io/gateway-name: istio-gateway
   name: istio-gateway-istio
-  namespace: default
+  namespace: {{ .Release.Namespace }}
 spec:
   externalTrafficPolicy: Cluster
   internalTrafficPolicy: Cluster
@@ -201,13 +201,13 @@ apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
 metadata:
   name: kind-settings
-  namespace: default
+  namespace: {{ .Release.Namespace }}
 spec:
   configPatches:
   - applyTo: CLUSTER
     match:
       cluster:
-        name: outbound|443||gorouter.default.svc.cluster.local
+        name: outbound|443||gorouter.{{ .Release.Namespace }}.svc.cluster.local
       context: GATEWAY
     patch:
       operation: MERGE
@@ -228,7 +228,7 @@ metadata:
   annotations:
     networking.istio.io/service-type: NodePort
   name: istio-gateway
-  namespace: default
+  namespace: {{ .Release.Namespace }}
 spec:
   gatewayClassName: istio
   listeners:

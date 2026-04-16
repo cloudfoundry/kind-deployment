@@ -29,7 +29,7 @@ data:
         "private_key": "/etc/ssl/certs/service-discovery-controller/tls.key",
         "hosts": [
           {
-            "hostname": "{{ .Values.serviceDiscoveryController.nats.host }}",
+            "hostname": "{{ tpl .Values.serviceDiscoveryController.nats.host . }}",
             "port": {{ .Values.serviceDiscoveryController.nats.port }}
           }
         ]

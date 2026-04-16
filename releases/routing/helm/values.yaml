@@ -33,12 +33,12 @@ routingApi:
     password: ~
     user: postgres
     port: 5432
-    address: postgresql.default.svc.cluster.local
+    address: postgresql.{{ .Release.Namespace }}.svc.cluster.local
     caCertificateSecret: ""
     skipSSLVerify: true
-  locketAddress: locket.default.svc.cluster.local:8891
+  locketAddress: locket.{{ .Release.Namespace }}.svc.cluster.local:8891
   uaa:
-    address: uaa.default.svc.cluster.local
+    address: uaa.{{ .Release.Namespace }}.svc.cluster.local
     port: 8443
   image:
     repository: ghcr.io/cloudfoundry/k8s/routing-api
@@ -62,10 +62,10 @@ tcpRouter:
       imagePullPolicy: IfNotPresent
     resources: ~
   uaa:
-    address: uaa.default.svc.cluster.local
+    address: uaa.{{ .Release.Namespace }}.svc.cluster.local
     port: 8443
   routingApi:
-    address: https://routing-api.default.svc.cluster.local
+    address: https://routing-api.{{ .Release.Namespace }}.svc.cluster.local
     port: 3001
   nodeSelector: ~
   tolerations: ~

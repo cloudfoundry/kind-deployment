@@ -1,6 +1,6 @@
 {{ $_ := required ".Values.db.password must be provided" .Values.db.password }}
 auth-server:
-  url: {{ .Values.uaa.address }}
+  url: {{ tpl .Values.uaa.address . }}
   trust_store: /app/stores/trust_store.jks
   trust_store_password: changeit
 encryption:
@@ -68,7 +68,7 @@ spring:
   datasource:
     username: {{ .Values.db.user | quote }}
     password: {{ .Values.db.password | quote }}
-    url: jdbc:postgresql://{{ .Values.db.address }}:{{ .Values.db.port }}/{{ .Values.db.name }}?autoReconnect=true&{{- if not .Values.db.skipSSLVerify }}ssl=true&sslmode=require{{- else }}ssl=false&sslmode=allow{{- end }}
+    url: jdbc:postgresql://{{ tpl .Values.db.address . }}:{{ .Values.db.port }}/{{ .Values.db.name }}?autoReconnect=true&{{- if not .Values.db.skipSSLVerify }}ssl=true&sslmode=require{{- else }}ssl=false&sslmode=allow{{- end }}
   profiles:
     active: prod
 certificates:

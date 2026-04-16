@@ -6,14 +6,14 @@ metadata:
 stringData:
   cf-tcp-router.yaml: |-
     oauth:
-      token_endpoint: {{ .Values.tcpRouter.uaa.address }}
+      token_endpoint: {{ tpl .Values.tcpRouter.uaa.address . }}
       port: {{ .Values.tcpRouter.uaa.port }}
       client_name: "tcp_router"
       client_secret: {{ .Values.tcpRouter.oauthClientsSecret | quote }}
       skip_ssl_validation: false
       ca_certs: "/etc/ssl/cf-tcp-router/ca.crt"
     routing_api:
-      uri: {{ .Values.tcpRouter.routingApi.address }}
+      uri: {{ tpl .Values.tcpRouter.routingApi.address . }}
       port: {{ .Values.tcpRouter.routingApi.port }}
       auth_disabled: false
       client_cert_path: "/etc/ssl/cf-tcp-router/tls.crt"

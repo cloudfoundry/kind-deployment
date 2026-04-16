@@ -98,7 +98,7 @@ uaa:
 zones:
   internal:
     hostnames:
-    - uaa.default.svc.cluster.local
+    - uaa.{{ .Release.Namespace }}.svc.cluster.local
 database:
   maxactive: 100
   maxidle: 10
@@ -108,7 +108,7 @@ database:
   abandonedtimeout: 300
   username: {{ .Values.uaadb.user | quote }}
   password: {{ .Values.uaadb.password | quote }}
-  url: jdbc:postgresql://{{ .Values.uaadb.address }}:{{ .Values.uaadb.port }}/{{ .Values.uaadb.name }}?{{- if .Values.uaadb.skipSSLVerify }}sslmode=disable{{- else }}sslmode=verify-full&sslrootcert=/etc/ssl/certs/postgres/ca.crt{{- end }}
+  url: jdbc:postgresql://{{ tpl .Values.uaadb.address . }}:{{ .Values.uaadb.port }}/{{ .Values.uaadb.name }}?{{- if .Values.uaadb.skipSSLVerify }}sslmode=disable{{- else }}sslmode=verify-full&sslrootcert=/etc/ssl/certs/postgres/ca.crt{{- end }}
 scim:
   userids_enabled: true
   user:

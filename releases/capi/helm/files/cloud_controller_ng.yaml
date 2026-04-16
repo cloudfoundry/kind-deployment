@@ -23,7 +23,7 @@ deployment_updater:
   update_frequency_in_seconds: 5
   lock_key: "cf-deployment-updater"
   lock_owner: "cf_deployment_updater.bosh-vm-id"
-internal_service_hostname: {{ .Values.cloudController.internalServiceHostname }}
+internal_service_hostname: {{ tpl .Values.cloudController.internalServiceHostname . }}
 system_domain_organization: system
 system_domain: {{ .Values.cloudController.systemDomain }}
 app_domains:
@@ -108,9 +108,9 @@ log_audit_events: false
 telemetry_log_path: /tmp/cloud_controller_telemetry.log
 loggregator:
   router: "127.0.0.1:3457"
-  internal_url: "http://loggregator-trafficcontroller.default.svc.cluster.local:8081"
+  internal_url: "http://loggregator-trafficcontroller.{{ .Release.Namespace }}.svc.cluster.local:8081"
 logcache:
-  host: log-cache.default.svc.cluster.local
+  host: log-cache.{{ .Release.Namespace }}.svc.cluster.local
   port: 8080
 logcache_tls:
   key_file: "/etc/ssl/certs/cloud-controller/tls.key"
@@ -125,7 +125,7 @@ log_stream:
   url: "{{ .Values.cloudController.logStream.url }}"
 uaa:
   url: "{{ .Values.cloudController.uaa.url }}"
-  internal_url: https://uaa.default.svc.cluster.local:8443
+  internal_url: https://uaa.{{ .Release.Namespace }}.svc.cluster.local:8443
   resource_id: "cloud_controller,cloud_controller_service_permissions"
   ca_file: "/etc/ssl/certs/cloud-controller/ca.crt"
   client_timeout: 60
@@ -254,7 +254,7 @@ temporary_enable_v2: true
 max_concurrent_service_broker_requests: 0
 diego:
   file_server_url: {{ .Values.cloudController.diego.fileServerUrl }}
-  cc_uploader_url: {{ .Values.cloudController.diego.ccUploaderUrl }}
+  cc_uploader_url: {{ tpl .Values.cloudController.diego.ccUploaderUrl . }}
   use_privileged_containers_for_running: false
   use_privileged_containers_for_staging: false
   enable_declarative_asset_downloads: false
@@ -267,7 +267,7 @@ diego:
   insecure_docker_registry_list: []
   docker_staging_stack: "cflinuxfs4"
   bbs:
-    url: https://bbs.default.svc.cluster.local:8889
+    url: https://bbs.{{ .Release.Namespace }}.svc.cluster.local:8889
     key_file: /etc/ssl/certs/cloud-controller/tls.key
     cert_file: /etc/ssl/certs/cloud-controller/tls.crt
     ca_file: /etc/ssl/certs/cloud-controller/ca.crt
@@ -327,7 +327,7 @@ pending_builds:
   expiration_in_seconds: 42
   frequency_in_seconds: 300
 credhub_api:
-  internal_url: {{ .Values.cloudController.credhubApi.internalUrl }}
+  internal_url: {{ tpl .Values.cloudController.credhubApi.internalUrl . }}
   {{- if .Values.cloudController.credhubApi.externalUrl }}
   external_url: {{ .Values.cloudController.credhubApi.externalUrl }}
   {{- end }}
@@ -336,7 +336,7 @@ credential_references:
   interpolate_service_bindings: true
 internal_route_vip_range: "127.128.0.0/9"
 locket:
-  host: "locket.default.svc.cluster.local"
+  host: "locket.{{ .Release.Namespace }}.svc.cluster.local"
   port: 8891
   ca_file: "/etc/ssl/certs/cloud-controller/ca.crt"
   cert_file: "/etc/ssl/certs/cloud-controller/tls.crt"

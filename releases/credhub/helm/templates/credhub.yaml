@@ -49,7 +49,7 @@ spec:
         - name: UAA_URL
           value: https://uaa.{{ .Release.Namespace }}.svc.cluster.local:8443
         - name: SUBJECT_ALTERNATIVE_NAMES
-          value: "DNS:{{ .Values.hostname }},DNS:credhub.{{ .Release.Namespace }}.svc.cluster.local,DNS:credhub.{{ .Release.Namespace }}.svc,DNS:credhub.{{ .Release.Namespace }},DNS:credhub"
+          value: "DNS:{{ tpl .Values.hostname . }},DNS:credhub.{{ .Release.Namespace }}.svc.cluster.local,DNS:credhub.{{ .Release.Namespace }}.svc,DNS:credhub.{{ .Release.Namespace }},DNS:credhub"
         volumeMounts:
         - name: config
           mountPath: /app/config

@@ -1,6 +1,6 @@
-hostname: "credhub.default.svc.cluster.local"
+hostname: "credhub.{{ .Release.Namespace }}.svc.cluster.local"
 uaa:
-  address: "https://uaa.default.svc.cluster.local:8443"
+  address: "https://uaa.{{ .Release.Namespace }}.svc.cluster.local:8443"
 
 image:
   repository: ghcr.io/cloudfoundry/k8s/credhub
@@ -17,6 +17,6 @@ db:
   password: ~
   user: postgres
   port: 5432
-  address: postgresql.default.svc.cluster.local
+  address: postgresql.{{ .Release.Namespace }}.svc.cluster.local
   caCertificateSecret: ""
   skipSSLVerify: true

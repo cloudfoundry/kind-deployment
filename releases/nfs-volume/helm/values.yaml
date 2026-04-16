@@ -2,7 +2,7 @@ nfsbroker:
   enabled: false
   certificateSecret: ""
   oauthClientsSecret: ""
-  credhubURL: https://credhub.default.svc.cluster.local:8844
+  credhubURL: https://credhub.{{ .Release.Namespace }}.svc.cluster.local:8844
   image:
     repository: ghcr.io/cloudfoundry/k8s/nfsbroker
     tag: ""

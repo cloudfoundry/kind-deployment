@@ -1,7 +1,7 @@
 auctioneer:
   enabled: false
   certificateSecret: ""
-  hostname: "auctioneer.default.svc.cluster.local"
+  hostname: "auctioneer.{{ .Release.Namespace }}.svc.cluster.local"
   image:
     repository: ghcr.io/cloudfoundry/k8s/auctioneer
     tag: ""
@@ -12,7 +12,7 @@ auctioneer:
 bbs:
   enabled: false
   certificateSecret: ""
-  hostname: "bbs.default.svc.cluster.local"
+  hostname: "bbs.{{ .Release.Namespace }}.svc.cluster.local"
   image:
     repository: ghcr.io/cloudfoundry/k8s/bbs
     tag: ""
@@ -34,7 +34,7 @@ fileserver:
 locket:
   enabled: false
   certificateSecret: ""
-  hostname: "locket.default.svc.cluster.local"
+  hostname: "locket.{{ .Release.Namespace }}.svc.cluster.local"
   image:
     repository: ghcr.io/cloudfoundry/k8s/locket
     tag: ""
@@ -63,15 +63,15 @@ routeEmitter:
   locketCertificateSecret: ""
   uaaCertificateSecret: ""
   oauthClientsSecret: ""
-  natsAddress: "nats.default.svc.cluster.local:4222"
-  locketAddress: "locket.default.svc.cluster.local:8891"
-  bbsAddress: "https://bbs.default.svc.cluster.local:8889"
+  natsAddress: "nats.{{ .Release.Namespace }}.svc.cluster.local:4222"
+  locketAddress: "locket.{{ .Release.Namespace }}.svc.cluster.local:8891"
+  bbsAddress: "https://bbs.{{ .Release.Namespace }}.svc.cluster.local:8889"
   routingApi:
     enabled: false
     certificateSecret: ""
-    address: "https://routing-api.default.svc.cluster.local"
+    address: "https://routing-api.{{ .Release.Namespace }}.svc.cluster.local"
     port: 3001
-  uaaAddress: "https://uaa.default.svc.cluster.local:8443"
+  uaaAddress: "https://uaa.{{ .Release.Namespace }}.svc.cluster.local:8443"
   enableInternalEmitter: true
   enableTcpEmitter: true
   image:
@@ -91,7 +91,7 @@ diegodb:
   password: ~
   user: postgres
   port: 5432
-  address: postgresql.default.svc.cluster.local
+  address: postgresql.{{ .Release.Namespace }}.svc.cluster.local
   caCertificateSecret: ""
   skipSSLVerify: true
 
@@ -100,7 +100,7 @@ locketdb:
   password: ~
   user: postgres
   port: 5432
-  address: postgresql.default.svc.cluster.local
+  address: postgresql.{{ .Release.Namespace }}.svc.cluster.local
   caCertificateSecret: ""
   skipSSLVerify: true
 

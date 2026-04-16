@@ -22,7 +22,7 @@ data:
     {
       "address": "0.0.0.0",
       "port": "8053",
-      "service_discovery_controller_address": "{{ .Values.serviceDiscoveryController.hostname }}",
+      "service_discovery_controller_address": "{{ tpl .Values.serviceDiscoveryController.hostname . }}",
       "service_discovery_controller_port": "{{ .Values.serviceDiscoveryController.port }}",
       "client_cert": "/etc/ssl/certs/bosh-dns-adapter/tls.crt",
       "client_key": "/etc/ssl/certs/bosh-dns-adapter/tls.key",

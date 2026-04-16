@@ -14,11 +14,11 @@ policyServer:
     password: ~
     user: postgres
     port: 5432
-    address: postgresql.default.svc.cluster.local
+    address: postgresql.{{ .Release.Namespace }}.svc.cluster.local
     caCertificateSecret: ""
     skipSSLVerify: true
   nats:
-    address: nats.default.svc.cluster.local:4222
+    address: nats.{{ .Release.Namespace }}.svc.cluster.local:4222
   nodeSelector: ~
   tolerations: ~
 
@@ -26,14 +26,14 @@ serviceDiscoveryController:
   enabled: false
   resources: ~
   certificateSecret: ""
-  hostname: service-discovery-controller.default.svc.cluster.local
+  hostname: service-discovery-controller.{{ .Release.Namespace }}.svc.cluster.local
   port: 8054
   image:
     repository: ghcr.io/cloudfoundry/k8s/service-discovery-controller
     tag: ""
     imagePullPolicy: IfNotPresent
   nats:
-    host: nats.default.svc.cluster.local
+    host: nats.{{ .Release.Namespace }}.svc.cluster.local
     port: 4222
   nodeSelector: ~
   tolerations: ~

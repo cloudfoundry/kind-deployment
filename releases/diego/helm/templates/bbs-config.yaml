@@ -28,11 +28,11 @@ stringData:
       "cell_registrations_locket_enabled": true,
       "max_task_retries": 3,
       "max_data_string_length": 640,
-      "database_connection_string": "postgres://{{ .Values.diegodb.user }}:{{ .Values.diegodb.password }}@{{ .Values.diegodb.address }}:{{ .Values.diegodb.port }}/{{ .Values.diegodb.name }}",
+      "database_connection_string": "postgres://{{ .Values.diegodb.user }}:{{ .Values.diegodb.password }}@{{ tpl .Values.diegodb.address . }}:{{ .Values.diegodb.port }}/{{ .Values.diegodb.name }}",
       "encryption_keys": {
         "key-2016-06": "MZvOZLfI9lLjUqPVZfJ7khVm1M4lq6"
       },
-      "auctioneer_address": "https://auctioneer.{{ .Release.Namespace }}.svc.cluster.local:9016",
+      "auctioneer_address": "https://{{ tpl .Values.auctioneer.hostname . }}:9016",
       "auctioneer_require_tls": false,
       "auctioneer_client_cert": "/etc/ssl/certs/bbs/tls.crt",
       "auctioneer_client_key": "/etc/ssl/certs/bbs/tls.key",
@@ -58,7 +58,7 @@ stringData:
       "ca_file": "/etc/ssl/certs/bbs/ca.crt",
       "cert_file": "/etc/ssl/certs/bbs/tls.crt",
       "key_file": "/etc/ssl/certs/bbs/tls.key",
-      "locket_address": "locket.{{ .Release.Namespace }}.svc.cluster.local:8891",
+      "locket_address": "{{ tpl .Values.locket.hostname . }}:8891",
       "locket_ca_cert_file": "/etc/ssl/certs/bbs/ca.crt",
       "locket_client_cert_file": "/etc/ssl/certs/bbs/tls.crt",
       "locket_client_key_file": "/etc/ssl/certs/bbs/tls.key",
