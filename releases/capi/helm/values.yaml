@@ -50,6 +50,7 @@ cloudController:
     url: https://uaa.127-0-0-1.nip.io
   blobstore:
     type: storage-cli
+    provider: s3
     resource_directory_key: cc-resources
     app_package_directory_key: cc-packages
     droplet_directory_key: cc-droplets
