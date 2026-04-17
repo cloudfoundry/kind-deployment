@@ -356,11 +356,10 @@ releases:
           - gorouter
           - ssh-proxy
           - cf-tcp-router
-      - loggregatorCertificateSecret: all-in-one-tls
+      - loggregator:
+          certificateSecret: all-in-one-tls
       - locket:
           certificateSecret: all-in-one-tls
-      - fileServer:
-          address: http://fileserver.{{ .Values.systemNamespace }}.svc.cluster.local:8080
 
     hooks:
       - events: ["presync"]
