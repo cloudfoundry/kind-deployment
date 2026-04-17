@@ -44,7 +44,7 @@ jobs:
           mv cf8 $HOME/.local/bin/cf
         env:
           # renovate: dataSource=github-releases depName=cloudfoundry/cli
-          CF_CLI_VERSION: "8.18.0"
+          CF_CLI_VERSION: "8.18.3"
           # renovate: dataSource=github-releases depName=kubernetes-sigs/kind
           KIND_VERSION: "0.31.0"
           # renovate: dataSource=github-releases depName=helmfile/helmfile
