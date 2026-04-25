@@ -217,7 +217,7 @@ spec:
             '@type': type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
             explicit_http_config:
               http2_protocol_options:
-                max_inbound_window_update_frames_per_data_frame_sent: 20
+                max_inbound_window_update_frames_per_data_frame_sent: 10000
   workloadSelector:
     labels:
       gateway.networking.k8s.io/gateway-name: istio-gateway

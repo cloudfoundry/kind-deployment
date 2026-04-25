@@ -141,6 +141,13 @@ releases:
       - global:
           security:
             allowInsecureImages: true
+      - persistence:
+          enabled: true
+          size: 10Gi
+          # Ensure blobstore data survives MinIO pod restarts.
+          # Without persistence, resource pool SHA1 entries in PostgreSQL become stale:
+          # CC says "I have click.tar.gz" -> client skips upload -> MinIO has no file ->
+          # package assembly fails -> vendor/click not found in staging container.
 
   - name: loggregator-agent
     namespace: {{ .Values.systemNamespace }}

@@ -164,7 +164,12 @@ storage_cli_config_file_resource_pool: /etc/cloud-controller/storage_cli_config_
 resource_pool:
   blobstore_type: {{ .Values.cloudController.blobstore.type }}
   blobstore_provider: {{ .Values.cloudController.blobstore.provider }}
-  minimum_size: 65536
+  # minimum_size raised above all vendor tar.gz files (largest: werkzeug ~807KB = 826240 bytes)
+  # This ensures vendor files are ALWAYS uploaded fresh, bypassing resource matching.
+  # Root cause: with minimum_size=65536, files like click(336KB) were cached in the resource pool.
+  # After a MinIO pod restart (ephemeral storage), resource pool DB still had the SHA1 entry,
+  # but MinIO had lost the actual file -> CF client skips upload, staging fails.
+  minimum_size: 1048576
   maximum_size: 536870912
   resource_directory_key: {{ .Values.cloudController.blobstore.resource_directory_key }}
   fog_connection:
