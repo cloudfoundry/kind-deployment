@@ -7,7 +7,7 @@ COPY --from=src . .
 RUN ./gradlew bootJar -x test -x check
 
 # Runtime image
-FROM bellsoft/liberica-openjre-debian:21
+FROM bellsoft/liberica-openjre-debian:25.0.3
 
 WORKDIR /app
 
