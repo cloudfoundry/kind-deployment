@@ -12,7 +12,7 @@ inputs:
   test-branch:
     description: 'CF test repository branch to checkout'
     required: false
-    default: 'develop'
+    default: 'release-candidate'
   config-template:
     description: 'Config template file path'
     required: true
