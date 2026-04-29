@@ -6,6 +6,7 @@ metadata:
   name: {{ .Values.gorouter.name }}-config
 stringData:
   gorouter.yaml: |-
+    max_request_body_size: 2048000
     port: 8080
     ssl_port: 443
     index: 0

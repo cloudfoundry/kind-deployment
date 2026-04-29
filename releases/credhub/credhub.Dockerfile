@@ -1,5 +1,5 @@
 # Build image
-FROM --platform=$BUILDPLATFORM bellsoft/liberica-openjdk-debian:21.0.11 AS builder
+FROM --platform=$BUILDPLATFORM bellsoft/liberica-openjdk-debian:25.0.3 AS builder
 
 WORKDIR /app
 COPY --from=src . .
@@ -7,7 +7,7 @@ COPY --from=src . .
 RUN ./gradlew bootJar -x test -x check
 
 # Runtime image
-FROM bellsoft/liberica-openjre-debian:21
+FROM bellsoft/liberica-openjre-debian:25.0.3
 
 WORKDIR /app
 
