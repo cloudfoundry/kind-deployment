@@ -12,7 +12,7 @@ group "default" {
 
 variable "ROUTING_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/routing-release
-  default = "0.378.0"
+  default = "0.379.0"
 }
 
 target "routing" {
@@ -32,7 +32,7 @@ target "routing" {
 
 variable "CF_NETWORKING_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/cf-networking-release
-  default = "3.112.0"
+  default = "3.112.1"
 }
 
 target "cf-networking" {
@@ -70,7 +70,7 @@ target "bosh-dns" {
 
 variable "CAPI_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/capi-release
-  default = "1.232.0"
+  default = "1.234.0"
 }
 
 target "capi" {
@@ -171,7 +171,7 @@ target "log-cache" {
 
 variable "CF_DEPLOYMENT_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/cf-deployment
-  default = "55.4.0"
+  default = "55.5.0"
 }
 
 target "fileserver" {
@@ -188,7 +188,7 @@ target "fileserver" {
 
 variable "UAA_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/uaa-release
-  default = "78.12.0"
+  default = "78.13.0"
 }
 
 target "uaa" {
@@ -206,7 +206,7 @@ target "uaa" {
 
 variable "CREDHUB_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=pivotal/credhub-release
-  default = "2.15.3"
+  default = "2.15.5"
 }
 
 target "credhub" {
