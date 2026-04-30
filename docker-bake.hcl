@@ -236,7 +236,7 @@ target "cflinuxfs4" {
 
 variable "NFS_VOLUME_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/nfs-volume-release
-  default = "7.57.0"
+  default = "7.58.0"
 }
 
 target "nfs-volume" {
