@@ -84,7 +84,7 @@ routeRegistrar:
   image:
     repository: ghcr.io/cloudfoundry/k8s/route-registrar
     # sync: release=routing
-    tag: "0.375.0"
+    tag: "0.380.0"
     imagePullPolicy: IfNotPresent
   resources: ~
 
@@ -99,7 +99,7 @@ udpForwarder:
   image:
     repository: ghcr.io/cloudfoundry/k8s/udp-forwarder
     # sync: release=loggregator-agent
-    tag: "8.3.17"
+    tag: "8.3.19"
     imagePullPolicy: IfNotPresent
   resources: ~
   certificateSecret: ""

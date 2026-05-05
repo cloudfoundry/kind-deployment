@@ -3,4 +3,4 @@ version: 0.14.0
 description: Helm chart for Log Cache components
 type: application
 apiVersion: v2
-appVersion: 3.2.6
+appVersion: 3.2.8
