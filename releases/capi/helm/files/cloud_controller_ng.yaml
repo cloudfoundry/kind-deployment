@@ -219,7 +219,7 @@ renderer:
   default_results_per_page: 50
   max_inline_relations_depth: 3
 install_buildpacks:
-  - name: java-buildpack
+  - name: java_buildpack
     package: buildpack_java
   - name: ruby_buildpack
     package: buildpack_ruby
