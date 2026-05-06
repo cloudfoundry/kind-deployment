@@ -1,18 +1,44 @@
 #!/usr/bin/env bash
 # setup-podman-vm.sh
 # Called automatically by create-kind.sh / install when Podman is detected.
-# Prepares the Podman VM (macOS) for use with kind and NFS.
+# Prepares the Podman VM (macOS/Windows) for use with kind and NFS.
+#
+# On Linux, Podman runs natively (no VM) – this script is skipped.
 #
 # Environment variables:
 #   PODMAN_MACHINE  – name of the Podman machine (default: podman-machine-default)
 
 set -euo pipefail
 
-PODMAN_MACHINE="${PODMAN_MACHINE:-podman-machine-default}"
-
 log()  { echo "==> $*"; }
 err()  { echo ""; echo "ERROR: $*" >&2; echo ""; exit 1; }
 warn() { echo "WARN:  $*" >&2; }
+
+# ---------------------------------------------------------------------------
+# Skip VM setup on Linux (Podman runs natively, no machine abstraction)
+# ---------------------------------------------------------------------------
+if [ "$(uname -s)" = "Linux" ]; then
+  log "Running on Linux – Podman VM setup not needed (native Podman runtime)."
+  log "Loading NFS kernel modules directly on the host..."
+
+  # Load NFS modules on the Linux host (for kind worker node containers)
+  sudo modprobe nfs   2>/dev/null || warn "Could not load 'nfs' module"
+  sudo modprobe nfsv3 2>/dev/null || warn "Could not load 'nfsv3' module"
+  sudo modprobe nfsd  2>/dev/null || warn "Could not load 'nfsd' module"
+
+  # Verify
+  if grep -qE "^nfsd[[:space:]]" /proc/modules 2>/dev/null; then
+    log "  nfsd – confirmed in /proc/modules ✓"
+  else
+    warn "  nfsd not found in /proc/modules – NFS server may fail to start."
+  fi
+
+  log "Linux NFS setup complete."
+  exit 0
+fi
+
+# macOS/Windows only from here on
+PODMAN_MACHINE="${PODMAN_MACHINE:-podman-machine-default}"
 
 # ---------------------------------------------------------------------------
 # 1. Ensure the Podman machine exists
