@@ -6,12 +6,16 @@ This repository provides a simple and fast way to run Cloud Foundry locally. It 
 
 The following tools need to be installed:
 
-- [`docker`](https://docs.docker.com/engine/install/)
+- [`docker`](https://docs.docker.com/engine/install/) or [podman](https://podman.io/docs/installation)
+- [`docker-compose`](https://docs.docker.com/compose/install) or [podman-compose](https://github.com/containers/podman-compose)
 - [`kind`](https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries) (v0.31.0 or higher)
 - [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl) (v1.35.1 or higher)
 - `make`:
   - It should be already installed on MacOS and Linux.
   - For Windows installation see: <https://gnuwin32.sourceforge.net/packages/make.htm>
+
+> [!IMPORTANT]  
+> Please ensure that your Podman setup is configured as an alias for Docker, as this project relies on Docker commands. You can achieve this by executing `sudo ln -s /opt/podman/bin/podman /usr/local/bin/docker` and `sudo ln -s /opt/homebrew/bin/podman-compose /usr/local/bin/docker-compose` on Mac OS X.
 
 ## Run the Installation
 

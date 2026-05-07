@@ -1,12 +1,18 @@
 FROM alpine:latest AS builder
 
+ARG TARGETARCH
+
 RUN apk add --no-cache curl
 
 COPY --from=storage-cli . /storage-cli
 WORKDIR /storage-cli
 
+# Download the storage-cli binary matching the target architecture.
+# Without this, the amd64 binary would be used on arm64 nodes (via Rosetta),
+# causing a Go runtime 'taggedPointerPack' panic with high memory addresses.
 RUN STORAGE_CLI_RELEASE_VERSION=$(sed -n 's/.*storage_cli_version="\([^"]*\)".*/\1/p' packaging) && \
-    curl https://github.com/cloudfoundry/storage-cli/releases/download/v${STORAGE_CLI_RELEASE_VERSION}/storage-cli-${STORAGE_CLI_RELEASE_VERSION}-linux-amd64 -L -o /usr/local/bin/storage-cli && \
+    ARCH=${TARGETARCH:-amd64} && \
+    curl https://github.com/cloudfoundry/storage-cli/releases/download/v${STORAGE_CLI_RELEASE_VERSION}/storage-cli-${STORAGE_CLI_RELEASE_VERSION}-linux-${ARCH} -L -o /usr/local/bin/storage-cli && \
     chmod +x /usr/local/bin/storage-cli
 
 FROM ruby:4.0.3-slim

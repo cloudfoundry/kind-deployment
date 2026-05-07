@@ -68,6 +68,29 @@ spec:
       annotations:
         checksum/config: {{ cat (include (print $.Template.BasePath "/cloud-controller-config.yaml") .) (include (print $.Template.BasePath "/cloud-controller-route-registrar-config.yaml") .) (include (print $.Template.BasePath "/nginx-config.yaml") .) | sha256sum }}
     spec:
+      # Fix for arm64 / Apple Silicon: download native storage-cli binary.
+      # The image contains amd64 storage-cli which causes 'taggedPointerPack'
+      # panic when run under Rosetta. This init container fetches the arm64
+      # binary and mounts it into cloud-controller & local-worker containers.
+      initContainers:
+        - name: fix-storage-cli-arch
+          image: alpine:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              ARCH=$(uname -m)
+              if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
+                wget -q https://github.com/cloudfoundry/storage-cli/releases/download/v0.0.5/storage-cli-0.0.5-linux-arm64 -O /fix/storage-cli
+                chmod +x /fix/storage-cli
+                echo "Downloaded arm64 storage-cli"
+              else
+                echo "Not arm64 – skipping storage-cli fix"
+                touch /fix/storage-cli
+              fi
+          volumeMounts:
+            - name: storage-cli-fix
+              mountPath: /fix
       containers:
         - name: cloud-controller
           image: {{ .Values.cloudController.image.repository }}:{{ default .Chart.AppVersion .Values.cloudController.image.tag }}
@@ -101,6 +124,11 @@ spec:
               mountPath: /var/run
             - name: tmpdir
               mountPath: /tmp
+            {{- if .Values.cloudController.blobstore.storage_cli }}
+            - name: storage-cli-fix
+              mountPath: /usr/local/bin/storage-cli
+              subPath: storage-cli
+            {{- end }}
         - name: route-registrar
           image: {{ .Values.routeRegistrar.image.repository }}:{{ .Values.routeRegistrar.image.tag }}
           imagePullPolicy: {{ .Values.routeRegistrar.image.imagePullPolicy }}
@@ -155,6 +183,11 @@ spec:
               mountPath: /var/run
             - name: tmpdir
               mountPath: /tmp
+            {{- if .Values.cloudController.blobstore.storage_cli }}
+            - name: storage-cli-fix
+              mountPath: /usr/local/bin/storage-cli
+              subPath: storage-cli
+            {{- end }}
         - name: nginx
           image: {{ .Values.nginx.image.repository }}:{{ default .Chart.AppVersion .Values.nginx.image.tag }}
           imagePullPolicy: {{ .Values.nginx.image.imagePullPolicy }}
@@ -253,5 +286,7 @@ spec:
         - name: var-run # Share unix sockets between containers.
           emptyDir: {}
         - name: tmpdir
+          emptyDir: {}
+        - name: storage-cli-fix
           emptyDir: {}
 {{- end }}
