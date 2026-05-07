@@ -171,7 +171,7 @@ target "log-cache" {
 
 variable "CF_DEPLOYMENT_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/cf-deployment
-  default = "56.0.0"
+  default = "56.2.0"
 }
 
 target "fileserver" {
