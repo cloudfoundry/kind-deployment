@@ -33,6 +33,21 @@ if [ "$(uname -s)" = "Linux" ]; then
     warn "  nfsd not found in /proc/modules – NFS server may fail to start."
   fi
 
+  # On Linux, check if Podman is running rootless and warn about privileged ports
+  if [ -z "${PODMAN_SOCK:-}" ] && [ ! -w /run/podman/podman.sock ] && [ -S "${XDG_RUNTIME_DIR}/podman/podman.sock" ]; then
+    warn ""
+    warn "Podman is running in ROOTLESS mode."
+    warn "kind will FAIL to bind privileged ports (80, 443, 2222)."
+    warn ""
+    warn "Fix options:"
+    warn "  1. Run this script with sudo: sudo -E make up"
+    warn "  2. Or configure unprivileged port start:"
+    warn "       echo 'net.ipv4.ip_unprivileged_port_start=80' | sudo tee -a /etc/sysctl.conf"
+    warn "       sudo sysctl -p"
+    warn ""
+    err "Cannot proceed with rootless Podman – kind requires privileged ports."
+  fi
+
   log "Linux NFS setup complete."
   exit 0
 fi
