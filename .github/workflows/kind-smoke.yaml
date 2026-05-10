@@ -65,7 +65,7 @@ jobs:
           HELMFILE_VERSION: "1.5.1"
       - name: Run make up (default)
         if: steps.check_changes.outputs.skip != 'true' && github.event_name == 'pull_request'
-        run: make up
+        run: podman version && make up
         env:
           CONTAINER_RUNTIME: docker
       - name: Run make up
