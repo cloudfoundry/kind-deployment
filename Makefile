@@ -21,8 +21,8 @@ temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub te
 	@ ./scripts/init.sh
 
 install:
-	kind get kubeconfig --name cfk8s > temp/kubeconfig
 	@ . ./scripts/detect-runtime.sh; \
+	kind get kubeconfig --name cfk8s > temp/kubeconfig; \
 	if [ "$$IS_PODMAN" = "true" ]; then ./scripts/setup-podman-vm.sh; fi; \
 	$$CONTAINER_RUNTIME run --rm --net=host --env-file temp/secrets.env \
 		--env INSTALL_OPTIONAL_COMPONENTS \
