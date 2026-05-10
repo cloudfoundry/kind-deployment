@@ -45,7 +45,7 @@ jobs:
           docker run --rm \
             --privileged \
             --pid host \
-            alpine sh -c "sysctl -w fs.inotify.max_user_instances=512"
+            alpine sh -c "sysctl -w fs.inotify.max_user_instances=512 && sysctl -w net.ipv4.ip_unprivileged_port_start=80"
       - name: Install dependencies
         if: steps.check_changes.outputs.skip != 'true'
         run: |
