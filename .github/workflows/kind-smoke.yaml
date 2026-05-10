@@ -42,8 +42,10 @@ jobs:
       - name: Set kernel settings
         if: steps.check_changes.outputs.skip != 'true'
         run: |
-          sudo sysctl -w fs.inotify.max_user_instances=512
-          sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
+          docker run --rm \
+            --privileged \
+            --pid host \
+            alpine sh -c "sysctl -w fs.inotify.max_user_instances=512 && sysctl -w net.ipv4.ip_unprivileged_port_start=80"
       - name: Install dependencies
         if: steps.check_changes.outputs.skip != 'true'
         run: |
@@ -64,11 +66,14 @@ jobs:
       - name: Run make up (default)
         if: steps.check_changes.outputs.skip != 'true' && github.event_name == 'pull_request'
         run: make up
+        env:
+          CONTAINER_RUNTIME: docker
       - name: Run make up
         if: steps.check_changes.outputs.skip != 'true' && github.event_name != 'pull_request'
-        run: make up
+        run: podman version && make up
         env:
-          INSTALL_OPTIONAL_COMPONENTS: ${{ inputs.minimal }}  
+          CONTAINER_RUNTIME: docker
+          INSTALL_OPTIONAL_COMPONENTS: ${{ inputs.minimal }}
       - name: Login
         if: steps.check_changes.outputs.skip != 'true'
         run: make login
