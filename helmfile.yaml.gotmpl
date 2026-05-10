@@ -33,6 +33,9 @@ releases:
     version: {{ .Values.charts.cilium.version }}
     values:
       - ./assets/values/cilium.yaml
+      {{- if env "CILIUM_EXTRA_VALUES" }}
+      - {{ env "CILIUM_EXTRA_VALUES" }}
+      {{- end }}
     hooks:
       - events: ["postsync"]
         showlogs: true

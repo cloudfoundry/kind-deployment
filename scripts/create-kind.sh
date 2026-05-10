@@ -52,6 +52,13 @@ setup_nfs() {
 
 script_full_path=$(dirname "$0")
 
+# Select kind config based on runtime
+if [ "${IS_PODMAN}" = "true" ]; then
+  KIND_CONFIG="$script_full_path/../kind-podman.yaml"
+else
+  KIND_CONFIG="$script_full_path/../kind.yaml"
+fi
+
 # When running under Podman, ensure the Podman VM is ready (NFS modules, inotify, …)
 if [ "${IS_PODMAN}" = "true" ]; then
   echo "Podman detected – ensuring Podman VM is configured..."
@@ -63,7 +70,7 @@ if kind get clusters | grep -q "cfk8s"; then
   exit 0
 fi
 
-kind create cluster --name "cfk8s" --config="$script_full_path/../kind.yaml"
+kind create cluster --name "cfk8s" --config="$KIND_CONFIG"
 
 echo "Applying taints to workload nodes..."
 kubectl taint nodes -l cloudfoundry.org/cell=true cloudfoundry.org/cell=true:NoSchedule --overwrite || true

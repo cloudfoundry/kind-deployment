@@ -1,0 +1,17 @@
+ipam:
+  mode: kubernetes
+envoy:
+  enabled: false
+# kube-proxy replacement via eBPF requires privileges not available in
+# rootless Podman containers (used in CI). Fall back to standard kube-proxy mode.
+kubeProxyReplacement: false
+k8sServiceHost: cfk8s-control-plane
+k8sServicePort: 6443
+operator:
+  replicas: 1
+# Disable features that require elevated eBPF privileges
+bpf:
+  masquerade: false
+nodePort:
+  enabled: false
+
