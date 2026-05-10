@@ -50,6 +50,12 @@ if [ "${IS_PODMAN}" = "true" ]; then
 fi
 
 # Compose sub-command
-COMPOSE_CMD="${CONTAINER_RUNTIME} compose"
+# Prefer standalone 'podman-compose' over 'podman compose' (which may delegate
+# to the docker-compose plugin and fail without a Docker daemon).
+if [ "${IS_PODMAN}" = "true" ] && command -v podman-compose &>/dev/null; then
+  COMPOSE_CMD="podman-compose"
+else
+  COMPOSE_CMD="${CONTAINER_RUNTIME} compose"
+fi
 
 export CONTAINER_RUNTIME IS_PODMAN COMPOSE_CMD
