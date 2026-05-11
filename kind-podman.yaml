@@ -24,8 +24,16 @@ kubeadmConfigPatches:
         bind-address: 0.0.0.0
 nodes:
 - role: control-plane
+  extraMounts:
+  - hostPath: /sys/fs/bpf
+    containerPath: /sys/fs/bpf
+    propagation: Bidirectional
 - role: worker
   labels:
+  extraMounts:
+  - hostPath: /sys/fs/bpf
+    containerPath: /sys/fs/bpf
+    propagation: Bidirectional
   extraPortMappings:
   - containerPort: 31080
     hostPort: 80
@@ -77,3 +85,7 @@ nodes:
   labels:
     cloudfoundry.org/cell: "true"
     cloudfoundry.org/zone: z1
+  extraMounts:
+  - hostPath: /sys/fs/bpf
+    containerPath: /sys/fs/bpf
+    propagation: Bidirectional

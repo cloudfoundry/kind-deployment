@@ -150,6 +150,10 @@ jobs:
         run: |
           sudo sysctl -w fs.inotify.max_user_instances=512
           sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
+          # Mount BPF filesystem on the host so Cilium's mount-bpf-fs init-container
+          # can detect it as already mounted and skip the privileged mount syscall,
+          # which fails inside rootless Podman-spawned KinD nodes.
+          sudo mount bpffs /sys/fs/bpf -t bpf -o nosuid,nodev,noexec,relatime
       - name: Install podman-compose
         if: steps.check_changes.outputs.skip != 'true'
         run: |
