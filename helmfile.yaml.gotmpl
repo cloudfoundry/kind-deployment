@@ -396,8 +396,6 @@ releases:
           enableCommaDelimitedDestinations: true
       - ccUploader:
           certificateSecret: all-in-one-tls
-      - udpForwarder:
-          certificateSecret: all-in-one-tls
       - ccdb:
           password: {{ .Values.secrets.dbPassword }}
           caCertificateSecret: all-in-one-tls
