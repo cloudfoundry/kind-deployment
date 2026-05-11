@@ -9,9 +9,21 @@ k8sServiceHost: cfk8s-control-plane
 k8sServicePort: 6443
 operator:
   replicas: 1
-# Disable features that require elevated eBPF privileges
+# Use VXLAN tunnel instead of native routing (required without elevated privileges)
+routingMode: tunnel
+tunnelProtocol: vxlan
+# Disable all eBPF features that require CAP_BPF / kernel privileges
+# not available inside rootless Podman-spawned KinD nodes.
 bpf:
   masquerade: false
+hostServices:
+  enabled: false
 nodePort:
   enabled: false
-
+socketLB:
+  enabled: false
+externalIPs:
+  enabled: false
+# Disable Hubble to reduce resource usage and avoid additional eBPF probes
+hubble:
+  enabled: false
