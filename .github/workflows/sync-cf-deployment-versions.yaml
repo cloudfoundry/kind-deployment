@@ -11,12 +11,31 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    env:
+      BRANCH: auto/sync-cf-deployment-versions
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
           ref: main
+          fetch-depth: 0
           token: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
+
+      - name: Prepare sync branch
+        run: |
+          git config user.name "ard-wg-k8s-gitbot"
+          git config user.email "kind-deployment@cloudfoundry.org"
+
+          if git fetch origin "$BRANCH" 2>/dev/null; then
+            git checkout "$BRANCH"
+            if ! git rebase main; then
+              git rebase --abort
+              echo "::error::Rebase failed due to conflicts, manual resolution required."
+              exit 1
+            fi
+          else
+            git checkout -b "$BRANCH"
+          fi
 
       - name: Get latest cf-deployment release tag
         id: cf-deployment-tag
@@ -27,26 +46,23 @@ jobs:
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "Latest cf-deployment release: $TAG"
 
-      - name: Extract release versions and generate versions.yaml
+      - name: Extract release versions and update charts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pip3 install pyyaml requests
           python3 scripts/sync-cf-deployment-versions.py
 
-      - name: Create pull request
+      - name: Commit and push
         env:
           GH_TOKEN: ${{ secrets.SERVICE_USER_GITHUB_TOKEN }}
         run: |
-          git config user.name "ard-wg-k8s-gitbot"
-          git config user.email "kind-deployment@cloudfoundry.org"
-          git checkout -b auto/sync-cf-deployment-versions
           if git diff --quiet; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No changes to commit."
             exit 0
           fi
 
           git add -A
           git commit -m "chore: update BOSH release versions from cf-deployment ${{ steps.cf-deployment-tag.outputs.tag }}"
-          git push -f -u origin auto/sync-cf-deployment-versions
-          gh pr create --fill --base main || echo "PR already exists"
+          git push --force-with-lease -u origin "$BRANCH"
+          gh pr create --fill --base main || true
