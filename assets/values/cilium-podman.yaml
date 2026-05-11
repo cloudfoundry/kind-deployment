@@ -16,6 +16,10 @@ tunnelProtocol: vxlan
 # not available inside rootless Podman-spawned KinD nodes.
 bpf:
   masquerade: false
+  # Disable automatic BPF filesystem mounting – the host already has bpffs mounted
+  # at /sys/fs/bpf and the init-container mount syscall fails inside Podman containers.
+  autoMount:
+    enabled: false
 hostServices:
   enabled: false
 nodePort:
@@ -27,3 +31,8 @@ externalIPs:
 # Disable Hubble to reduce resource usage and avoid additional eBPF probes
 hubble:
   enabled: false
+# Tell Cilium where the cgroup root is (since we can't auto-mount)
+cgroup:
+  autoMount:
+    enabled: false
+  hostRoot: /sys/fs/cgroup
