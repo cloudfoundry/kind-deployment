@@ -213,6 +213,20 @@ jobs:
       - name: debug events
         if: failure()
         run: kubectl get events -A --sort-by='.lastTimestamp'
+      - name: debug cilium
+        if: failure()
+        run: |
+          echo "===== CILIUM PODS ====="
+          kubectl get pod -n kube-system -l k8s-app=cilium -o wide
+          echo "===== CILIUM AGENT LOGS (all pods) ====="
+          for pod in $(kubectl get pod -n kube-system -l k8s-app=cilium -o jsonpath='{.items[*].metadata.name}'); do
+            echo "--- $pod ---"
+            kubectl logs -n kube-system "$pod" --all-containers=true --previous 2>/dev/null || kubectl logs -n kube-system "$pod" --all-containers=true 2>/dev/null || true
+          done
+          echo "===== CILIUM OPERATOR LOGS ====="
+          kubectl logs -n kube-system -l name=cilium-operator --all-containers=true 2>/dev/null || true
+          echo "===== CILIUM STATUS ====="
+          kubectl exec -n kube-system $(kubectl get pod -n kube-system -l k8s-app=cilium -o jsonpath='{.items[0].metadata.name}' 2>/dev/null) -- cilium status 2>/dev/null || true
       - name: debug pods
         if: failure()
         run: |
