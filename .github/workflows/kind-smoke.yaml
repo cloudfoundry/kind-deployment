@@ -178,12 +178,12 @@ jobs:
           HELMFILE_VERSION: "1.5.0"
       - name: Run make up (default)
         if: steps.check_changes.outputs.skip != 'true' && github.event_name == 'pull_request'
-        run: make up
+        run: systemd-run --scope -p LimitMEMLOCK=infinity -- make up
         env:
           CONTAINER_RUNTIME: podman
       - name: Run make up
         if: steps.check_changes.outputs.skip != 'true' && github.event_name != 'pull_request'
-        run: make up
+        run: systemd-run --scope -p LimitMEMLOCK=infinity -- make up
         env:
           CONTAINER_RUNTIME: podman
           INSTALL_OPTIONAL_COMPONENTS: ${{ inputs.minimal }}
