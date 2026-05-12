@@ -152,6 +152,23 @@ jobs:
           sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
           # Mount BPF filesystem on the host so Cilium's bpf.autoMount=false works correctly.
           sudo mount bpffs /sys/fs/bpf -t bpf -o nosuid,nodev,noexec,relatime || true
+          # Raise the host memlock hard limit so that Podman-started KinD node containers
+          # (and Cilium inside them) can call setrlimit(RLIMIT_MEMLOCK, unlimited).
+          # We write a systemd drop-in for the runner's user slice and reload systemd,
+          # then also apply it directly to PID 1 for immediate effect.
+          sudo mkdir -p /etc/systemd/system/user-.slice.d
+          sudo tee /etc/systemd/system/user-.slice.d/memlock.conf > /dev/null <<'EOF'
+          [Slice]
+          LimitMEMLOCK=infinity
+          EOF
+          sudo systemctl daemon-reload || true
+          sudo prlimit --pid 1 --memlock=unlimited:unlimited
+          # Configure Podman to pass unlimited memlock to every container it spawns.
+          mkdir -p ~/.config/containers
+          cat > ~/.config/containers/containers.conf <<'EOF'
+          [containers]
+          default_ulimits = ["memlock=-1:-1"]
+          EOF
       - name: Install podman-compose
         if: steps.check_changes.outputs.skip != 'true'
         run: |
@@ -178,12 +195,12 @@ jobs:
           HELMFILE_VERSION: "1.5.0"
       - name: Run make up (default)
         if: steps.check_changes.outputs.skip != 'true' && github.event_name == 'pull_request'
-        run: systemd-run --scope -p LimitMEMLOCK=infinity -- make up
+        run: make up
         env:
           CONTAINER_RUNTIME: podman
       - name: Run make up
         if: steps.check_changes.outputs.skip != 'true' && github.event_name != 'pull_request'
-        run: systemd-run --scope -p LimitMEMLOCK=infinity -- make up
+        run: make up
         env:
           CONTAINER_RUNTIME: podman
           INSTALL_OPTIONAL_COMPONENTS: ${{ inputs.minimal }}
