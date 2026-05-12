@@ -23,4 +23,4 @@ FROM nginx:${NGINX_VERSION}
 
 COPY --from=builder /src/nginx/objs/ngx_http_upload_module.so /etc/nginx/modules/ngx_http_upload_module.so
 
-RUN addgroup --gid 1000 vcap && adduser --home /nonexistent --no-create-home --shell /bin/false --system --uid 1000 --gid 1000 vcap
+RUN groupadd --gid 1000 vcap && useradd --home /nonexistent --no-create-home --shell /bin/false --system --uid 1000 --gid 1000 vcap
