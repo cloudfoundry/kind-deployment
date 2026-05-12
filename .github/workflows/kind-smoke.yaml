@@ -152,23 +152,16 @@ jobs:
           sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
           # Mount BPF filesystem on the host so Cilium's bpf.autoMount=false works correctly.
           sudo mount bpffs /sys/fs/bpf -t bpf -o nosuid,nodev,noexec,relatime || true
-          # Raise the host memlock hard limit so that Podman-started KinD node containers
-          # (and Cilium inside them) can call setrlimit(RLIMIT_MEMLOCK, unlimited).
-          # We write a systemd drop-in for the runner's user slice and reload systemd,
-          # then also apply it directly to PID 1 for immediate effect.
-          sudo mkdir -p /etc/systemd/system/user-.slice.d
-          sudo tee /etc/systemd/system/user-.slice.d/memlock.conf > /dev/null <<'EOF'
-          [Slice]
-          LimitMEMLOCK=infinity
-          EOF
-          sudo systemctl daemon-reload || true
-          sudo prlimit --pid 1 --memlock=unlimited:unlimited
-          # Configure Podman to pass unlimited memlock to every container it spawns.
-          mkdir -p ~/.config/containers
-          cat > ~/.config/containers/containers.conf <<'EOF'
-          [containers]
-          default_ulimits = ["memlock=-1:-1"]
-          EOF
+          # Cilium calls setrlimit(RLIMIT_MEMLOCK, unlimited) inside KinD node containers.
+          # In rootless Podman the container inherits the hard memlock limit from the
+          # `podman run` process. We place a podman shim ahead of the real binary in PATH
+          # that injects --ulimit memlock=-1:-1 into every `podman run` call, so the
+          # container starts with unlimited memlock and Cilium never needs SYS_RESOURCE.
+          REAL_PODMAN=$(which podman)
+          mkdir -p "$HOME/.local/bin"
+          printf '#!/usr/bin/env bash\nif [ "$1" = "run" ]; then\n  exec "%s" run --ulimit memlock=-1:-1 "${@:2}"\nelse\n  exec "%s" "$@"\nfi\n' "$REAL_PODMAN" "$REAL_PODMAN" > "$HOME/.local/bin/podman"
+          chmod +x "$HOME/.local/bin/podman"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: Install podman-compose
         if: steps.check_changes.outputs.skip != 'true'
         run: |
