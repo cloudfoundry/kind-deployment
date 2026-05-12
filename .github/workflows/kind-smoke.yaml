@@ -160,8 +160,12 @@ jobs:
           sudo sh -c 'echo "* hard memlock unlimited" >> /etc/security/limits.conf'
           sudo sh -c 'echo "runner soft memlock unlimited" >> /etc/security/limits.conf'
           sudo sh -c 'echo "runner hard memlock unlimited" >> /etc/security/limits.conf'
-          # Apply immediately for the current session
+          # Apply immediately for the current session and for PID 1 so all
+          # child processes (including Podman and the KinD nodes it spawns) inherit
+          # the unlimited hard limit.
           sudo prlimit --pid $$ --memlock=unlimited:unlimited
+          sudo prlimit --pid 1 --memlock=unlimited:unlimited
+          ulimit -l unlimited || true
           # Allow Podman containers to use CAP_SYS_RESOURCE so Cilium can set memlock rlimit.
           mkdir -p ~/.config/containers
           cat > ~/.config/containers/containers.conf <<'EOF'
