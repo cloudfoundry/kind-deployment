@@ -50,5 +50,5 @@ loadBalancer:
 # Disable sysctl override file creation – Cilium tries to write
 # /etc/sysctl.d/99-zzz-override_cilium.conf which fails in rootless
 # Podman KinD nodes that lack CAP_SYS_ADMIN / write access to /etc/sysctl.d/.
-sysctlFix:
+sysctlfix:
   enabled: false
