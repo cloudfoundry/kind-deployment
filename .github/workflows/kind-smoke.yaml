@@ -152,16 +152,13 @@ jobs:
           sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
           # Mount BPF filesystem on the host so Cilium's bpf.autoMount=false works correctly.
           sudo mount bpffs /sys/fs/bpf -t bpf -o nosuid,nodev,noexec,relatime || true
-          # Cilium calls setrlimit(RLIMIT_MEMLOCK, unlimited) inside KinD node containers.
-          # In rootless Podman the container inherits the hard memlock limit from the
-          # `podman run` process. We place a podman shim ahead of the real binary in PATH
-          # that injects --ulimit memlock=-1:-1 into every `podman run` call, so the
-          # container starts with unlimited memlock and Cilium never needs SYS_RESOURCE.
-          REAL_PODMAN=$(which podman)
-          mkdir -p "$HOME/.local/bin"
-          printf '#!/usr/bin/env bash\nif [ "$1" = "run" ]; then\n  exec "%s" run --ulimit memlock=-1:-1 "${@:2}"\nelse\n  exec "%s" "$@"\nfi\n' "$REAL_PODMAN" "$REAL_PODMAN" > "$HOME/.local/bin/podman"
-          chmod +x "$HOME/.local/bin/podman"
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          # Raise the memlock hard+soft limit to unlimited system-wide via /etc/security/limits.conf.
+          # The GitHub Actions runner re-reads PAM limits for each step via a new bash process,
+          # so this takes effect in subsequent steps without a full re-login.
+          # Additionally set it on PID 1 directly so any process forked after this point also inherits it.
+          echo "* - memlock unlimited" | sudo tee -a /etc/security/limits.conf
+          echo "root - memlock unlimited" | sudo tee -a /etc/security/limits.conf
+          sudo prlimit --pid 1 --memlock=unlimited:unlimited
       - name: Install podman-compose
         if: steps.check_changes.outputs.skip != 'true'
         run: |
@@ -188,12 +185,18 @@ jobs:
           HELMFILE_VERSION: "1.5.0"
       - name: Run make up (default)
         if: steps.check_changes.outputs.skip != 'true' && github.event_name == 'pull_request'
-        run: make up
+        run: |
+          # Apply unlimited memlock to the current shell process before make up,
+          # so Podman and all child processes (KinD nodes → containerd → Cilium) inherit it.
+          sudo prlimit --pid $$ --memlock=unlimited:unlimited
+          make up
         env:
           CONTAINER_RUNTIME: podman
       - name: Run make up
         if: steps.check_changes.outputs.skip != 'true' && github.event_name != 'pull_request'
-        run: make up
+        run: |
+          sudo prlimit --pid $$ --memlock=unlimited:unlimited
+          make up
         env:
           CONTAINER_RUNTIME: podman
           INSTALL_OPTIONAL_COMPONENTS: ${{ inputs.minimal }}
