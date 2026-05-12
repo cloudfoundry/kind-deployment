@@ -150,10 +150,27 @@ jobs:
         run: |
           sudo sysctl -w fs.inotify.max_user_instances=512
           sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
-          # Mount BPF filesystem on the host so Cilium's mount-bpf-fs init-container
-          # can detect it as already mounted and skip the privileged mount syscall,
-          # which fails inside rootless Podman-spawned KinD nodes.
-          sudo mount bpffs /sys/fs/bpf -t bpf -o nosuid,nodev,noexec,relatime
+          # Mount BPF filesystem on the host so Cilium's bpf.autoMount=false works correctly.
+          sudo mount bpffs /sys/fs/bpf -t bpf -o nosuid,nodev,noexec,relatime || true
+          # Raise memlock to unlimited system-wide.
+          # Cilium calls setrlimit(RLIMIT_MEMLOCK, unlimited) inside KinD nodes.
+          # In rootless Podman the container is --privileged but the rlimit hard cap
+          # comes from the host; we must raise it here before Podman spawns the nodes.
+          sudo sh -c 'echo "* soft memlock unlimited" >> /etc/security/limits.conf'
+          sudo sh -c 'echo "* hard memlock unlimited" >> /etc/security/limits.conf'
+          sudo sh -c 'echo "runner soft memlock unlimited" >> /etc/security/limits.conf'
+          sudo sh -c 'echo "runner hard memlock unlimited" >> /etc/security/limits.conf'
+          # Apply immediately for the current session
+          sudo prlimit --pid $$ --memlock=unlimited:unlimited
+          # Allow Podman containers to use CAP_SYS_RESOURCE so Cilium can set memlock rlimit.
+          mkdir -p ~/.config/containers
+          cat > ~/.config/containers/containers.conf <<'EOF'
+          [containers]
+          default_capabilities = [
+            "CHOWN", "DAC_OVERRIDE", "FOWNER", "FSETID", "KILL", "NET_BIND_SERVICE",
+            "SETFCAP", "SETGID", "SETPCAP", "SETUID", "SYS_CHROOT", "SYS_RESOURCE"
+          ]
+          EOF
       - name: Install podman-compose
         if: steps.check_changes.outputs.skip != 'true'
         run: |
