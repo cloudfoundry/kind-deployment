@@ -165,15 +165,17 @@ jobs:
           # allowed from within the container's user namespace.
           sudo sysctl -w kernel.unprivileged_bpf_disabled=0
           mkdir -p ~/.config/containers
-          cat > ~/.config/containers/containers.conf <<'EOF'
-          [containers]
-          default_capabilities = [
-            "CHOWN", "DAC_OVERRIDE", "FOWNER", "FSETID", "KILL", "NET_BIND_SERVICE",
-            "SETFCAP", "SETGID", "SETPCAP", "SETUID", "SYS_CHROOT",
-            "NET_ADMIN", "BPF", "SYS_RESOURCE"
-          ]
-          default_ulimits = ["memlock=-1:-1"]
-          EOF
+          # Write containers.conf without leading whitespace (heredoc indentation
+          # would be interpreted as literal content and break TOML parsing).
+          cat > ~/.config/containers/containers.conf << 'CONTAINERSCONF'
+[containers]
+default_capabilities = [
+  "CHOWN", "DAC_OVERRIDE", "FOWNER", "FSETID", "KILL", "NET_BIND_SERVICE",
+  "SETFCAP", "SETGID", "SETPCAP", "SETUID", "SYS_CHROOT",
+  "NET_ADMIN", "BPF", "SYS_RESOURCE"
+]
+default_ulimits = ["memlock=-1:-1"]
+CONTAINERSCONF
       - name: Install podman-compose
         if: steps.check_changes.outputs.skip != 'true'
         run: |
