@@ -167,15 +167,7 @@ jobs:
           mkdir -p ~/.config/containers
           # Write containers.conf without leading whitespace (heredoc indentation
           # would be interpreted as literal content and break TOML parsing).
-          cat > ~/.config/containers/containers.conf << 'CONTAINERSCONF'
-[containers]
-default_capabilities = [
-  "CHOWN", "DAC_OVERRIDE", "FOWNER", "FSETID", "KILL", "NET_BIND_SERVICE",
-  "SETFCAP", "SETGID", "SETPCAP", "SETUID", "SYS_CHROOT",
-  "NET_ADMIN", "BPF", "SYS_RESOURCE"
-]
-default_ulimits = ["memlock=-1:-1"]
-CONTAINERSCONF
+          printf '[containers]\ndefault_capabilities = [\n  "CHOWN", "DAC_OVERRIDE", "FOWNER", "FSETID", "KILL", "NET_BIND_SERVICE",\n  "SETFCAP", "SETGID", "SETPCAP", "SETUID", "SYS_CHROOT",\n  "NET_ADMIN", "BPF", "SYS_RESOURCE"\n]\ndefault_ulimits = ["memlock=-1:-1"]\n' > ~/.config/containers/containers.conf
       - name: Install podman-compose
         if: steps.check_changes.outputs.skip != 'true'
         run: |
