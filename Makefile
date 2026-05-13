@@ -21,13 +21,17 @@ temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub te
 	@ ./scripts/init.sh
 
 install:
-	@ . ./scripts/detect-runtime.sh; \
-	kind get kubeconfig --name cfk8s > temp/kubeconfig; \
-	if [ "$$IS_PODMAN" = "true" ]; then ./scripts/setup-podman-vm.sh; export CILIUM_EXTRA_VALUES="./assets/values/cilium-podman.yaml"; fi; \
-	$$CONTAINER_RUNTIME run --rm --net=host --env-file temp/secrets.env \
-		--env INSTALL_OPTIONAL_COMPONENTS \
-		--env CILIUM_EXTRA_VALUES \
-		-v "$$PWD/temp/certs:/certs" -v "$$PWD/temp/kubeconfig:/helm/.kube/config:ro" -v "$$PWD:/wd" --workdir /wd ghcr.io/helmfile/helmfile:v$(HELMFILE_VERSION) helmfile sync
+        @ . ./scripts/detect-runtime.sh; \
+        kind get kubeconfig --name cfk8s > temp/kubeconfig; \
+        if [ "$$IS_PODMAN" = "true" ]; then \
+                ./scripts/setup-podman-vm.sh; \
+                export SKIP_CILIUM="true"; \
+        fi; \
+        $$CONTAINER_RUNTIME run --rm --net=host --env-file temp/secrets.env \
+                --env INSTALL_OPTIONAL_COMPONENTS \
+                --env CILIUM_EXTRA_VALUES \
+                --env SKIP_CILIUM \
+                -v "$$PWD/temp/certs:/certs" -v "$$PWD/temp/kubeconfig:/helm/.kube/config:ro" -v "$$PWD:/wd" --workdir /wd ghcr.io/helmfile/helmfile:v$(HELMFILE_VERSION) helmfile sync
 
 login:
 	@ . temp/secrets.sh; \

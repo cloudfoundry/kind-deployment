@@ -31,6 +31,11 @@ releases:
     namespace: kube-system
     chart: {{ .Values.charts.cilium.url }}
     version: {{ .Values.charts.cilium.version }}
+    # Skip Cilium when running under rootless Podman (SKIP_CILIUM=true).
+    # kindnet is used as CNI instead (see kind-podman.yaml).
+    # Cilium 1.18.x unconditionally probes BPF_PROG_TYPE_CGROUP_SOCK which
+    # requires CAP_NET_ADMIN in the host user namespace – impossible in rootless Podman.
+    installed: {{ ne (env "SKIP_CILIUM") "true" }}
     values:
       - ./assets/values/cilium.yaml
       {{- if env "CILIUM_EXTRA_VALUES" }}
@@ -58,7 +63,9 @@ releases:
     chart: {{ .Values.charts.istioBase.url }}
     version: {{ .Values.charts.istioBase.version }}
     needs:
+      {{- if ne (env "SKIP_CILIUM") "true" }}
       - kube-system/cilium
+      {{- end }}
     values:
       - defaultRevision: minimal
 
@@ -83,7 +90,9 @@ releases:
     namespace: {{ .Values.systemNamespace }}
     chart: ./assets/base-chart
     needs:
+      {{- if ne (env "SKIP_CILIUM") "true" }}
       - kube-system/cilium
+      {{- end }}
       - istio-system/istiod
     set:
       - name: caCert

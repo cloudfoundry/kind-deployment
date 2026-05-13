@@ -150,24 +150,8 @@ jobs:
         run: |
           sudo sysctl -w fs.inotify.max_user_instances=512
           sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
-          # Mount BPF filesystem on the host so Cilium's bpf.autoMount=false works correctly.
+          # Mount BPF filesystem on the host (needed by kindnet on some kernels)
           sudo mount bpffs /sys/fs/bpf -t bpf -o nosuid,nodev,noexec,relatime || true
-          # Raise memlock to unlimited on PID 1 so all spawned processes (Podman → KinD nodes
-          # → containerd → Cilium) inherit the unlimited hard limit.
-          sudo prlimit --pid 1 --memlock=unlimited:unlimited
-          # Cilium 1.18.x always probes BPF program types at startup, including CGroupSock,
-          # which requires CAP_NET_ADMIN in the container's user namespace. Without it the
-          # bpf(BPF_PROG_LOAD) syscall returns EPERM and Cilium exits fatally.
-          #
-          # Solution: configure Podman to add NET_ADMIN and BPF capabilities to every
-          # container it spawns (i.e. the KinD node containers), and raise memlock via ulimit.
-          # Also set unprivileged_bpf_disabled=0 so that the BPF_PROG_LOAD syscall is
-          # allowed from within the container's user namespace.
-          sudo sysctl -w kernel.unprivileged_bpf_disabled=0
-          mkdir -p ~/.config/containers
-          # Write containers.conf without leading whitespace (heredoc indentation
-          # would be interpreted as literal content and break TOML parsing).
-          printf '[containers]\ndefault_capabilities = [\n  "CHOWN", "DAC_OVERRIDE", "FOWNER", "FSETID", "KILL", "NET_BIND_SERVICE",\n  "SETFCAP", "SETGID", "SETPCAP", "SETUID", "SYS_CHROOT",\n  "NET_ADMIN", "BPF", "SYS_RESOURCE"\n]\ndefault_ulimits = ["memlock=-1:-1"]\n' > ~/.config/containers/containers.conf
       - name: Install podman-compose
         if: steps.check_changes.outputs.skip != 'true'
         run: |

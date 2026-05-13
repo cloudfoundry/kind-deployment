@@ -1,7 +1,12 @@
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 networking:
-  disableDefaultCNI: true
+  # Use kindnet (the KinD default CNI) instead of Cilium when running under
+  # rootless Podman. Cilium 1.18.x unconditionally probes BPF_PROG_TYPE_CGROUP_SOCK
+  # at startup which requires CAP_NET_ADMIN in the *host* (initial) user namespace –
+  # a privilege that rootless Podman containers structurally cannot have.
+  # kindnet provides full pod-to-pod connectivity without BPF privileges.
+  disableDefaultCNI: false
 
 featureGates:
   PodAndContainerStatsFromCRI: true
