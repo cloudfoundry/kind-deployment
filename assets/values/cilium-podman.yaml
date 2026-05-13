@@ -52,3 +52,20 @@ loadBalancer:
 # Podman KinD nodes that lack CAP_SYS_ADMIN / write access to /etc/sysctl.d/.
 sysctlfix:
   enabled: false
+
+# Disable features that require loading eBPF programs which may fail
+# in unprivileged Podman KinD containers on GitHub Actions.
+bandwidthManager:
+  enabled: false
+localRedirectPolicy: false
+# Use iptables for masquerading instead of eBPF
+enableIPv4Masquerade: true
+# Disable DSR which requires eBPF
+loadBalancer:
+  mode: snat
+  dsrDispatch: opt
+# Disable sysctl override file creation – Cilium tries to write
+# /etc/sysctl.d/99-zzz-override_cilium.conf which fails in rootless
+# Podman KinD nodes that lack CAP_SYS_ADMIN / write access to /etc/sysctl.d/.
+sysctlfix:
+  enabled: false

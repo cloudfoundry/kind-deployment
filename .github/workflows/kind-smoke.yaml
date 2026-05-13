@@ -159,6 +159,11 @@ jobs:
           echo "* - memlock unlimited" | sudo tee -a /etc/security/limits.conf
           echo "root - memlock unlimited" | sudo tee -a /etc/security/limits.conf
           sudo prlimit --pid 1 --memlock=unlimited:unlimited
+          # Allow unprivileged eBPF so that Cilium can load and probe BPF programs
+          # (e.g. CGroupSock/FnSetRetval helper probe) inside rootless Podman KinD nodes.
+          # Without this, features.HaveProgramHelper returns EPERM which Cilium treats as
+          # a fatal error rather than "not supported".
+          sudo sysctl -w kernel.unprivileged_bpf_disabled=0
       - name: Install podman-compose
         if: steps.check_changes.outputs.skip != 'true'
         run: |
