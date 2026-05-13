@@ -152,18 +152,28 @@ jobs:
           sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
           # Mount BPF filesystem on the host so Cilium's bpf.autoMount=false works correctly.
           sudo mount bpffs /sys/fs/bpf -t bpf -o nosuid,nodev,noexec,relatime || true
-          # Raise the memlock hard+soft limit to unlimited system-wide via /etc/security/limits.conf.
-          # The GitHub Actions runner re-reads PAM limits for each step via a new bash process,
-          # so this takes effect in subsequent steps without a full re-login.
-          # Additionally set it on PID 1 directly so any process forked after this point also inherits it.
-          echo "* - memlock unlimited" | sudo tee -a /etc/security/limits.conf
-          echo "root - memlock unlimited" | sudo tee -a /etc/security/limits.conf
+          # Raise memlock to unlimited on PID 1 so all spawned processes (Podman → KinD nodes
+          # → containerd → Cilium) inherit the unlimited hard limit.
           sudo prlimit --pid 1 --memlock=unlimited:unlimited
-          # Allow unprivileged eBPF so that Cilium can load and probe BPF programs
-          # (e.g. CGroupSock/FnSetRetval helper probe) inside rootless Podman KinD nodes.
-          # Without this, features.HaveProgramHelper returns EPERM which Cilium treats as
-          # a fatal error rather than "not supported".
+          # Cilium 1.18.x always probes BPF program types at startup, including CGroupSock,
+          # which requires CAP_NET_ADMIN in the container's user namespace. Without it the
+          # bpf(BPF_PROG_LOAD) syscall returns EPERM and Cilium exits fatally.
+          #
+          # Solution: configure Podman to add NET_ADMIN and BPF capabilities to every
+          # container it spawns (i.e. the KinD node containers), and raise memlock via ulimit.
+          # Also set unprivileged_bpf_disabled=0 so that the BPF_PROG_LOAD syscall is
+          # allowed from within the container's user namespace.
           sudo sysctl -w kernel.unprivileged_bpf_disabled=0
+          mkdir -p ~/.config/containers
+          cat > ~/.config/containers/containers.conf <<'EOF'
+          [containers]
+          default_capabilities = [
+            "CHOWN", "DAC_OVERRIDE", "FOWNER", "FSETID", "KILL", "NET_BIND_SERVICE",
+            "SETFCAP", "SETGID", "SETPCAP", "SETUID", "SYS_CHROOT",
+            "NET_ADMIN", "BPF", "SYS_RESOURCE"
+          ]
+          default_ulimits = ["memlock=-1:-1"]
+          EOF
       - name: Install podman-compose
         if: steps.check_changes.outputs.skip != 'true'
         run: |
@@ -190,18 +200,12 @@ jobs:
           HELMFILE_VERSION: "1.5.0"
       - name: Run make up (default)
         if: steps.check_changes.outputs.skip != 'true' && github.event_name == 'pull_request'
-        run: |
-          # Apply unlimited memlock to the current shell process before make up,
-          # so Podman and all child processes (KinD nodes → containerd → Cilium) inherit it.
-          sudo prlimit --pid $$ --memlock=unlimited:unlimited
-          make up
+        run: make up
         env:
           CONTAINER_RUNTIME: podman
       - name: Run make up
         if: steps.check_changes.outputs.skip != 'true' && github.event_name != 'pull_request'
-        run: |
-          sudo prlimit --pid $$ --memlock=unlimited:unlimited
-          make up
+        run: make up
         env:
           CONTAINER_RUNTIME: podman
           INSTALL_OPTIONAL_COMPONENTS: ${{ inputs.minimal }}
