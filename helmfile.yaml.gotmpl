@@ -103,6 +103,8 @@ releases:
         file: {{ .Values.certsDir }}/all-in-one.crt
       - name: tlsKey
         file: {{ .Values.certsDir }}/all-in-one.key
+      - name: ciliumNetworkPolicies.enabled
+        value: {{ ne (env "SKIP_CILIUM") "true" }}
     hooks:
       - events: ["presync"]
         showlogs: true
