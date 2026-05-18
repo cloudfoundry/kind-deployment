@@ -60,6 +60,7 @@ cloudController:
     buildpack_directory_key: cc-buildpacks
     storage_cli:
       host: http://blobstore.127-0-0-1.nip.io
+      region: us-east-1
       aws_access_key_id: admin
       aws_secret_access_key: ~
     fog_connection:
