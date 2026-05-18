@@ -1,6 +1,6 @@
 {{- if .Values.routingApi.enabled }}
 {{ $_ := required ".Values.routingApi.sqldb.password must be provided" .Values.routingApi.sqldb.password }}
- kind: Secret
+kind: Secret
 apiVersion: v1
 metadata:
   name: routing-api-config
