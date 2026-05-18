@@ -29,8 +29,8 @@ repositories:
 releases:
   - name: cilium
     namespace: kube-system
-    chart: cilium/cilium
-    version: 1.18.4
+    chart: {{ .Values.charts.cilium.url }}
+    version: {{ .Values.charts.cilium.version }}
     values:
       - ./assets/values/cilium.yaml
     hooks:
@@ -52,8 +52,8 @@ releases:
 
   - name: istio-base
     namespace: istio-system
-    chart: istio/base
-    version: 1.29.1
+    chart: {{ .Values.charts.istioBase.url }}
+    version: {{ .Values.charts.istioBase.version }}
     needs:
       - kube-system/cilium
     values:
@@ -61,8 +61,8 @@ releases:
 
   - name: istiod
     namespace: istio-system
-    chart: istio/istiod
-    version: 1.29.1
+    chart: {{ .Values.charts.istiod.url }}
+    version: {{ .Values.charts.istiod.version }}
     needs:
       - istio-base
     values:
@@ -102,18 +102,17 @@ releases:
 
   - name: nats
     namespace: {{ .Values.systemNamespace }}
-    chart: nats/nats
-    version: 2.12.4
+    chart: {{ .Values.charts.nats.url }}
+    version: {{ .Values.charts.nats.version }}
     needs:
       - "{{ .Values.systemNamespace }}/base"
     values:
       - ./assets/values/nats.yaml
 
-
   - name: postgresql
     namespace: {{ .Values.systemNamespace }}
-    chart: bitnami/postgresql
-    version: 16.7.27
+    chart: {{ .Values.charts.postgres.url }}
+    version: {{ .Values.charts.postgres.version }}
     needs:
       - "{{ .Values.systemNamespace }}/base"
     values:
@@ -123,8 +122,8 @@ releases:
 
   - name: minio
     namespace: {{ .Values.systemNamespace }}
-    chart: bitnami/minio
-    version: 17.0.21
+    chart: {{ .Values.charts.minio.url }}
+    version: {{ .Values.charts.minio.version }}
     needs:
       - "{{ .Values.systemNamespace }}/base"
     values:
@@ -151,7 +150,7 @@ releases:
 
   - name: loggregator-agent
     namespace: {{ .Values.systemNamespace }}
-    chart: ./releases/loggregator-agent/helm
+    chart: {{ .Values.charts.loggregatorAgent.url }}
     needs:
       - {{ .Values.systemNamespace }}/base
     values:
@@ -168,7 +167,7 @@ releases:
 
   - name: gorouter
     namespace: {{ .Values.systemNamespace }}
-    chart: ./releases/routing/helm
+    chart: {{ .Values.charts.routing.url }}
     needs:
       - {{ .Values.systemNamespace }}/base
       - {{ .Values.systemNamespace }}/nats
@@ -181,7 +180,7 @@ releases:
 
   - name: tcp-routing
     namespace: {{ .Values.systemNamespace }}
-    chart: ./releases/routing/helm
+    chart: {{ .Values.charts.routing.url }}
     installed: {{ .Values.installOptionalComponents }}
     needs:
       - loggregator-agent
@@ -206,7 +205,7 @@ releases:
 
   - name: loggregator
     namespace: {{ .Values.systemNamespace }}
-    chart: ./releases/loggregator/helm
+    chart: {{ .Values.charts.loggregator.url }}
     installed: {{ .Values.installOptionalComponents }}
     needs:
       - {{ .Values.systemNamespace }}/base
@@ -225,7 +224,7 @@ releases:
 
   - name: log-cache
     namespace: {{ .Values.systemNamespace }}
-    chart: ./releases/log-cache/helm
+    chart: {{ .Values.charts.logCache.url }}
     needs:
       - "{{ .Values.systemNamespace }}/base"
       - uaa
@@ -237,7 +236,7 @@ releases:
 
   - name: uaa
     namespace: {{ .Values.systemNamespace }}
-    chart: ./releases/uaa/helm
+    chart: {{ .Values.charts.uaa.url }}
     needs:
       - postgresql
       - {{ .Values.systemNamespace }}/base
@@ -253,7 +252,7 @@ releases:
 
   - name: credhub
     namespace: {{ .Values.systemNamespace }}
-    chart: ./releases/credhub/helm
+    chart: {{ .Values.charts.credhub.url }}
     installed: {{ .Values.installOptionalComponents }}
     needs:
       - uaa
@@ -267,7 +266,7 @@ releases:
 
   - name: locket
     namespace: {{ .Values.systemNamespace }}
-    chart: ./releases/diego/helm
+    chart: {{ .Values.charts.diego.url }}
     needs:
       - loggregator-agent
       - postgresql
@@ -282,11 +281,14 @@ releases:
 
   - name: diego
     namespace: {{ .Values.systemNamespace }}
-    chart: ./releases/diego/helm
+    chart: {{ .Values.charts.diego.url }}
     needs:
       - locket
       - uaa
       - loggregator-agent
+    set:
+      - name: sshProxyHostKey
+        file: {{ .Values.certsDir }}/ssh_key
     values:
       - diegodb:
           password: {{ .Values.secrets.dbPassword }}
@@ -295,8 +297,6 @@ releases:
       - diegoSSHCredentials: {{ .Values.secrets.diegoSSHCredentials }}
       - sshProxy:
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
-      - sshProxyHostKey: |
-{{ readFile (printf "%s/ssh_key" .Values.certsDir) | indent 10 }}
       - auctioneer:
           enabled: true
           certificateSecret: all-in-one-tls
@@ -311,7 +311,7 @@ releases:
 
   - name: tps-watcher
     namespace: {{ .Values.systemNamespace }}
-    chart: ./releases/capi/helm
+    chart: {{ .Values.charts.capi.url }}
     needs:
       - capi
     values:
@@ -322,7 +322,7 @@ releases:
 
   - name: route-emitter
     namespace: {{ .Values.systemNamespace }}
-    chart: ./releases/diego/helm
+    chart: {{ .Values.charts.diego.url }}
     needs:
       - diego
       - nats
@@ -349,17 +349,18 @@ releases:
 
   - name: k8s-rep
     namespace: {{ .Values.systemNamespace }}
-    chart: cloudfoundry-k8s/k8s-rep
-    version: "{{ .Values.versions.k8sRep }}"
+    chart: {{ .Values.charts.k8sRep.url }}
+    version: {{ .Values.charts.k8sRep.version }}
     needs:
       - diego
+    set:
+      - name: caCertificate
+        file: {{ .Values.certsDir }}/ca.crt
     values:
-      - caCertificate: |
-{{ readFile (printf "%s/ca.crt" .Values.certsDir) | indent 10 }}
       - stacks:
-          cflinuxfs4: ghcr.io/cloudfoundry/k8s/cflinuxfs4:{{ .Values.versions.cflinuxfs4 }}
+          cflinuxfs4: ghcr.io/cloudfoundry/k8s/cflinuxfs4:{{ .Values.stacks.cflinuxfs4.version }}
       - workloadsNamespace: {{ .Values.workloadsNamespace }}
-      - containerProxyVerifySubjectAltName: 
+      - containerProxyVerifySubjectAltName:
           - gorouter
           - ssh-proxy
           - cf-tcp-router
@@ -380,7 +381,7 @@ releases:
 
   - name: capi
     namespace: {{ .Values.systemNamespace }}
-    chart: ./releases/capi/helm
+    chart: {{ .Values.charts.capi.url }}
     needs:
       - minio
       - diego
@@ -404,7 +405,7 @@ releases:
 
   - name: nfs-volume
     namespace: {{ .Values.systemNamespace }}
-    chart: ./releases/nfs-volume/helm
+    chart: {{ .Values.charts.nfsVolume.url }}
     installed: {{ .Values.installOptionalComponents }}
     needs:
       - capi
@@ -418,7 +419,7 @@ releases:
 
   - name: cf-networking
     namespace: {{ .Values.systemNamespace }}
-    chart: ./releases/cf-networking/helm
+    chart: {{ .Values.charts.cfNetworking.url }}
     installed: {{ .Values.installOptionalComponents }}
     needs:
       - capi
@@ -445,8 +446,8 @@ releases:
 
   - name: policy-agent
     namespace: {{ .Values.systemNamespace }}
-    chart: cloudfoundry-k8s/policy-agent
-    version: "{{ .Values.versions.policyAgent }}"
+    chart: {{ .Values.charts.policyAgent.url }}
+    version: {{ .Values.charts.policyAgent.version }}
     installed: {{ .Values.installOptionalComponents }}
     needs:
       - cf-networking

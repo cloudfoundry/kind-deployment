@@ -4,7 +4,6 @@
   "properties": {
     "global": {
       "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
-      "required": [],
       "title": "global",
       "type": "object"
     },
@@ -61,11 +60,6 @@
               "type": "string"
             }
           },
-          "required": [
-            "repository",
-            "tag",
-            "imagePullPolicy"
-          ],
           "title": "image",
           "type": "object"
         },
@@ -106,15 +100,6 @@
           }
         }
       },
-      "required": [
-        "enabled",
-        "certificateSecret",
-        "hostname",
-        "appsDomain",
-        "image",
-        "nodeSelector",
-        "tolerations"
-      ],
       "title": "gorouter",
       "type": "object"
     },
@@ -135,18 +120,10 @@
               "type": "string"
             }
           },
-          "required": [
-            "repository",
-            "tag",
-            "imagePullPolicy"
-          ],
           "title": "image",
           "type": "object"
         }
       },
-      "required": [
-        "image"
-      ],
       "title": "routeRegistrar",
       "type": "object"
     },
@@ -231,11 +208,6 @@
               "type": "string"
             }
           },
-          "required": [
-            "repository",
-            "tag",
-            "imagePullPolicy"
-          ],
           "title": "image",
           "type": "object"
         },
@@ -281,14 +253,6 @@
           }
         }
       },
-      "required": [
-        "enabled",
-        "certificateSecret",
-        "systemDomain",
-        "image",
-        "nodeSelector",
-        "tolerations"
-      ],
       "title": "routingApi",
       "type": "object"
     },
@@ -332,11 +296,6 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "repository",
-                "tag",
-                "imagePullPolicy"
-              ],
               "title": "image",
               "type": "object"
             },
@@ -346,10 +305,6 @@
               "type": "null"
             }
           },
-          "required": [
-            "image",
-            "resources"
-          ],
           "title": "haproxy",
           "type": "object"
         },
@@ -372,11 +327,6 @@
               "type": "string"
             }
           },
-          "required": [
-            "repository",
-            "tag",
-            "imagePullPolicy"
-          ],
           "title": "image",
           "type": "object"
         },
@@ -446,15 +396,6 @@
           }
         }
       },
-      "required": [
-        "enabled",
-        "certificateSecret",
-        "oauthClientsSecret",
-        "image",
-        "haproxy",
-        "nodeSelector",
-        "tolerations"
-      ],
       "title": "tcpRouter",
       "type": "object"
     },
@@ -484,29 +425,13 @@
               "type": "string"
             }
           },
-          "required": [
-            "repository",
-            "tag",
-            "imagePullPolicy"
-          ],
           "title": "image",
           "type": "object"
         }
       },
-      "required": [
-        "certificateSecret",
-        "image"
-      ],
       "title": "udpForwarder",
       "type": "object"
     }
   },
-  "required": [
-    "gorouter",
-    "udpForwarder",
-    "routingApi",
-    "tcpRouter",
-    "routeRegistrar"
-  ],
   "type": "object"
 }
