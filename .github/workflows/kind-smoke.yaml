@@ -121,7 +121,7 @@ jobs:
           name: report.json
           path: ./cf-smoke-tests/report.json
 
-  kind-smoke-podman:
+  dd:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -244,6 +244,13 @@ jobs:
           echo "===== CC_WORKER_CLOCK ====="
           kubectl get pod -l app.kubernetes.io/name=cc-worker-clock -o wide
           kubectl logs -l app.kubernetes.io/name=cc-worker-clock
+          echo "===== CF_TCP_ROUTER ====="
+          kubectl get pod -n cf-system -l app=cf-tcp-router -o wide
+          kubectl get pod -n cf-system -l app=cf-tcp-router -o jsonpath='{.items[*].status.containerStatuses[*].state}' | jq 2>/dev/null || true
+          kubectl logs -n cf-system -l app=cf-tcp-router --all-containers=true 2>/dev/null || true
+          echo "===== ROUTING_API ====="
+          kubectl get pod -n cf-system -l app=routing-api -o wide
+          kubectl logs -n cf-system -l app=routing-api --all-containers=true 2>/dev/null || true
       - uses: actions/upload-artifact@v7
         if: always()
         with:

@@ -32,13 +32,13 @@ nodes:
   extraMounts:
   - hostPath: /sys/fs/bpf
     containerPath: /sys/fs/bpf
-    propagation: Bidirectional
+    propagation: HostToContainer
 - role: worker
   labels:
   extraMounts:
   - hostPath: /sys/fs/bpf
     containerPath: /sys/fs/bpf
-    propagation: Bidirectional
+    propagation: HostToContainer
   extraPortMappings:
   - containerPort: 31080
     hostPort: 80
@@ -93,4 +93,4 @@ nodes:
   extraMounts:
   - hostPath: /sys/fs/bpf
     containerPath: /sys/fs/bpf
-    propagation: Bidirectional
+    propagation: HostToContainer
