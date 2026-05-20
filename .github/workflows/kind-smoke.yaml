@@ -121,7 +121,7 @@ jobs:
           name: report.json
           path: ./cf-smoke-tests/report.json
 
-  dd:
+  kind-smoke-podman:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
