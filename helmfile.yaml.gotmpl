@@ -48,15 +48,8 @@ releases:
         args:
           - "-c"
           - |
-            echo "Waiting for nodes to become ready after CNI installation..."
+            echo "Cilium installed – waiting for nodes to become ready..."
             kubectl wait --for=condition=Ready nodes --all --timeout=300s
-
-            corefile=$(kubectl -n kube-system get configmap coredns -o jsonpath='{.data.Corefile}' | sed '/kubernetes/i \
-              rewrite name regex (.*)\\.127-0-0-1\\.nip\\.io istio-gateway-istio.{{ .Values.systemNamespace }}.svc.cluster.local answer auto\
-            ')
-            kubectl -n kube-system patch configmap coredns --type=json \
-              -p="$(jq -n --arg cf "$corefile" '[{"op":"replace","path":"/data/Corefile","value":$cf}]')"
-            kubectl -n kube-system rollout restart deployment/coredns
 
   - name: istio-base
     namespace: istio-system
@@ -112,7 +105,21 @@ releases:
         args:
           - "-c"
           - |
+            echo "Waiting for nodes to become ready..."
+            kubectl wait --for=condition=Ready nodes --all --timeout=300s
             kubectl apply --server-side --filename assets/gateway-api.yaml
+      - events: ["postsync"]
+        showlogs: true
+        command: "/bin/sh"
+        args:
+          - "-c"
+          - |
+            corefile=$(kubectl -n kube-system get configmap coredns -o jsonpath='{.data.Corefile}' | sed '/kubernetes/i \
+              rewrite name regex (.*)\\.127-0-0-1\\.nip\\.io istio-gateway-istio.{{ .Values.systemNamespace }}.svc.cluster.local answer auto\
+            ')
+            kubectl -n kube-system patch configmap coredns --type=json \
+              -p="$(jq -n --arg cf "$corefile" '[{"op":"replace","path":"/data/Corefile","value":$cf}]')"
+            kubectl -n kube-system rollout restart deployment/coredns
 
   - name: nats
     namespace: {{ .Values.systemNamespace }}
