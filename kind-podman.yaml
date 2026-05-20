@@ -29,19 +29,12 @@ kubeadmConfigPatches:
         bind-address: 0.0.0.0
 nodes:
 - role: control-plane
-  # Allow unprivileged processes inside pods to bind low ports (e.g. HAProxy
-  # on port 80 inside cf-tcp-router). The host sysctl set in the GHA workflow
-  # only applies to the host network namespace, not to each kind node's netns.
-  sysctls:
-    net.ipv4.ip_unprivileged_port_start: "0"
   extraMounts:
   - hostPath: /sys/fs/bpf
     containerPath: /sys/fs/bpf
     propagation: HostToContainer
 - role: worker
   labels:
-  sysctls:
-    net.ipv4.ip_unprivileged_port_start: "0"
   extraMounts:
   - hostPath: /sys/fs/bpf
     containerPath: /sys/fs/bpf
@@ -97,8 +90,6 @@ nodes:
   labels:
     cloudfoundry.org/cell: "true"
     cloudfoundry.org/zone: z1
-  sysctls:
-    net.ipv4.ip_unprivileged_port_start: "0"
   extraMounts:
   - hostPath: /sys/fs/bpf
     containerPath: /sys/fs/bpf
