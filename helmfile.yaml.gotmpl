@@ -480,6 +480,21 @@ releases:
       - name: pollInterval
         value: "5s"
     hooks:
+      - events: ["presync"]
+        showlogs: true
+        command: "/bin/sh"
+        args:
+          - "-c"
+          - |
+            # The policy-agent chart hardcodes imagePullSecrets: [{name: image-pull-secret}].
+            # Kubernetes refuses to pull images when a referenced secret does not exist,
+            # even for public images. Create an empty placeholder if it's missing.
+            kubectl create secret docker-registry image-pull-secret \
+              --namespace {{ .Values.systemNamespace }} \
+              --docker-server=ghcr.io \
+              --docker-username=x \
+              --docker-password=x \
+              --dry-run=client -o yaml | kubectl apply -f -
       - events: ["postsync"]
         showlogs: true
         command: "/bin/sh"
