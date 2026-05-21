@@ -31,7 +31,7 @@ jobs:
             --privileged \
             --pid host \
             -v /lib/modules:/lib/modules:ro \
-            alpine sh -c "sysctl -w fs.inotify.max_user_instances=512 && modprobe nfs && modprobe nfsd"
+            alpine sh -c "sysctl -w fs.inotify.max_user_instances=512 && sysctl -w net.ipv4.ip_unprivileged_port_start=80 && modprobe nfs && modprobe nfsd"
       - name: Install dependencies
         if: steps.check_changes.outputs.skip != 'true'
         run: |
