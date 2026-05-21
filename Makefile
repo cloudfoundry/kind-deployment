@@ -1,7 +1,19 @@
 LOCAL = true
 TARGET_ARCH ?= $(if $(filter true,$(LOCAL)),$(shell go env GOARCH),amd64)
 # renovate: dataSource=github-releases depName=helmfile/helmfile
-HELMFILE_VERSION ?= "1.5.0"
+HELMFILE_VERSION ?= "1.5.1"
+
+# Build all images for the local architecture (arm64 on Apple Silicon, amd64 elsewhere).
+# This ensures Go binaries like storage-cli are native – not run under Rosetta,
+# which causes 'taggedPointerPack' panics with high memory addresses.
+build:
+	@ . ./scripts/detect-runtime.sh; \
+	if [ "$$CONTAINER_RUNTIME" = "podman" ]; then \
+		echo "Building with Podman is not yet supported via docker-bake.hcl."; \
+		echo "Use 'podman build' manually with the Dockerfiles in releases/."; \
+		exit 1; \
+	fi; \
+	docker buildx bake --file docker-bake.hcl --set "*.platform=linux/$(TARGET_ARCH)" $(BAKE_TARGETS)
 
 init: temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub temp/secrets.sh temp/secrets.env
 
@@ -9,9 +21,13 @@ temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub te
 	@ ./scripts/init.sh
 
 install:
-	kind get kubeconfig --name cfk8s > temp/kubeconfig
-	docker run --rm --net=host --env-file temp/secrets.env \
+	@ . ./scripts/detect-runtime.sh; \
+	if [ "$$IS_PODMAN" = "true" ]; then export SKIP_CILIUM="true"; fi; \
+	kind get kubeconfig --name cfk8s > temp/kubeconfig; \
+	$$CONTAINER_RUNTIME run --rm --net=host --env-file temp/secrets.env \
 		--env INSTALL_OPTIONAL_COMPONENTS \
+		--env CILIUM_EXTRA_VALUES \
+		--env SKIP_CILIUM \
 		-v "$$PWD/temp/certs:/certs" -v "$$PWD/temp/kubeconfig:/helm/.kube/config:ro" -v "$$PWD:/wd" --workdir /wd ghcr.io/helmfile/helmfile:v$(HELMFILE_VERSION) helmfile sync
 
 login:
@@ -33,7 +49,7 @@ create-org:
 bootstrap: create-org
 	@ ./scripts/upload_buildpacks.sh
 
-bootstrap-complete: create-org 
+bootstrap-complete: create-org
 	@ ALL_BUILDPACKS=true ./scripts/upload_buildpacks.sh
 
 up: create-kind init install

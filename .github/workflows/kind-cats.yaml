@@ -31,7 +31,7 @@ jobs:
             --privileged \
             --pid host \
             -v /lib/modules:/lib/modules:ro \
-            alpine sh -c "sysctl -w fs.inotify.max_user_instances=512 && modprobe nfs && modprobe nfsd"
+            alpine sh -c "sysctl -w fs.inotify.max_user_instances=512 && sysctl -w net.ipv4.ip_unprivileged_port_start=80 && modprobe nfs && modprobe nfsd"
       - name: Install dependencies
         if: steps.check_changes.outputs.skip != 'true'
         run: |
@@ -48,7 +48,7 @@ jobs:
           # renovate: dataSource=github-releases depName=kubernetes-sigs/kind
           KIND_VERSION: "0.31.0"
           # renovate: dataSource=github-releases depName=helmfile/helmfile
-          HELMFILE_VERSION: "1.5.0"
+          HELMFILE_VERSION: "1.5.1"
       - name: Run make up
         if: steps.check_changes.outputs.skip != 'true'
         run: |

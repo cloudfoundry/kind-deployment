@@ -1,3 +1,4 @@
+{{- if .Values.ciliumNetworkPolicies.enabled }}
 ---
 apiVersion: cilium.io/v2
 kind: CiliumClusterwideNetworkPolicy
@@ -85,3 +86,4 @@ spec:
         - ports:
             - port: "8443"
               protocol: TCP
+{{- end }}

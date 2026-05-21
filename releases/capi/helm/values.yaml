@@ -40,6 +40,9 @@ cloudController:
     repository: ghcr.io/cloudfoundry/k8s/cloud-controller
     tag: ""
     imagePullPolicy: IfNotPresent
+  loggregator:
+    endpoint: "forwarder-agent.{{ .Release.Namespace }}.svc.cluster.local:3458"
+    subjectName: metron
   doppler:
     url: wss://doppler.127-0-0-1.nip.io:443
   logCache:
@@ -57,6 +60,7 @@ cloudController:
     buildpack_directory_key: cc-buildpacks
     storage_cli:
       host: http://blobstore.127-0-0-1.nip.io
+      region: us-east-1
       aws_access_key_id: admin
       aws_secret_access_key: ~
     fog_connection:
@@ -95,15 +99,6 @@ nginx:
     imagePullPolicy: IfNotPresent
   resources: ~
 
-udpForwarder:
-  image:
-    repository: ghcr.io/cloudfoundry/k8s/udp-forwarder
-    # sync: release=loggregator-agent
-    tag: "8.3.19"
-    imagePullPolicy: IfNotPresent
-  resources: ~
-  certificateSecret: ""
-
 tpsWatcher:
   enabled: false
   resources: ~
@@ -124,6 +119,5 @@ ccdb:
   address: postgresql.{{ .Release.Namespace }}.svc.cluster.local
   caCertificateSecret: ""
   skipSSLVerify: true
-
 
 oauthClientsSecret: ~

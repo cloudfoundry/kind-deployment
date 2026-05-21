@@ -194,33 +194,6 @@ spec:
             - name: nginx-config
               mountPath: /etc/nginx/nginx_server_public_tls.conf
               subPath: nginx_server_public_tls.conf
-        - name: udp-forwarder
-          image: {{ .Values.udpForwarder.image.repository }}:{{ .Values.udpForwarder.image.tag }}
-          imagePullPolicy: {{ .Values.udpForwarder.image.imagePullPolicy }}
-          {{- if .Values.udpForwarder.resources }}
-          resources:
-            {{- toYaml .Values.udpForwarder.resources | nindent 12 }}
-          {{- end }}
-          env:
-            - name: UDP_PORT
-              value: "3457"
-            - name: LOGGREGATOR_AGENT_CA_FILE_PATH
-              value: /etc/ssl/certs/udp-forwarder/ca.crt
-            - name: LOGGREGATOR_AGENT_CERT_FILE_PATH
-              value: /etc/ssl/certs/udp-forwarder/tls.crt
-            - name: LOGGREGATOR_AGENT_KEY_FILE_PATH
-              value: /etc/ssl/certs/udp-forwarder/tls.key
-            - name: LOGGREGATOR_AGENT_ADDR
-              value: "forwarder-agent.{{ .Release.Namespace }}.svc.cluster.local:3458"
-            - name: METRICS_CA_FILE_PATH
-              value: /etc/ssl/certs/udp-forwarder/ca.crt
-            - name: METRICS_CERT_FILE_PATH
-              value: /etc/ssl/certs/udp-forwarder/tls.crt
-            - name: METRICS_KEY_FILE_PATH
-              value: /etc/ssl/certs/udp-forwarder/tls.key
-          volumeMounts:
-            - name: udp-forwarder
-              mountPath: /etc/ssl/certs/udp-forwarder
       {{- if .Values.cloudController.nodeSelector }}
       nodeSelector:
         {{- toYaml .Values.cloudController.nodeSelector | nindent 8 }}
@@ -247,9 +220,6 @@ spec:
         - name: nginx-config
           configMap:
             name: nginx-config
-        - name: udp-forwarder
-          secret:
-            secretName: {{ required "udpForwarder.certificateSecret is required" .Values.udpForwarder.certificateSecret }}
         - name: var-run # Share unix sockets between containers.
           emptyDir: {}
         - name: tmpdir

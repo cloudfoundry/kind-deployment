@@ -12,7 +12,7 @@ group "default" {
 
 variable "ROUTING_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/routing-release
-  default = "0.380.0"
+  default = "0.381.0"
 }
 
 target "routing" {
@@ -32,7 +32,7 @@ target "routing" {
 
 variable "CF_NETWORKING_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/cf-networking-release
-  default = "3.112.1"
+  default = "3.113.0"
 }
 
 target "cf-networking" {
@@ -51,7 +51,7 @@ target "cf-networking" {
 
 variable "BOSH_DNS_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/bosh-dns-release
-  default = "1.39.21"
+  default = "1.39.23"
 }
 
 target "bosh-dns" {
@@ -70,7 +70,7 @@ target "bosh-dns" {
 
 variable "CAPI_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/capi-release
-  default = "1.234.0"
+  default = "1.235.0"
 }
 
 target "capi" {
@@ -90,7 +90,7 @@ target "capi" {
 
 variable "DIEGO_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/diego-release
-  default = "2.135.0"
+  default = "2.136.0"
 }
 
 target "diego" {
@@ -171,7 +171,7 @@ target "log-cache" {
 
 variable "CF_DEPLOYMENT_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/cf-deployment
-  default = "56.3.0"
+  default = "56.5.0"
 }
 
 target "fileserver" {
@@ -236,7 +236,7 @@ target "cflinuxfs4" {
 
 variable "NFS_VOLUME_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/nfs-volume-release
-  default = "7.58.0"
+  default = "7.59.0"
 }
 
 target "nfs-volume" {

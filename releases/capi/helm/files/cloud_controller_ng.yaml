@@ -107,8 +107,11 @@ logging:
 log_audit_events: false
 telemetry_log_path: /tmp/cloud_controller_telemetry.log
 loggregator:
-  router: "127.0.0.1:3457"
-  internal_url: "http://loggregator-trafficcontroller.{{ .Release.Namespace }}.svc.cluster.local:8081"
+  endpoint: {{ tpl .Values.cloudController.loggregator.endpoint . }}
+  subject_name: {{ .Values.cloudController.loggregator.subjectName }}
+  key_file: "/etc/ssl/certs/cloud-controller/tls.key"
+  cert_file: "/etc/ssl/certs/cloud-controller/tls.crt"
+  ca_file: "/etc/ssl/certs/cloud-controller/ca.crt"
 logcache:
   host: log-cache.{{ .Release.Namespace }}.svc.cluster.local
   port: 8080
