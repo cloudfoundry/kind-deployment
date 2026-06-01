@@ -36,7 +36,7 @@ stringData:
         {{- if not .Values.policyServer.networkpolicydb.skipSSLVerify }}
         "ca_cert": "/etc/ssl/certs/postgres/ca.crt",
         {{- end }}
-        "skip_hostname_validation": {{ .Values.policyServer.networkpolicydb.skipSSLVerify }}
+        "skip_hostname_validation": {{ .Values.policyServer.networkpolicydb.skipHostnameVerify }}
       },
       "database_migration_timeout": 600,
       "max_idle_connections": 10,
@@ -72,7 +72,7 @@ stringData:
         {{- if not .Values.policyServer.networkpolicydb.skipSSLVerify }}
         "ca_cert": "/etc/ssl/certs/postgres/ca.crt",
         {{- end }}
-        "skip_hostname_validation": {{ .Values.policyServer.networkpolicydb.skipSSLVerify }}
+        "skip_hostname_validation": {{ .Values.policyServer.networkpolicydb.skipHostnameVerify }}
       },
       "max_idle_connections": 10,
       "max_open_connections": 200,
@@ -100,7 +100,7 @@ stringData:
             {{- if not .Values.policyServer.networkpolicydb.skipSSLVerify }}
             "ca_cert": "/etc/ssl/certs/postgres/ca.crt",
             {{- end }}
-          "skip_hostname_validation": {{ .Values.policyServer.networkpolicydb.skipSSLVerify }}
+          "skip_hostname_validation": {{ .Values.policyServer.networkpolicydb.skipHostnameVerify }}
       },
       "uaa_client": "network-policy",
       "uaa_client_secret": {{ .Values.policyServer.oauthClientsSecret | quote }},

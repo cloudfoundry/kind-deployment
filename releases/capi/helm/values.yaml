@@ -119,5 +119,6 @@ ccdb:
   address: postgresql.{{ .Release.Namespace }}.svc.cluster.local
   caCertificateSecret: ""
   skipSSLVerify: true
+  skipHostnameVerify: false
 
 oauthClientsSecret: ~

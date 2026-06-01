@@ -17,6 +17,7 @@ policyServer:
     address: postgresql.{{ .Release.Namespace }}.svc.cluster.local
     caCertificateSecret: ""
     skipSSLVerify: true
+    skipHostnameVerify: false
   nats:
     address: nats.{{ .Release.Namespace }}.svc.cluster.local:4222
   nodeSelector: ~

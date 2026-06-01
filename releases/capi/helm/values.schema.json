@@ -401,6 +401,9 @@
         },
         "skipSSLVerify": {
           "type": "boolean"
+        },
+        "skipHostnameVerify": {
+          "type": "boolean"
         }
       },
       "type": "object"
