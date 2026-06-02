@@ -32,7 +32,7 @@ target "routing" {
 
 variable "CF_NETWORKING_RELEASE_VERSION" {
   # renovate: dataSource=github-releases depName=cloudfoundry/cf-networking-release
-  default = "3.114.0"
+  default = "3.115.0"
 }
 
 target "cf-networking" {
