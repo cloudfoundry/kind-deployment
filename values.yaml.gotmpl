@@ -36,7 +36,9 @@ charts:
   cfNetworking:
     url: ./releases/cf-networking/helm
   nfsVolume:
-    url: ./releases/nfs-volume/helm
+    url: cloudfoundry-k8s/nfs-volume
+    # renovate: dataSource=docker depName=ghcr.io/cloudfoundry/helm/nfs-volume
+    version: "7.60.0"
   cilium:
     url: cilium/cilium
     version: 1.18.4

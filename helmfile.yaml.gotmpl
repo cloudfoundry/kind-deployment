@@ -406,6 +406,7 @@ releases:
   - name: nfs-volume
     namespace: {{ .Values.systemNamespace }}
     chart: {{ .Values.charts.nfsVolume.url }}
+    version: {{ .Values.charts.nfsVolume.version }}
     installed: {{ .Values.installOptionalComponents }}
     needs:
       - capi
