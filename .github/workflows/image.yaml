@@ -1,17 +1,6 @@
 name: Publish docker image
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - "docker-bake.hcl"
-  workflow_dispatch:
-    inputs:
-      target:
-        description: "Bake target"
-        required: false
-        type: string
+on: {}
 
 env:
   REGISTRY_PREFIX: ghcr.io/cloudfoundry/k8s/

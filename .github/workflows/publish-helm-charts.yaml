@@ -1,13 +1,7 @@
 name: Publish helm chart
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'releases/**/helm/**'  
-  workflow_dispatch:
-
+on: {}
+  
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
