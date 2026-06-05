@@ -50,7 +50,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          pip3 install pyyaml requests
+          pip3 install -r scripts/requirements.txt
           python3 scripts/sync-cf-deployment-versions.py
 
       - name: Commit and push

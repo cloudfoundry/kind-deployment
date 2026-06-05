@@ -1,59 +1,84 @@
 #!/usr/bin/env python3
 
-import subprocess
-import base64
-import json
 import os
 import yaml
 import sys
 import re
 import requests
 
+BOSH_RELEASES = { "capi": "capi",
+                  "cf-networking": "cfNetworking",
+                  "credhub": "credhub",
+                  "diego": "diego",
+                  "log-cache": "logCache",
+                  "loggregator": "loggregator",
+                  "loggregator-agent": "loggregatorAgent",
+                  "routing": "routing",
+                  "uaa": "uaa",
+                }
+                
 
-def get_bake_config(release: str) -> dict:
-    result = subprocess.run(["docker", "buildx", "bake", "--print", release], capture_output=True, text=True, check=True)
-    return json.loads(result.stdout)
-
-
-def get_tags_by_release(release: str) -> list:
-    config = get_bake_config(release)
-    all_tags = []
-    for target in config.get("target", {}).values():
-        all_tags.extend([f"cloudfoundry/k8s/{tag}" for tag in target.get("tags", []) if "latest" not in tag])
-
-    return all_tags
-
-
-def update_chart_yaml(chart_yaml_path, version):
-    with open(chart_yaml_path) as f:
+def load_yaml_from_gotmpl(file_path: str) -> dict:
+    with open(file_path) as f:
         content = f.read()
-    updated = re.sub(r"^(appVersion:\s*).*$", rf"\g<1>{version}", content, flags=re.MULTILINE)
-    with open(chart_yaml_path, "w") as f:
-        f.write(updated)
-    print(f"Setting appVersion in {chart_yaml_path} to {version}")
+
+    # Replace Go template expressions so the remaining content is valid YAML.
+    sanitized = re.sub(r"\{\{.*?\}\}", '"__GOTMPL__"', content, flags=re.DOTALL)
+    return yaml.safe_load(sanitized) or {}
 
 
-def update_values_yaml(values_path, release_versions):
-    with open(values_path) as f:
-        content = f.read()
-    updated = re.sub(r"(#\s*sync:\s*release=([\w-]+))\n(\s*)(tag:\s*)([\"']?).*?\5", lambda m: replace_tag(release_versions, m), content)
-    with open(values_path, "w") as f:
-        f.write(updated)
-    print(f"Updated tags in {values_path}")
+def update_gotmpl_with_versions(file_path: str, values: dict) -> None:
+    chart_versions = {}
+    for name, cfg in values.get("charts", {}).items():
+        if isinstance(cfg, dict) and "version" in cfg:
+            chart_versions[name] = str(cfg["version"])
 
+    with open(file_path) as f:
+        lines = f.readlines()
 
-def replace_tag(release_versions, m):
-    release_name = m.group(2)
-    indent = m.group(3)
-    quote = m.group(5)
-    version = release_versions.get(release_name)
-    if version is None:
-        return m.group(0)
-    return f"# sync: release={release_name}\n{indent}tag: {quote}{version}{quote}"
+    in_charts = False
+    current_chart = None
+
+    for i, line in enumerate(lines):
+        if re.match(r"^charts:\s*$", line):
+            in_charts = True
+            current_chart = None
+            continue
+
+        if in_charts and re.match(r"^[A-Za-z_][A-Za-z0-9_]*:\s*$", line):
+            in_charts = False
+            current_chart = None
+
+        if not in_charts:
+            continue
+
+        chart_match = re.match(r"^  ([A-Za-z0-9][A-Za-z0-9_-]*):\s*$", line)
+        if chart_match:
+            current_chart = chart_match.group(1)
+            continue
+
+        if current_chart not in chart_versions:
+            continue
+
+        version_match = re.match(r"^(\s*version:\s*)([\"']?)([^\"'#\s\n]+)([\"']?)(.*)$", line)
+        if not version_match:
+            continue
+
+        prefix = version_match.group(1)
+        quote = version_match.group(2) if version_match.group(2) else '"'
+        suffix = version_match.group(5)
+        # Preserve the original line's newline character if present
+        has_newline = line.endswith("\n")
+        lines[i] = f"{prefix}{quote}{chart_versions[current_chart]}{quote}{suffix}"
+        if has_newline:
+            lines[i] += "\n"
+
+    with open(file_path, "w") as f:
+        f.writelines(lines)
 
 
 def latest_cf_deployment_release() -> str:
-    headers = {"Authorization": f"Bearer {os.environ.get('GITHUB_TOKEN')}"}
+    headers = {"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}"}
     response = requests.get("https://api.github.com/repos/cloudfoundry/cf-deployment/releases/latest", headers=headers)
     response.raise_for_status()
     latest_version = response.json()["tag_name"]
@@ -69,17 +94,6 @@ def cf_deployment_manifest() -> dict:
     return yaml.safe_load(response.text.encode("utf-8"))
 
 
-def is_image_available(tag) -> bool:
-    image, tag = tag.split(":")
-
-    token = base64.b64encode(os.environ.get("GITHUB_TOKEN").encode()).decode()
-    headers = {"Authorization": f"Bearer {token}"}
-    response = requests.get(f"https://ghcr.io/v2/{image}/tags/list", headers=headers)
-
-    response.raise_for_status()
-    return tag in response.json().get("tags", [])
-
-
 def main():
     manifest = cf_deployment_manifest()
 
@@ -88,7 +102,8 @@ def main():
         print("No releases found in cf-deployment manifest", file=sys.stderr)
         sys.exit(1)
 
-    releases_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "releases")
+    values_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "values.yaml.gotmpl")
+    values = load_yaml_from_gotmpl(values_file)
     release_versions = {r["name"]: str(r["version"]) for r in releases}
 
     manifest_version = manifest.get("manifest_version")
@@ -99,33 +114,19 @@ def main():
         manifest_version = str(manifest_version).lstrip("v")
         release_versions["cf-deployment"] = manifest_version
 
-    missing_images = []
-
     for r in releases:
-        helm_dir = os.path.join(releases_dir, r["name"], "helm")
-        chart_yaml_path = os.path.join(helm_dir, "Chart.yaml")
-        values_path = os.path.join(helm_dir, "values.yaml")
+        if r["name"] not in BOSH_RELEASES:
+                print(f"Skipping release update of '{r['name']}': not a managed release", file=sys.stderr)
+                continue
+        yaml_key = BOSH_RELEASES[r["name"]]
+        if yaml_key not in values.get("charts", {}):
+                print(f"Skipping release update of '{r['name']}': no value found", file=sys.stderr)
+                continue
 
-        if not os.path.exists(chart_yaml_path):
-            print(f"Skipping chart update of '{r['name']}' no chart found at {chart_yaml_path}", file=sys.stderr)
-            continue
+        values["charts"][yaml_key]["version"] = str(r["version"])
+        print(f"Updated release '{r['name']}' to version {r['version']}")
 
-        update_chart_yaml(chart_yaml_path, str(r["version"]))
-
-        if not os.path.exists(values_path):
-            print(f"Skipping values update of '{r['name']}' no values found at {values_path}", file=sys.stderr)
-            continue
-
-        update_values_yaml(values_path, release_versions)
-
-        for tag in get_tags_by_release(r["name"]):
-            if not is_image_available(tag):
-                missing_images.append(tag)
-
-    if missing_images:
-        print(f"The following images are missing: \n{', \n'.join(missing_images)}", file=sys.stderr)
-        sys.exit(1)
-
+    update_gotmpl_with_versions(values_file, values)
 
 if __name__ == "__main__":
     main()
