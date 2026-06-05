@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import os
 import yaml
 import sys
@@ -86,16 +87,23 @@ def latest_cf_deployment_release() -> str:
     return latest_version
 
 
-def cf_deployment_manifest() -> dict:
-    version = latest_cf_deployment_release()
-    headers = {"Authorization": f"Bearer {os.environ.get('GITHUB_TOKEN')}"}
-    response = requests.get(f"https://raw.githubusercontent.com/cloudfoundry/cf-deployment/refs/tags/{version}/cf-deployment.yml", headers=headers)
+def cf_deployment_manifest(ref: str = None) -> dict:
+    if ref is None:
+        ref = f"refs/tags/{latest_cf_deployment_release()}"
+    else:
+        print(f"Using cf-deployment ref: {ref}")
+    headers = {"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}"}
+    response = requests.get(f"https://raw.githubusercontent.com/cloudfoundry/cf-deployment/{ref}/cf-deployment.yml", headers=headers)
     response.raise_for_status()
     return yaml.safe_load(response.text.encode("utf-8"))
 
 
 def main():
-    manifest = cf_deployment_manifest()
+    parser = argparse.ArgumentParser(description="Sync cf-deployment release versions into values.yaml.gotmpl")
+    parser.add_argument("--ref", default=None, help="Git ref (branch, tag, or SHA) to download cf-deployment.yml from. Defaults to the latest release tag.")
+    args = parser.parse_args()
+
+    manifest = cf_deployment_manifest(ref=args.ref)
 
     releases = manifest.get("releases", [])
     if not releases:
