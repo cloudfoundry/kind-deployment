@@ -1,9 +1,0 @@
-{
-    "provider": "{{ .Values.cloudController.blobstore.provider }}",
-    "bucket_name": "{{ .Values.cloudController.blobstore.droplet_directory_key }}",
-    "credentials_source": "static",
-    "access_key_id": "{{ .Values.cloudController.blobstore.storage_cli.aws_access_key_id }}",
-    "secret_access_key": "{{ .Values.cloudController.blobstore.storage_cli.aws_secret_access_key }}",
-    "host": "{{ .Values.cloudController.blobstore.storage_cli.host }}",
-    "region": "{{ .Values.cloudController.blobstore.storage_cli.region }}"
-}

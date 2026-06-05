@@ -1,6 +1,0 @@
-name: loggregator-agent
-version: 0.15.0
-description: Helm chart for Loggregator Agent components
-type: application
-apiVersion: v2
-appVersion: 8.3.19

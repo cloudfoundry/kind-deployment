@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: Secret
-metadata:
-  name: credhub-config
-stringData:
-  application.yml: |
-  {{- tpl (.Files.Get "files/credhub.yaml") . | nindent 4 }}

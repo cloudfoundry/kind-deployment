@@ -1,6 +1,0 @@
-name: loggregator
-version: 0.16.0
-description: Helm chart for Loggregator components
-type: application
-apiVersion: v2
-appVersion: 107.0.29
