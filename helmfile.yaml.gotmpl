@@ -151,6 +151,7 @@ releases:
   - name: loggregator-agent
     namespace: {{ .Values.systemNamespace }}
     chart: {{ .Values.charts.loggregatorAgent.url }}
+    version: {{ .Values.charts.loggregatorAgent.version }}
     needs:
       - {{ .Values.systemNamespace }}/base
     values:
@@ -168,6 +169,7 @@ releases:
   - name: gorouter
     namespace: {{ .Values.systemNamespace }}
     chart: {{ .Values.charts.routing.url }}
+    version: {{ .Values.charts.routing.version }}
     needs:
       - {{ .Values.systemNamespace }}/base
       - {{ .Values.systemNamespace }}/nats
@@ -181,6 +183,7 @@ releases:
   - name: tcp-routing
     namespace: {{ .Values.systemNamespace }}
     chart: {{ .Values.charts.routing.url }}
+    version: {{ .Values.charts.routing.version }}
     installed: {{ .Values.installOptionalComponents }}
     needs:
       - loggregator-agent
@@ -206,6 +209,7 @@ releases:
   - name: loggregator
     namespace: {{ .Values.systemNamespace }}
     chart: {{ .Values.charts.loggregator.url }}
+    version: {{ .Values.charts.loggregator.version }}
     installed: {{ .Values.installOptionalComponents }}
     needs:
       - {{ .Values.systemNamespace }}/base
@@ -225,6 +229,7 @@ releases:
   - name: log-cache
     namespace: {{ .Values.systemNamespace }}
     chart: {{ .Values.charts.logCache.url }}
+    version: {{ .Values.charts.logCache.version }}
     needs:
       - "{{ .Values.systemNamespace }}/base"
       - uaa
@@ -237,6 +242,7 @@ releases:
   - name: uaa
     namespace: {{ .Values.systemNamespace }}
     chart: {{ .Values.charts.uaa.url }}
+    version: {{ .Values.charts.uaa.version }}
     needs:
       - postgresql
       - {{ .Values.systemNamespace }}/base
@@ -253,6 +259,7 @@ releases:
   - name: credhub
     namespace: {{ .Values.systemNamespace }}
     chart: {{ .Values.charts.credhub.url }}
+    version: {{ .Values.charts.credhub.version }}
     installed: {{ .Values.installOptionalComponents }}
     needs:
       - uaa
@@ -267,6 +274,7 @@ releases:
   - name: locket
     namespace: {{ .Values.systemNamespace }}
     chart: {{ .Values.charts.diego.url }}
+    version: {{ .Values.charts.diego.version }}
     needs:
       - loggregator-agent
       - postgresql
@@ -282,6 +290,7 @@ releases:
   - name: diego
     namespace: {{ .Values.systemNamespace }}
     chart: {{ .Values.charts.diego.url }}
+    version: {{ .Values.charts.diego.version }}
     needs:
       - locket
       - uaa
@@ -312,6 +321,7 @@ releases:
   - name: tps-watcher
     namespace: {{ .Values.systemNamespace }}
     chart: {{ .Values.charts.capi.url }}
+    version: {{ .Values.charts.capi.version }}
     needs:
       - capi
     values:
@@ -323,6 +333,7 @@ releases:
   - name: route-emitter
     namespace: {{ .Values.systemNamespace }}
     chart: {{ .Values.charts.diego.url }}
+    version: {{ .Values.charts.diego.version }}
     needs:
       - diego
       - nats
@@ -382,6 +393,7 @@ releases:
   - name: capi
     namespace: {{ .Values.systemNamespace }}
     chart: {{ .Values.charts.capi.url }}
+    version: {{ .Values.charts.capi.version }}
     needs:
       - minio
       - diego
@@ -421,6 +433,7 @@ releases:
   - name: cf-networking
     namespace: {{ .Values.systemNamespace }}
     chart: {{ .Values.charts.cfNetworking.url }}
+    version: {{ .Values.charts.cfNetworking.version }}
     installed: {{ .Values.installOptionalComponents }}
     needs:
       - capi

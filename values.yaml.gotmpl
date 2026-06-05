@@ -10,21 +10,37 @@ stacks:
 
 charts:
   capi:
-    url: ./releases/capi/helm
+    url: cloudfoundry-k8s/capi
+    # renovate: dataSource=docker depName=ghcr.io/cloudfoundry/helm/capi
+    version: "1.235.0"
   loggregatorAgent:
-    url: ./releases/loggregator-agent/helm
+    url: cloudfoundry-k8s/loggregator-agent
+    # renovate: dataSource=docker depName=ghcr.io/cloudfoundry/helm/loggregator-agent
+    version: "8.3.19"
   loggregator:
-    url: ./releases/loggregator/helm
+    url: cloudfoundry-k8s/loggregator
+    # renovate: dataSource=docker depName=ghcr.io/cloudfoundry/helm/loggregator
+    version: "107.0.30"
   logCache:
-    url: ./releases/log-cache/helm
+    url: cloudfoundry-k8s/log-cache
+    # renovate: dataSource=docker depName=ghcr.io/cloudfoundry/helm/log-cache
+    version: "3.2.8"
   diego:
-    url: ./releases/diego/helm
+    url: cloudfoundry-k8s/diego
+    # renovate: dataSource=docker depName=ghcr.io/cloudfoundry/helm/diego
+    version: "2.135.0"
   uaa:
-    url: ./releases/uaa/helm
+    url: cloudfoundry-k8s/uaa
+    # renovate: dataSource=docker depName=ghcr.io/cloudfoundry/helm/uaa
+    version: "78.16.0"
   credhub:
-    url: ./releases/credhub/helm
+    url: cloudfoundry-k8s/credhub
+    # renovate: dataSource=docker depName=ghcr.io/cloudfoundry/helm/credhub
+    version: "1.0.0"
   routing:
-    url: ./releases/routing/helm
+    url: cloudfoundry-k8s/routing
+    # renovate: dataSource=docker depName=ghcr.io/cloudfoundry/helm/routing
+    version: "0.382.0"
   k8sRep:
     url: cloudfoundry-k8s/k8s-rep
     # renovate: dataSource=github-releases depName=cloudfoundry/k8s-garden-client
@@ -34,7 +50,9 @@ charts:
     # renovate: dataSource=github-releases depName=cloudfoundry/k8s-policy-agent
     version: "0.3.2"
   cfNetworking:
-    url: ./releases/cf-networking/helm
+    url: cloudfoundry-k8s/cf-networking
+    # renovate: dataSource=docker depName=ghcr.io/cloudfoundry/helm/cf-networking
+    version: "3.114.0"
   nfsVolume:
     url: cloudfoundry-k8s/nfs-volume
     # renovate: dataSource=docker depName=ghcr.io/cloudfoundry/helm/nfs-volume
