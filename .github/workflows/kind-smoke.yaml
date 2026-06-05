@@ -11,6 +11,11 @@ on:
         type: boolean
         required: false
         default: true
+      pre-validation:
+        description: 'Use pre-validated versions of cf-deployment from the develop branch'
+        type: boolean
+        required: false
+        default: false
   schedule:
     - cron: '0 7 * * 1'
 
@@ -63,6 +68,14 @@ jobs:
           KIND_VERSION: "0.31.0"
           # renovate: dataSource=github-releases depName=helmfile/helmfile
           HELMFILE_VERSION: "1.5.2"
+      - name: Use pre-validated version of cf-deployment
+        id: pre_validation
+        if: steps.check_changes.outputs.skip != 'true' && github.event_name == 'workflow_dispatch' && github.event.inputs.pre-validation == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pip3 install -r scripts/requirements.txt
+          python3 scripts/sync-cf-deployment-versions.py --ref develop
       - name: Run make up (default)
         if: steps.check_changes.outputs.skip != 'true' && github.event_name == 'pull_request'
         run: make up
