@@ -11,8 +11,8 @@ on:
         type: boolean
         required: false
         default: true
-      pre-validation:
-        description: 'Use pre-validated versions of cf-deployment from the develop branch'
+      fresh-validation:
+        description: 'Use versions of cf-deployment from the develop branch'
         type: boolean
         required: false
         default: false
@@ -68,9 +68,9 @@ jobs:
           KIND_VERSION: "0.31.0"
           # renovate: dataSource=github-releases depName=helmfile/helmfile
           HELMFILE_VERSION: "1.5.2"
-      - name: Use pre-validated version of cf-deployment
+      - name: Use develop versions of cf-deployment
         id: pre_validation
-        if: steps.check_changes.outputs.skip != 'true' && github.event_name == 'workflow_dispatch' && github.event.inputs.pre-validation == 'true'
+        if: steps.check_changes.outputs.skip != 'true' && github.event_name == 'workflow_dispatch' && github.event.inputs.fresh-validation == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
