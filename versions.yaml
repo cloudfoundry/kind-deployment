@@ -13,7 +13,11 @@ charts:
     version: 2.15.8
   diego:
     url: cloudfoundry-k8s/diego
+<<<<<<< HEAD
     version: 0.23.0
+=======
+    version: 2.135.0
+>>>>>>> e96567d (Put versions into separate yaml file)
   istioBase:
     url: istio/base
     version: 1.29.1
@@ -29,10 +33,17 @@ charts:
     version: 3.2.8
   loggregator:
     url: cloudfoundry-k8s/loggregator
+<<<<<<< HEAD
     version: 107.0.31
   loggregatorAgent:
     url: cloudfoundry-k8s/loggregator-agent
     version: 8.3.22
+=======
+    version: 107.0.30
+  loggregatorAgent:
+    url: cloudfoundry-k8s/loggregator-agent
+    version: 8.3.19
+>>>>>>> e96567d (Put versions into separate yaml file)
   minio:
     url: bitnami/minio
     version: 17.0.21

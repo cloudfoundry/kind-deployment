@@ -2,9 +2,9 @@
 
 import argparse
 import os
+from ruamel.yaml import YAML
 import yaml
 import sys
-import re
 import requests
 
 BOSH_RELEASES = { "capi": "capi",
@@ -18,65 +18,6 @@ BOSH_RELEASES = { "capi": "capi",
                   "uaa": "uaa",
                 }
                 
-
-def load_yaml_from_gotmpl(file_path: str) -> dict:
-    with open(file_path) as f:
-        content = f.read()
-
-    # Replace Go template expressions so the remaining content is valid YAML.
-    sanitized = re.sub(r"\{\{.*?\}\}", '"__GOTMPL__"', content, flags=re.DOTALL)
-    return yaml.safe_load(sanitized) or {}
-
-
-def update_gotmpl_with_versions(file_path: str, values: dict) -> None:
-    chart_versions = {}
-    for name, cfg in values.get("charts", {}).items():
-        if isinstance(cfg, dict) and "version" in cfg:
-            chart_versions[name] = str(cfg["version"])
-
-    with open(file_path) as f:
-        lines = f.readlines()
-
-    in_charts = False
-    current_chart = None
-
-    for i, line in enumerate(lines):
-        if re.match(r"^charts:\s*$", line):
-            in_charts = True
-            current_chart = None
-            continue
-
-        if in_charts and re.match(r"^[A-Za-z_][A-Za-z0-9_]*:\s*$", line):
-            in_charts = False
-            current_chart = None
-
-        if not in_charts:
-            continue
-
-        chart_match = re.match(r"^  ([A-Za-z0-9][A-Za-z0-9_-]*):\s*$", line)
-        if chart_match:
-            current_chart = chart_match.group(1)
-            continue
-
-        if current_chart not in chart_versions:
-            continue
-
-        version_match = re.match(r"^(\s*version:\s*)([\"']?)([^\"'#\s\n]+)([\"']?)(.*)$", line)
-        if not version_match:
-            continue
-
-        prefix = version_match.group(1)
-        quote = version_match.group(2) if version_match.group(2) else '"'
-        suffix = version_match.group(5)
-        # Preserve the original line's newline character if present
-        has_newline = line.endswith("\n")
-        lines[i] = f"{prefix}{quote}{chart_versions[current_chart]}{quote}{suffix}"
-        if has_newline:
-            lines[i] += "\n"
-
-    with open(file_path, "w") as f:
-        f.writelines(lines)
-
 
 def latest_cf_deployment_release() -> str:
     headers = {"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}"}
@@ -110,8 +51,12 @@ def main():
         print("No releases found in cf-deployment manifest", file=sys.stderr)
         sys.exit(1)
 
-    values_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "values.yaml.gotmpl")
-    values = load_yaml_from_gotmpl(values_file)
+    values_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "versions.yaml")
+ 
+    yaml = YAML()
+    yaml.preserve_quotes = True
+    with open(values_file, "r") as f:
+        values = yaml.load(f)
     release_versions = {r["name"]: str(r["version"]) for r in releases}
 
     manifest_version = manifest.get("manifest_version")
@@ -134,7 +79,8 @@ def main():
         values["charts"][yaml_key]["version"] = str(r["version"])
         print(f"Updated release '{r['name']}' to version {r['version']}")
 
-    update_gotmpl_with_versions(values_file, values)
+    with open(values_file, "w") as f:
+        yaml.dump(values, f)
 
 if __name__ == "__main__":
     main()
