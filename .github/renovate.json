@@ -10,10 +10,7 @@
     {
       "customType": "regex",
       "managerFilePatterns": [
-        "/^releases/.*/Chart.yaml$/",
-        "/^releases/.*/values.yaml$/",
         "/^values.yaml.gotmpl$/",
-        "/^docker-bake.hcl$/",
         "/^Makefile$/",
         "/^\\.github/workflows/.+\\.yaml$/"
       ],
