@@ -4,7 +4,7 @@ set -e
 
 INSTALLED_BUILPACKS=$(cf curl /v3/buildpacks | jq -r '.resources[] | "#" + .name + "#"')
 
-buildpacks=("nodejs_buildpack" "binary_buildpack")
+buildpacks=("nodejs-buildpack" "binary-buildpack")
 position=1
 
 if [[ $ALL_BUILDPACKS == "true" ]]; then

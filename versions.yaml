@@ -12,7 +12,7 @@ charts:
     url: cloudfoundry-k8s/credhub
     version: 2.15.8
   diego:
-    url: ../cf-k8s-releases-os/diego/helm
+    url: ../cf-k8s-releases/diego/helm
     version: 0.23.0
   istioBase:
     url: istio/base
@@ -59,25 +59,33 @@ charts:
 
 buildpacks:
   binary-buildpack:
-    version: 1.0.0
+    image: ghcr.io/cloudfoundry/k8s/binary-buildpack
+    tag: 1.1.26
   dotnet-core-buildpack:
-    version: 1.0.0
+    image: ghcr.io/cloudfoundry/k8s/dotnet-core-buildpack
+    tag: 2.4.51
   go-buildpack:
-    version: 1.0.0
-  java-buildpack:
-    version: 1.0.0
+    image: ghcr.io/cloudfoundry/k8s/go-buildpack
+    tag: 1.10.47
   nginx-buildpack:
-    version: 1.0.0
+    image: ghcr.io/cloudfoundry/k8s/nginx-buildpack
+    tag: 1.2.38
   nodejs-buildpack:
-    version: 1.0.0
+    image: ghcr.io/cloudfoundry/k8s/nodejs-buildpack
+    tag: 1.9.2
   php-buildpack:
-    version: 1.0.0
+    image: ghcr.io/cloudfoundry/k8s/php-buildpack
+    tag: 5.0.6
   python-buildpack:
-    version: 1.0.0
+    image: ghcr.io/cloudfoundry/k8s/python-buildpack
+    tag: 1.9.1
   r-buildpack:
-    version: 1.0.0
+    image: ghcr.io/cloudfoundry/k8s/r-buildpack
+    tag: 1.2.28
   ruby-buildpack:
-    version: 1.0.0
+    image: ghcr.io/cloudfoundry/k8s/ruby-buildpack
+    tag: 1.11.1
   staticfile-buildpack:
-    version: 1.0.0
+    image: ghcr.io/cloudfoundry/k8s/staticfile-buildpack
+    tag: 1.6.38
   
