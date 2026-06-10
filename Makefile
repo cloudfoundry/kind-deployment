@@ -1,15 +1,45 @@
+LOCAL = true
+TARGET_ARCH ?= $(if $(filter true,$(LOCAL)),$(shell go env GOARCH),amd64)
+# renovate: dataSource=github-releases depName=helmfile/helmfile
+HELMFILE_VERSION ?= "1.5.3"
+
+# Build all images for the local architecture (arm64 on Apple Silicon, amd64 elsewhere).
+# This ensures Go binaries like storage-cli are native – not run under Rosetta,
+# which causes 'taggedPointerPack' panics with high memory addresses.
+build:
+	@ . ./scripts/detect-runtime.sh; \
+	if [ "$$CONTAINER_RUNTIME" = "podman" ]; then \
+		echo "Building with Podman is not yet supported via docker-bake.hcl."; \
+		echo "Use 'podman build' manually with the Dockerfiles in releases/."; \
+		exit 1; \
+	fi; \
+	docker buildx bake --file docker-bake.hcl --set "*.platform=linux/$(TARGET_ARCH)" $(BAKE_TARGETS)
+
 init: temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub temp/secrets.sh temp/secrets.env
 
 temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub temp/secrets.sh temp/secrets.env:
 	@ ./scripts/init.sh
 
 install:
-	@ ./scripts/install.sh
+	@ . ./scripts/detect-runtime.sh; \
+	if [ "$$IS_PODMAN" = "true" ]; then export SKIP_CILIUM="true"; fi; \
+	kind get kubeconfig --name cfk8s > temp/kubeconfig; \
+	$$CONTAINER_RUNTIME run --rm --net=host --env-file temp/secrets.env \
+		--env INSTALL_OPTIONAL_COMPONENTS \
+		--env CILIUM_EXTRA_VALUES \
+		--env SKIP_CILIUM \
+		-v "$$PWD/temp/certs:/certs" -v "$$PWD/temp/kubeconfig:/helm/.kube/config:ro" -v "$$PWD:/wd" --workdir /wd ghcr.io/helmfile/helmfile:v$(HELMFILE_VERSION) helmfile sync
 
 login:
-	@ . temp/secrets.sh; \
-	curl --silent --show-error --fail --insecure --retry 9 --retry-delay 5 --retry-all-errors --output /dev/null "https://api.127-0-0-1.nip.io/v2/info"; \
-	echo "API is ready. Logging in..."; \
+	@ echo "Waiting for CF API to become ready..."; \
+	for i in $$(seq 1 60); do \
+		status=$$(curl -sk -o /dev/null -w "%{http_code}" https://api.127-0-0-1.nip.io/v2/info); \
+		if [ "$$status" = "200" ]; then echo "CF API is ready."; break; fi; \
+		echo "  attempt $$i/60: HTTP $$status – retrying in 10s..."; \
+		sleep 10; \
+	done; \
+	if [ "$$status" != "200" ]; then echo "ERROR: CF API did not become ready after 10 minutes." >&2; exit 1; fi; \
+	. temp/secrets.sh; \
 	cf login -a https://api.127-0-0-1.nip.io -u ccadmin -p "$$CC_ADMIN_PASSWORD" --skip-ssl-validation
 
 create-kind:
@@ -27,7 +57,7 @@ create-org:
 bootstrap: create-org
 	@ ./scripts/upload_buildpacks.sh
 
-bootstrap-complete: create-org 
+bootstrap-complete: create-org
 	@ ALL_BUILDPACKS=true ./scripts/upload_buildpacks.sh
 
 up: create-kind init install
@@ -35,4 +65,4 @@ up: create-kind init install
 down: delete-kind
 	@ rm -rf temp
 
-PHONY: install login create-kind delete-kind up down create-org bootstrap bootstrap-complete
+.PHONY: build install login create-kind delete-kind up down create-org bootstrap bootstrap-complete
