@@ -1,6 +1,0 @@
-name: routing
-version: 0.25.0
-description: Helm chart for Gorouter components
-type: application
-apiVersion: v2
-appVersion: 0.381.0

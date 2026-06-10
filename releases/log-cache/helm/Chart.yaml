@@ -1,6 +1,0 @@
-name: log-cache
-version: 0.15.0
-description: Helm chart for Log Cache components
-type: application
-apiVersion: v2
-appVersion: 3.2.8

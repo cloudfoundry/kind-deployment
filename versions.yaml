@@ -1,0 +1,58 @@
+charts:
+  capi:
+    url: cloudfoundry-k8s/capi
+    version: 1.235.0
+  cfNetworking:
+    url: cloudfoundry-k8s/cf-networking
+    version: 3.114.0
+  cilium:
+    url: cilium/cilium
+    version: 1.18.4
+  credhub:
+    url: cloudfoundry-k8s/credhub
+    version: 2.15.8
+  diego:
+    url: cloudfoundry-k8s/diego
+    version: 0.23.0
+  istioBase:
+    url: istio/base
+    version: 1.29.1
+  istiod:
+    url: istio/istiod
+    version: 1.29.1
+  k8sRep:
+    url: cloudfoundry-k8s/k8s-rep
+    # renovate: dataSource=github-releases depName=cloudfoundry/k8s-garden-client
+    version: 0.6.3
+  logCache:
+    url: cloudfoundry-k8s/log-cache
+    version: 3.2.8
+  loggregator:
+    url: cloudfoundry-k8s/loggregator
+    version: 107.0.31
+  loggregatorAgent:
+    url: cloudfoundry-k8s/loggregator-agent
+    version: 8.3.22
+  minio:
+    url: bitnami/minio
+    version: 17.0.21
+  nats:
+    url: nats/nats
+    version: 2.12.4
+  nfsVolume:
+    url: cloudfoundry-k8s/nfs-volume
+    # renovate: dataSource=docker depName=ghcr.io/cloudfoundry/helm/nfs-volume
+    version: 7.60.0
+  policyAgent:
+    url: cloudfoundry-k8s/policy-agent
+    # renovate: dataSource=github-releases depName=cloudfoundry/k8s-policy-agent
+    version: 0.3.2
+  postgres:
+    url: bitnami/postgresql
+    version: 16.7.27
+  routing:
+    url: cloudfoundry-k8s/routing
+    version: 0.382.0
+  uaa:
+    url: cloudfoundry-k8s/uaa
+    version: 78.16.0

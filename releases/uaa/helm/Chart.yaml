@@ -1,6 +1,0 @@
-name: uaa
-version: 0.22.0
-description: A Helm chart for UAA
-type: application
-apiVersion: v2
-appVersion: 78.14.0
