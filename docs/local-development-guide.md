@@ -2,11 +2,11 @@
 
 This guide explains how to test local code changes in your kind cluster.
 
-## 2. Build Local Image
+## 1. Build Local Image
 
 The images are built in [cf-k8s-releases](https://github.com/cloudfoundry/cf-k8s-releases). For building the image with modified source code, please refer to th [local-development-guide](https://github.com/cloudfoundry/cf-k8s-releases/blob/main/docs/local-development-guide.md).
 
-## 3. Load Image into kind
+## 2. Load Image into kind
 
 Make the locally built image available to your kind cluster:
 
@@ -20,7 +20,7 @@ kind load docker-image <image>:latest --name cfk8s
 kind load docker-image gorouter:latest --name cfk8s
 ```
 
-## 4. Use the Image
+## 3. Use the Image
 
 Update the deployment or daemonset to use your local image:
 
