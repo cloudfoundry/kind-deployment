@@ -2,37 +2,9 @@
 
 This guide explains how to test local code changes in your kind cluster.
 
-## 1. Make Code Changes
+## 2. Build Local Image
 
-Edit your source code locally in your project directory (e.g., routing-release or other relevant Cloud Foundry project).
-
-## 2. Build Image
-
-Build a Docker image with your local changes:
-
-```bash
-docker buildx bake <image> --set <image>.contexts.src=<path-to-local-source>
-```
-
-**Example:**
-
-```bash
-docker buildx bake gorouter --set gorouter.contexts.src=/Users/user/routing-release/src
-```
-
-This creates an image tagged as `<image>:latest` (e.g., `gorouter:latest`) in your local Docker daemon.
-
-<details>
-
-  <summary>View all available images</summary>
-
-  To see all buildable images:
-
-  ```bash
-  docker buildx bake --print
-  ```
-
-</details>
+The images are built in [cf-k8s-releases](https://github.com/cloudfoundry/cf-k8s-releases). For building the image with modified source code, please refer to th [local-development-guide](https://github.com/cloudfoundry/cf-k8s-releases/blob/main/docs/local-development-guide.md).
 
 ## 3. Load Image into kind
 
