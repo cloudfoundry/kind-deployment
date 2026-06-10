@@ -73,8 +73,8 @@ def main():
                 continue
         yaml_key = BOSH_RELEASES[r["name"]]
         if yaml_key not in values.get("charts", {}):
-                print(f"Skipping release update of '{r['name']}': no value found", file=sys.stderr)
-                continue
+                print(f"error in release update of '{r['name']}': no value found", file=sys.stderr)
+                sys.exit(1)
 
         values["charts"][yaml_key]["version"] = str(r["version"])
         print(f"Updated release '{r['name']}' to version {r['version']}")
