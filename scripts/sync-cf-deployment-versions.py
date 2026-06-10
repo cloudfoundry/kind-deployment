@@ -29,7 +29,7 @@ def latest_cf_deployment_release() -> str:
 
 
 def cf_deployment_manifest(ref: str = None) -> dict:
-    if ref is None:
+    if not ref:
         ref = f"refs/tags/{latest_cf_deployment_release()}"
     else:
         print(f"Using cf-deployment ref: {ref}")
