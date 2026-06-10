@@ -12,7 +12,7 @@ charts:
     url: cloudfoundry-k8s/credhub
     version: 2.15.8
   diego:
-    url: cloudfoundry-k8s/diego
+    url: ../cf-k8s-releases-os/diego/helm
     version: 0.23.0
   istioBase:
     url: istio/base
@@ -56,3 +56,28 @@ charts:
   uaa:
     url: cloudfoundry-k8s/uaa
     version: 78.16.0
+
+buildpacks:
+  binary-buildpack:
+    version: 1.0.0
+  dotnet-core-buildpack:
+    version: 1.0.0
+  go-buildpack:
+    version: 1.0.0
+  java-buildpack:
+    version: 1.0.0
+  nginx-buildpack:
+    version: 1.0.0
+  nodejs-buildpack:
+    version: 1.0.0
+  php-buildpack:
+    version: 1.0.0
+  python-buildpack:
+    version: 1.0.0
+  r-buildpack:
+    version: 1.0.0
+  ruby-buildpack:
+    version: 1.0.0
+  staticfile-buildpack:
+    version: 1.0.0
+  

@@ -310,10 +310,11 @@ releases:
       - auctioneer:
           enabled: true
           certificateSecret: all-in-one-tls
-      - bbs:
+      - bb
           enabled: true
           certificateSecret: all-in-one-tls
       - fileserver:
+          buildpacks: {{ .Values.buildpacks }}
           enabled: true
       - sshProxy:
           enabled: true
