@@ -10,10 +10,9 @@ temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub te
 
 install:
 	kind get kubeconfig --name cfk8s > temp/kubeconfig
-# 	docker run --rm --net=host --env-file temp/secrets.env \
-# 		--env INSTALL_OPTIONAL_COMPONENTS \
-# 		-v "$$PWD/temp/certs:/certs" -v "$$PWD/temp/kubeconfig:/helm/.kube/config:ro" -v "$$PWD:/wd" --workdir /wd ghcr.io/helmfile/helmfile:v$(HELMFILE_VERSION) helmfile sync
-	helmfile sync
+	docker run --rm --net=host --env-file temp/secrets.env \
+		--env INSTALL_OPTIONAL_COMPONENTS \
+		-v "$$PWD/temp/certs:/certs" -v "$$PWD/temp/kubeconfig:/helm/.kube/config:ro" -v "$$PWD:/wd" --workdir /wd ghcr.io/helmfile/helmfile:v$(HELMFILE_VERSION) helmfile sync
 
 login:
 	@ . temp/secrets.sh; \
