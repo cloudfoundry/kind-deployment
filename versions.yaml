@@ -12,7 +12,7 @@ charts:
     url: cloudfoundry-k8s/credhub
     version: 2.15.8
   diego:
-    url: ../cf-k8s-releases/diego/helm
+    url: cloudfoundry-k8s/diego
     version: 2.138.0
   istioBase:
     url: istio/base
