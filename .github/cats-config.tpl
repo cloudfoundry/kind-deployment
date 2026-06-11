@@ -55,12 +55,12 @@
     "volume_service_create_config": "{\"share\": \"nfs-server/exports/test-share\"}",
 
 
-    "java_buildpack_name": "java-buildpack",
-    "ruby_buildpack_name": "ruby-buildpack",
-    "nodejs_buildpack_name": "nodejs-buildpack",
-    "binary_buildpack_name": "binary-buildpack",
-    "go_buildpack_name": "go-buildpack",
-    "python_buildpack_name": "python-buildpack",
+    "java_buildpack_name": "java_buildpack",
+    "ruby_buildpack_name": "ruby_buildpack",
+    "nodejs_buildpack_name": "nodejs_buildpack",
+    "binary_buildpack_name": "binary_buildpack",
+    "go_buildpack_name": "go_buildpack",
+    "python_buildpack_name": "python_buildpack",
 
     "catnip_docker_app_image": "ghcr.io/cloudfoundry/catnip-app:latest"
 }
