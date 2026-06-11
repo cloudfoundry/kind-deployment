@@ -4,11 +4,11 @@ set -e
 
 INSTALLED_BUILPACKS=$(cf curl /v3/buildpacks | jq -r '.resources[] | "#" + .name + "#"')
 
-buildpacks=("nodejs-buildpack" "binary-buildpack")
+buildpacks=("java-buildpack" "nodejs-buildpack" "go-buildpack" "binary-buildpack")
 position=1
 
 if [[ $ALL_BUILDPACKS == "true" ]]; then
-  buildpacks+=("dotnet-core_buildpack" "nginx_buildpack" "php_buildpack" "python_buildpack" "r_buildpack" "ruby_buildpack" "staticfile_buildpack")
+  buildpacks+=("dotnet-core-buildpack" "nginx-buildpack" "php-buildpack" "python-buildpack" "r-buildpack" "ruby-buildpack" "staticfile-buildpack")
 fi
 
 

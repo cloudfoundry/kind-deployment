@@ -17,6 +17,8 @@ BOSH_RELEASES = { "capi": "capi",
                   "routing": "routing",
                   "uaa": "uaa",
                 }
+
+BUILDPACKS = [ "java-buildpack", "nodejs-buildpack", "go-buildpack", "binary-buildpack", "dotnet-core-buildpack", "nginx-buildpack", "php-buildpack", "python-buildpack", "r-buildpack", "ruby-buildpack", "staticfile-buildpack"]
                 
 
 def latest_cf_deployment_release() -> str:
@@ -68,16 +70,20 @@ def main():
         release_versions["cf-deployment"] = manifest_version
 
     for r in releases:
-        if r["name"] not in BOSH_RELEASES:
+        if (r["name"] not in BOSH_RELEASES) and (r["name"] not in BUILDPACKS):
                 print(f"Skipping release update of '{r['name']}': not a managed release", file=sys.stderr)
                 continue
-        yaml_key = BOSH_RELEASES[r["name"]]
-        if yaml_key not in values.get("charts", {}):
-                print(f"error in release update of '{r['name']}': no value found", file=sys.stderr)
-                sys.exit(1)
+        yaml_key = BOSH_RELEASES.get(r["name"], "unknown")
+        if yaml_key in values.get("charts", {}):
+            values["charts"][yaml_key]["version"] = str(r["version"])
+            print(f"Updated release '{r['name']}' to version {r['version']}")
+        elif r["name"] in BUILDPACKS and r["name"] in values.get("buildpacks", {}):
+            values["buildpacks"][r["name"]]["tag"] = str(r["version"])
+            print(f"Updated buildpack '{r['name']}' to version {r['version']}")
+        else:
+            print(f"error in release update of '{r['name']}': no value found", file=sys.stderr)
+            sys.exit(1)
 
-        values["charts"][yaml_key]["version"] = str(r["version"])
-        print(f"Updated release '{r['name']}' to version {r['version']}")
 
     with open(values_file, "w") as f:
         yaml.dump(values, f)

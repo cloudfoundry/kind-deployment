@@ -1,10 +1,10 @@
 charts:
   capi:
     url: cloudfoundry-k8s/capi
-    version: 1.235.0
+    version: 1.236.0
   cfNetworking:
     url: cloudfoundry-k8s/cf-networking
-    version: 3.114.0
+    version: 3.115.0
   cilium:
     url: cilium/cilium
     version: 1.18.4
@@ -13,7 +13,7 @@ charts:
     version: 2.15.8
   diego:
     url: ../cf-k8s-releases/diego/helm
-    version: 0.23.0
+    version: 2.138.0
   istioBase:
     url: istio/base
     version: 1.29.1
@@ -26,7 +26,7 @@ charts:
     version: 0.6.3
   logCache:
     url: cloudfoundry-k8s/log-cache
-    version: 3.2.8
+    version: 3.2.10
   loggregator:
     url: cloudfoundry-k8s/loggregator
     version: 107.0.31
@@ -52,7 +52,7 @@ charts:
     version: 16.7.27
   routing:
     url: cloudfoundry-k8s/routing
-    version: 0.382.0
+    version: 0.384.0
   uaa:
     url: cloudfoundry-k8s/uaa
     version: 78.16.0
@@ -60,10 +60,13 @@ charts:
 buildpacks:
   binary-buildpack:
     image: ghcr.io/cloudfoundry/k8s/binary-buildpack
-    tag: 1.1.26
+    tag: 1.1.21
   dotnet-core-buildpack:
     image: ghcr.io/cloudfoundry/k8s/dotnet-core-buildpack
     tag: 2.4.51
+  java-buildpack:
+    image: ghcr.io/cloudfoundry/k8s/java-buildpack
+    tag: 5.0.4
   go-buildpack:
     image: ghcr.io/cloudfoundry/k8s/go-buildpack
     tag: 1.10.47
@@ -88,4 +91,3 @@ buildpacks:
   staticfile-buildpack:
     image: ghcr.io/cloudfoundry/k8s/staticfile-buildpack
     tag: 1.6.38
-  
