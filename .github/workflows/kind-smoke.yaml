@@ -65,9 +65,9 @@ jobs:
           # renovate: dataSource=github-releases depName=cloudfoundry/cli
           CF_CLI_VERSION: "8.18.3"
           # renovate: dataSource=github-releases depName=kubernetes-sigs/kind
-          KIND_VERSION: "0.31.0"
+          KIND_VERSION: "0.32.0"
           # renovate: dataSource=github-releases depName=helmfile/helmfile
-          HELMFILE_VERSION: "1.5.2"
+          HELMFILE_VERSION: "1.5.3"
       - name: Use develop versions of cf-deployment
         id: pre_validation
         if: steps.check_changes.outputs.skip != 'true' && github.event_name == 'workflow_dispatch' && github.event.inputs.fresh-validation == 'true'
