@@ -41,6 +41,12 @@ jobs:
           else
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
+      - name: Pin nip.io domains to localhost
+        if: steps.check_changes.outputs.skip != 'true'
+        run: |
+          # nip.io is an external DNS service; CI runners sometimes can't resolve it.
+          # Hardcode the CF domains so DNS never leaves the machine.
+          printf '127.0.0.1 api.127-0-0-1.nip.io\n127.0.0.1 uaa.127-0-0-1.nip.io\n127.0.0.1 login.127-0-0-1.nip.io\n127.0.0.1 apps.127-0-0-1.nip.io\n127.0.0.1 doppler.127-0-0-1.nip.io\n127.0.0.1 log-stream.127-0-0-1.nip.io\n' | sudo tee -a /etc/hosts
       - name: Set kernel settings
         if: steps.check_changes.outputs.skip != 'true'
         run: |
