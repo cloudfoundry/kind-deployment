@@ -112,21 +112,21 @@ jobs:
         if: failure()
         run: |
           echo "===== CLOUD_CONTROLLER ====="
-          kubectl get pod -l app.kubernetes.io/name=cloud-controller -o wide
-          kubectl get pod -l app.kubernetes.io/name=cloud-controller -o jsonpath='{.status.containerStatuses[*].state}' | jq
-          kubectl logs -l app.kubernetes.io/name=cloud-controller --all-containers=true
+          kubectl get pod -n cf-system -l app.kubernetes.io/name=cloud-controller -o wide
+          kubectl get pod -n cf-system -l app.kubernetes.io/name=cloud-controller -o jsonpath='{.status.containerStatuses[*].state}' | jq
+          kubectl logs -n cf-system -l app.kubernetes.io/name=cloud-controller --all-containers=true
           echo "===== CC_WORKER ====="
-          kubectl get pod -l app.kubernetes.io/name=cc-worker -o wide
-          kubectl logs -l app.kubernetes.io/name=cc-worker
+          kubectl get pod -n cf-system -l app.kubernetes.io/name=cc-worker -o wide
+          kubectl logs -n cf-system -l app.kubernetes.io/name=cc-worker
           echo "===== CC_UPLOADER ====="
-          kubectl get pod -l app=cc-uploader -o wide
-          kubectl logs -l app=cc-uploader
+          kubectl get pod -n cf-system -l app=cc-uploader -o wide
+          kubectl logs -n cf-system -l app=cc-uploader
           echo "===== CC_DEPLOYMENT_UPDATER ====="
-          kubectl get pod -l app.kubernetes.io/name=cc-deployment-updater -o wide
-          kubectl logs -l app.kubernetes.io/name=cc-deployment-updater
+          kubectl get pod -n cf-system -l app.kubernetes.io/name=cc-deployment-updater -o wide
+          kubectl logs -n cf-system -l app.kubernetes.io/name=cc-deployment-updater
           echo "===== CC_WORKER_CLOCK ====="
-          kubectl get pod -l app.kubernetes.io/name=cc-worker-clock -o wide
-          kubectl logs -l app.kubernetes.io/name=cc-worker-clock
+          kubectl get pod -n cf-system -l app.kubernetes.io/name=cc-worker-clock -o wide
+          kubectl logs -n cf-system -l app.kubernetes.io/name=cc-worker-clock
       - uses: actions/upload-artifact@v7
         if: always()
         with:
