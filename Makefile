@@ -4,7 +4,21 @@ temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub te
 	@ ./scripts/init.sh
 
 install:
-	@ ./scripts/install.sh
+	@ . ./scripts/detect-runtime.sh; \
+	if [ "$$IS_PODMAN" = "true" ]; then export SKIP_CILIUM="true"; fi; \
+	kind get kubeconfig --name cfk8s > temp/kubeconfig; \
+	if ! command -v helmfile &> /dev/null; then \
+		echo "helmfile not found, using $$CONTAINER_RUNTIME to run helmfile"; \
+		$$CONTAINER_RUNTIME run --rm --net=host --env-file temp/secrets.env \
+			--env INSTALL_OPTIONAL_COMPONENTS \
+			--env CILIUM_EXTRA_VALUES \
+			--env SKIP_CILIUM \
+			-v "$$PWD/temp/certs:/certs" -v "$$PWD/temp/kubeconfig:/helm/.kube/config:ro" -v "$$PWD:/wd" --workdir /wd ghcr.io/helmfile/helmfile:v$(HELMFILE_VERSION) helmfile sync; \
+	else \
+		echo "helmfile found, using local helmfile"; \
+		source temp/secrets.sh; \
+		CILIUM_EXTRA_VALUES="$$CILIUM_EXTRA_VALUES" SKIP_CILIUM="$$SKIP_CILIUM" helmfile sync --kubeconfig temp/kubeconfig; \
+	fi
 
 login:
 	@ . temp/secrets.sh; \
@@ -27,7 +41,7 @@ create-org:
 bootstrap: create-org
 	@ ./scripts/upload_buildpacks.sh
 
-bootstrap-complete: create-org 
+bootstrap-complete: create-org
 	@ ALL_BUILDPACKS=true ./scripts/upload_buildpacks.sh
 
 up: create-kind init install
@@ -35,4 +49,4 @@ up: create-kind init install
 down: delete-kind
 	@ rm -rf temp
 
-PHONY: install login create-kind delete-kind up down create-org bootstrap bootstrap-complete
+.PHONY: install login create-kind delete-kind up down create-org bootstrap bootstrap-complete

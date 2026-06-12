@@ -32,8 +32,12 @@ releases:
     namespace: kube-system
     chart: {{ .Values.charts.cilium.url }}
     version: {{ .Values.charts.cilium.version }}
+    installed: {{ ne (env "SKIP_CILIUM") "true" }}
     values:
       - ./assets/values/cilium.yaml
+      {{- if env "CILIUM_EXTRA_VALUES" }}
+      - {{ env "CILIUM_EXTRA_VALUES" }}
+      {{- end }}
     hooks:
       - events: ["postsync"]
         showlogs: true
@@ -41,22 +45,17 @@ releases:
         args:
           - "-c"
           - |
-            echo "Waiting for nodes to become ready after CNI installation..."
+            echo "Cilium installed – waiting for nodes to become ready..."
             kubectl wait --for=condition=Ready nodes --all --timeout=300s
-
-            corefile=$(kubectl -n kube-system get configmap coredns -o jsonpath='{.data.Corefile}' | sed '/kubernetes/i \
-              rewrite name regex (.*)\\.127-0-0-1\\.nip\\.io istio-gateway-istio.{{ .Values.systemNamespace }}.svc.cluster.local answer auto\
-            ')
-            kubectl -n kube-system patch configmap coredns --type=json \
-              -p="$(jq -n --arg cf "$corefile" '[{"op":"replace","path":"/data/Corefile","value":$cf}]')"
-            kubectl -n kube-system rollout restart deployment/coredns
 
   - name: istio-base
     namespace: istio-system
     chart: {{ .Values.charts.istioBase.url }}
     version: {{ .Values.charts.istioBase.version }}
     needs:
+      {{- if ne (env "SKIP_CILIUM") "true" }}
       - kube-system/cilium
+      {{- end }}
     values:
       - defaultRevision: minimal
 
@@ -81,7 +80,9 @@ releases:
     namespace: {{ .Values.systemNamespace }}
     chart: ./assets/base-chart
     needs:
+      {{- if ne (env "SKIP_CILIUM") "true" }}
       - kube-system/cilium
+      {{- end }}
       - istio-system/istiod
     set:
       - name: caCert
@@ -92,6 +93,8 @@ releases:
         file: {{ .Values.certsDir }}/all-in-one.crt
       - name: tlsKey
         file: {{ .Values.certsDir }}/all-in-one.key
+      - name: ciliumNetworkPolicies.enabled
+        value: {{ ne (env "SKIP_CILIUM") "true" }}
     hooks:
       - events: ["presync"]
         showlogs: true
@@ -99,7 +102,21 @@ releases:
         args:
           - "-c"
           - |
+            echo "Waiting for nodes to become ready..."
+            kubectl wait --for=condition=Ready nodes --all --timeout=300s
             kubectl apply --server-side --filename assets/gateway-api.yaml
+      - events: ["postsync"]
+        showlogs: true
+        command: "/bin/sh"
+        args:
+          - "-c"
+          - |
+            corefile=$(kubectl -n kube-system get configmap coredns -o jsonpath='{.data.Corefile}' | sed '/kubernetes/i \
+              rewrite name regex (.*)\\.127-0-0-1\\.nip\\.io istio-gateway-istio.{{ .Values.systemNamespace }}.svc.cluster.local answer auto\
+            ')
+            kubectl -n kube-system patch configmap coredns --type=json \
+              -p="$(jq -n --arg cf "$corefile" '[{"op":"replace","path":"/data/Corefile","value":$cf}]')"
+            kubectl -n kube-system rollout restart deployment/coredns
 
   - name: nats
     namespace: {{ .Values.systemNamespace }}
@@ -404,6 +421,7 @@ releases:
       - minio
       - diego
       - postgresql
+      - "{{ .Values.systemNamespace }}/nats"
     values:
       - cloudController:
           enabled: true
@@ -442,6 +460,7 @@ releases:
     chart: {{ .Values.charts.nfsVolume.url }}
     version: {{ .Values.charts.nfsVolume.version }}
     installed: {{ .Values.installOptionalComponents }}
+    timeout: 600
     needs:
       - capi
     values:
@@ -493,6 +512,21 @@ releases:
       - name: pollInterval
         value: "5s"
     hooks:
+      - events: ["presync"]
+        showlogs: true
+        command: "/bin/sh"
+        args:
+          - "-c"
+          - |
+            # The policy-agent chart hardcodes imagePullSecrets: [{name: image-pull-secret}].
+            # Kubernetes refuses to pull images when a referenced secret does not exist,
+            # even for public images. Create an empty placeholder if it's missing.
+            kubectl create secret docker-registry image-pull-secret \
+              --namespace {{ .Values.systemNamespace }} \
+              --docker-server=ghcr.io \
+              --docker-username=x \
+              --docker-password=x \
+              --dry-run=client -o yaml | kubectl apply -f -
       - events: ["postsync"]
         showlogs: true
         command: "/bin/sh"
