@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: '0 6 * * *'
   workflow_dispatch:
+    inputs:
+      fresh-validation:
+        description: 'Use versions of cf-deployment from the develop branch'
+        type: boolean
+        required: false
+        default: false
   pull_request:
     branches:
       - main
@@ -49,6 +55,14 @@ jobs:
           KIND_VERSION: "0.32.0"
           # renovate: dataSource=github-releases depName=helmfile/helmfile
           HELMFILE_VERSION: "1.5.3"
+      - name: Use develop versions of cf-deployment
+        id: validation
+        if: steps.check_changes.outputs.skip != 'true' && github.event_name == 'workflow_dispatch' && github.event.inputs.fresh-validation == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pip3 install -r scripts/requirements.txt
+          python3 scripts/sync-cf-deployment-versions.py --ref develop
       - name: Run make up
         if: steps.check_changes.outputs.skip != 'true'
         run: |
