@@ -60,7 +60,7 @@ charts:
 buildpacks:
   binary-buildpack:
     image: ghcr.io/cloudfoundry/k8s/binary-buildpack
-    tag: 1.1.26
+    tag: 1.1.21
   dotnet-core-buildpack:
     image: ghcr.io/cloudfoundry/k8s/dotnet-core-buildpack
     tag: 2.4.51
