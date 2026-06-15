@@ -11,7 +11,7 @@ temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub te
 install:
 	kind get kubeconfig --name cfk8s > temp/kubeconfig
 
-	@if ! command -v helmfil &> /dev/null; then \
+	@if ! command -v helmfile &> /dev/null; then \
 		echo "helmfile not found, using docker to run helmfile"; \
 	    docker run --rm --net=host --env-file temp/secrets.env \
 			--env INSTALL_OPTIONAL_COMPONENTS \
