@@ -1,6 +1,6 @@
 name: CF Smoke Tests on KinD
 run-name: >-
-  CF Smoke Tests on KinD${{ github.event_name == 'workflow_dispatch' && github.event.inputs.fresh-validation == 'true' && ' (fresh validation)' || '' }}
+  CF Smoke Tests on KinD${{ github.event_name == 'schedule' && ' (scheduled)' || github.event_name == 'workflow_dispatch' && github.event.inputs.fresh-validation == 'true' && ' (fresh validation)' || '' }}
 
 on:
   pull_request:
