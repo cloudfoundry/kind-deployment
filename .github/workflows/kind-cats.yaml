@@ -1,6 +1,6 @@
 name: CF Acceptance Tests on KinD
 run-name: >-
-  CF Acceptance Tests on KinD${{ github.event_name == 'workflow_dispatch' && github.event.inputs.fresh-validation == 'true' && ' (fresh validation)' || '' }}
+  CF Acceptance Tests on KinD${{ github.event_name == 'schedule' && ' (scheduled)' || github.event_name == 'workflow_dispatch' && github.event.inputs.fresh-validation == 'true' && ' (fresh validation)' || '' }}
 
 on:
   schedule:
