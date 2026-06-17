@@ -1,0 +1,107 @@
+name: Create/Update Draft Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Calculate next version
+        id: next_version
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let latestTag = 'v0.0.0';
+            try {
+              const release = await github.rest.repos.getLatestRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+              });
+              latestTag = release.data.tag_name;
+              console.log('Latest release:', latestTag);
+            } catch (error) {
+              console.log('No releases found, using v0.0.0 as base');
+            }
+
+            const version = latestTag.replace(/^v/, '');
+            const parts = version.split('.');
+            const major = parseInt(parts[0]) || 0;
+            const minor = parseInt(parts[1]) || 0;
+
+            const nextMinor = minor + 1;
+            const nextVersion = `v${major}.${nextMinor}.0`;
+
+            console.log(`Bumping ${latestTag} to ${nextVersion}`);
+            core.setOutput('NEXT_VERSION', nextVersion);
+
+      - name: Generate release notes from versions.yaml
+        id: release_notes
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const yaml = require('js-yaml');
+
+            const versionsContent = fs.readFileSync('versions.yaml', 'utf8');
+            const versions = yaml.load(versionsContent);
+
+            let previousVersions = { charts: {}, buildpacks: {} };
+            try {
+              const latestRelease = await github.rest.repos.getLatestRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+              });
+
+              console.log(`Comparing with previous release: ${latestRelease.data.tag_name}`);
+
+              const response = await github.rest.repos.getContent({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                path: 'versions.yaml',
+                ref: latestRelease.data.tag_name,
+              });
+
+              const previousContent = Buffer.from(response.data.content, 'base64').toString('utf-8');
+              previousVersions = yaml.load(previousContent);
+            } catch (e) {
+              console.log('Could not fetch previous versions.yaml:', e.message);
+            }
+
+            let releaseNotes = '## Charts\n\n';
+            releaseNotes += '| Chart | Version |\n';
+            releaseNotes += '|-------|----------|\n';
+
+            for (const [name, data] of Object.entries(versions.charts)) {
+              const previousVersion = previousVersions.charts?.[name]?.version;
+              const changed = previousVersion && previousVersion !== data.version ? ' ↑' : '';
+              releaseNotes += `| ${name}${changed} | ${data.version} |\n`;
+            }
+
+            releaseNotes += '\n## Buildpacks\n\n';
+            releaseNotes += '| Buildpack | Tag |\n';
+            releaseNotes += '|-----------|-----|\n';
+
+            for (const [name, data] of Object.entries(versions.buildpacks)) {
+              const previousTag = previousVersions.buildpacks?.[name]?.tag;
+              const changed = previousTag && previousTag !== data.tag ? ' ↑' : '';
+              releaseNotes += `| ${name}${changed} | ${data.tag} |\n`;
+            }
+
+            core.setOutput('notes', releaseNotes);
+
+      - name: Create or update draft release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.next_version.outputs.NEXT_VERSION }}
+          body: ${{ steps.release_notes.outputs.notes }}
+          draft: true
+          files: versions.yaml
