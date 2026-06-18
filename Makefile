@@ -24,7 +24,7 @@ install:
 
 login:
 	@ . temp/secrets.sh; \
-	curl --silent --show-error --fail --insecure --retry 9 --retry-delay 5 --retry-all-errors "https://api.127-0-0-1.nip.io/v2/info"; \
+	curl --silent --show-error --fail --insecure --retry 9 --retry-delay 5 --retry-all-errors --output /dev/null "https://api.127-0-0-1.nip.io/v2/info"; \
 	echo "API is ready. Logging in..."; \
 	cf login -a https://api.127-0-0-1.nip.io -u ccadmin -p "$$CC_ADMIN_PASSWORD" --skip-ssl-validation
 
