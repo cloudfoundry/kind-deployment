@@ -16,10 +16,11 @@ BOSH_RELEASES = { "capi": "capi",
                   "loggregator-agent": "loggregatorAgent",
                   "routing": "routing",
                   "uaa": "uaa",
+                  "nfs-volume": "nfsVolume",
                 }
 
 BUILDPACKS = [ "java-buildpack", "nodejs-buildpack", "go-buildpack", "binary-buildpack", "dotnet-core-buildpack", "nginx-buildpack", "php-buildpack", "python-buildpack", "r-buildpack", "ruby-buildpack", "staticfile-buildpack"]
-                
+
 
 def latest_cf_deployment_release() -> str:
     headers = {"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}"}
@@ -31,14 +32,26 @@ def latest_cf_deployment_release() -> str:
 
 
 def cf_deployment_manifest(ref: str = None) -> dict:
-    if not ref:
-        ref = f"refs/tags/{latest_cf_deployment_release()}"
-    else:
-        print(f"Using cf-deployment ref: {ref}")
     headers = {"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}"}
     response = requests.get(f"https://raw.githubusercontent.com/cloudfoundry/cf-deployment/{ref}/cf-deployment.yml", headers=headers)
     response.raise_for_status()
     return yaml.safe_load(response.text.encode("utf-8"))
+
+def nfs_release_version(ref: str = None) -> dict:
+    headers = {"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}"}
+    response = requests.get(f"https://raw.githubusercontent.com/cloudfoundry/cf-deployment/{ref}/operations/enable-nfs-volume-service.yml", headers=headers)
+    response.raise_for_status()
+    for op in yaml.safe_load(response.text.encode("utf-8")):
+        if op.get("type") == "replace" and op.get("path") == "/releases/-":
+            nfs_version = str(op["value"]["version"])
+            print(f"Found nfs-volume release version: {nfs_version}")
+
+            return {
+                "name": "nfs-volume",
+                "version": nfs_version,
+            }
+
+    return {}
 
 
 def main():
@@ -46,9 +59,15 @@ def main():
     parser.add_argument("--ref", default=None, help="Git ref (branch, tag, or SHA) to download cf-deployment.yml from. Defaults to the latest release tag.")
     args = parser.parse_args()
 
+    if not args.ref:
+        args.ref = f"refs/tags/{latest_cf_deployment_release()}"
+    else:
+        print(f"Using cf-deployment ref: {args.ref}")
+
     manifest = cf_deployment_manifest(ref=args.ref)
 
     releases = manifest.get("releases", [])
+    releases.append(nfs_release_version(ref=args.ref))
     if not releases:
         print("No releases found in cf-deployment manifest", file=sys.stderr)
         sys.exit(1)
