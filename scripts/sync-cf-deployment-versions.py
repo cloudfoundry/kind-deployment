@@ -7,24 +7,40 @@ import yaml
 import sys
 import requests
 
-BOSH_RELEASES = { "capi": "capi",
-                  "cf-networking": "cfNetworking",
-                  "credhub": "credhub",
-                  "diego": "diego",
-                  "log-cache": "logCache",
-                  "loggregator": "loggregator",
-                  "loggregator-agent": "loggregatorAgent",
-                  "routing": "routing",
-                  "uaa": "uaa",
-                  "nfs-volume": "nfsVolume",
-                }
+BOSH_RELEASES = {
+    "capi": "capi",
+    "cf-networking": "cfNetworking",
+    "credhub": "credhub",
+    "diego": "diego",
+    "log-cache": "logCache",
+    "loggregator": "loggregator",
+    "loggregator-agent": "loggregatorAgent",
+    "routing": "routing",
+    "uaa": "uaa",
+    "nfs-volume": "nfsVolume",
+}
 
-BUILDPACKS = [ "java-buildpack", "nodejs-buildpack", "go-buildpack", "binary-buildpack", "dotnet-core-buildpack", "nginx-buildpack", "php-buildpack", "python-buildpack", "r-buildpack", "ruby-buildpack", "staticfile-buildpack"]
+BUILDPACKS = [
+    "java-buildpack",
+    "nodejs-buildpack",
+    "go-buildpack",
+    "binary-buildpack",
+    "dotnet-core-buildpack",
+    "nginx-buildpack",
+    "php-buildpack",
+    "python-buildpack",
+    "r-buildpack",
+    "ruby-buildpack",
+    "staticfile-buildpack",
+]
 
 
 def latest_cf_deployment_release() -> str:
     headers = {"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}"}
-    response = requests.get("https://api.github.com/repos/cloudfoundry/cf-deployment/releases/latest", headers=headers)
+    response = requests.get(
+        "https://api.github.com/repos/cloudfoundry/cf-deployment/releases/latest",
+        headers=headers,
+    )
     response.raise_for_status()
     latest_version = response.json()["tag_name"]
     print(f"Latest cf-deployment release: {latest_version}")
@@ -33,13 +49,20 @@ def latest_cf_deployment_release() -> str:
 
 def cf_deployment_manifest(ref: str = None) -> dict:
     headers = {"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}"}
-    response = requests.get(f"https://raw.githubusercontent.com/cloudfoundry/cf-deployment/{ref}/cf-deployment.yml", headers=headers)
+    response = requests.get(
+        f"https://raw.githubusercontent.com/cloudfoundry/cf-deployment/{ref}/cf-deployment.yml",
+        headers=headers,
+    )
     response.raise_for_status()
     return yaml.safe_load(response.text.encode("utf-8"))
 
+
 def nfs_release_version(ref: str = None) -> dict:
     headers = {"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}"}
-    response = requests.get(f"https://raw.githubusercontent.com/cloudfoundry/cf-deployment/{ref}/operations/enable-nfs-volume-service.yml", headers=headers)
+    response = requests.get(
+        f"https://raw.githubusercontent.com/cloudfoundry/cf-deployment/{ref}/operations/enable-nfs-volume-service.yml",
+        headers=headers,
+    )
     response.raise_for_status()
     for op in yaml.safe_load(response.text.encode("utf-8")):
         if op.get("type") == "replace" and op.get("path") == "/releases/-":
@@ -56,7 +79,11 @@ def nfs_release_version(ref: str = None) -> dict:
 
 def main():
     parser = argparse.ArgumentParser(description="Sync cf-deployment release versions into values.yaml.gotmpl")
-    parser.add_argument("--ref", default=None, help="Git ref (branch, tag, or SHA) to download cf-deployment.yml from. Defaults to the latest release tag.")
+    parser.add_argument(
+        "--ref",
+        default=None,
+        help="Git ref (branch, tag, or SHA) to download cf-deployment.yml from. Defaults to the latest release tag.",
+    )
     args = parser.parse_args()
 
     if not args.ref:
@@ -73,7 +100,7 @@ def main():
         sys.exit(1)
 
     values_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "versions.yaml")
- 
+
     yaml = YAML()
     yaml.preserve_quotes = True
     with open(values_file, "r") as f:
@@ -90,8 +117,11 @@ def main():
 
     for r in releases:
         if (r["name"] not in BOSH_RELEASES) and (r["name"] not in BUILDPACKS):
-                print(f"Skipping release update of '{r['name']}': not a managed release", file=sys.stderr)
-                continue
+            print(
+                f"Skipping release update of '{r['name']}': not a managed release",
+                file=sys.stderr,
+            )
+            continue
         yaml_key = BOSH_RELEASES.get(r["name"], "unknown")
         if yaml_key in values.get("charts", {}):
             values["charts"][yaml_key]["version"] = str(r["version"])
@@ -100,12 +130,15 @@ def main():
             values["buildpacks"][r["name"]]["tag"] = str(r["version"])
             print(f"Updated buildpack '{r['name']}' to version {r['version']}")
         else:
-            print(f"error in release update of '{r['name']}': no value found", file=sys.stderr)
+            print(
+                f"error in release update of '{r['name']}': no value found",
+                file=sys.stderr,
+            )
             sys.exit(1)
-
 
     with open(values_file, "w") as f:
         yaml.dump(values, f)
+
 
 if __name__ == "__main__":
     main()
