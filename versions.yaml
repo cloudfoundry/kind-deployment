@@ -41,7 +41,6 @@ charts:
     version: 2.12.4
   nfsVolume:
     url: cloudfoundry-k8s/nfs-volume
-    # renovate: dataSource=docker depName=ghcr.io/cloudfoundry/helm/nfs-volume
     version: 7.62.0
   policyAgent:
     url: cloudfoundry-k8s/policy-agent
