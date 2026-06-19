@@ -15,7 +15,7 @@ jobs:
       BRANCH: auto/sync-cf-deployment-versions
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: main
           fetch-depth: 0

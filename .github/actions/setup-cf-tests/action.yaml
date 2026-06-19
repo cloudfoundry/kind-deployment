@@ -29,7 +29,7 @@ runs:
   using: "composite"
   steps:
     - name: checkout CF test repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: "${{ inputs.test-org }}/${{ inputs.test-repo }}"
         ref: ${{ inputs.test-branch }}
