@@ -17,6 +17,8 @@ $OPENSSL x509 -req -in /certs/all-in-one.csr -CA /certs/ca.crt -CAkey /certs/ca.
 rm -f temp/certs/ssh_key temp/certs/ssh_key.pub
 $SSH_KEYGEN -t rsa -b 4096 -f /certs/ssh_key -N "" > /dev/null 2>&1
 
+docker run --rm -v $(pwd)/temp:/temp alpine chown -R $(id -u):$(id -g) /temp
+
 echo "export BLOBSTORE_PASSWORD=$($OPENSSL rand -hex 16)" > temp/secrets.sh
 echo "export DB_PASSWORD=$($OPENSSL rand -hex 16)" >> temp/secrets.sh
 echo "export OAUTH_CLIENTS_SECRET=$($OPENSSL rand -hex 16)" >> temp/secrets.sh
