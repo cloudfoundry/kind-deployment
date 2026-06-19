@@ -53,23 +53,15 @@ jobs:
             --privileged \
             --pid host \
             alpine sh -c "sysctl -w fs.inotify.max_user_instances=512"
-      - name: Install dependencies
+      - name: Install CF CLI
         if: steps.check_changes.outputs.skip != 'true'
         run: |
           mkdir -p $HOME/.local/bin && echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          curl -L https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64 -o $HOME/.local/bin/kind
-          chmod +x $HOME/.local/bin/kind
-          curl -L https://github.com/helmfile/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz | tar -zx
-          mv helmfile $HOME/.local/bin/helmfile
           curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=${CF_CLI_VERSION}&source=github" | tar -zx
           mv cf8 $HOME/.local/bin/cf
         env:
           # renovate: dataSource=github-releases depName=cloudfoundry/cli
           CF_CLI_VERSION: "8.18.3"
-          # renovate: dataSource=github-releases depName=kubernetes-sigs/kind
-          KIND_VERSION: "0.32.0"
-          # renovate: dataSource=github-releases depName=helmfile/helmfile
-          HELMFILE_VERSION: "1.5.3"
       - name: Use develop versions of cf-deployment
         id: pre_validation
         if: steps.check_changes.outputs.skip != 'true' && github.event_name == 'workflow_dispatch' && github.event.inputs.fresh-validation == 'true'

@@ -2,6 +2,8 @@
 
 set -e
 
+. scripts/tools.sh
+
 configure_registry_mirror() {
   local cache_name=$1
   local remote_url=$2
@@ -39,6 +41,9 @@ setup_nfs() {
 }
 
 script_full_path=$(dirname "$0")
+
+tools::install::kind
+tools::install::kubectl
 
 if kind get clusters | grep -q "cfk8s"; then
   echo "Kind cluster 'cfk8s' already exists."

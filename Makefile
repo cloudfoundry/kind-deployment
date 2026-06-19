@@ -1,26 +1,10 @@
-LOCAL = true
-TARGET_ARCH ?= $(if $(filter true,$(LOCAL)),$(shell go env GOARCH),amd64)
-# renovate: dataSource=github-releases depName=helmfile/helmfile
-HELMFILE_VERSION ?= "1.5.3"
-
 init: temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub temp/secrets.sh temp/secrets.env
 
 temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub temp/secrets.sh temp/secrets.env:
 	@ ./scripts/init.sh
 
 install:
-	kind get kubeconfig --name cfk8s > temp/kubeconfig
-
-	@if ! command -v helmfile &> /dev/null; then \
-		echo "helmfile not found, using docker to run helmfile"; \
-	    docker run --rm --net=host --env-file temp/secrets.env \
-			--env INSTALL_OPTIONAL_COMPONENTS \
-			-v "$$PWD/temp/certs:/certs" -v "$$PWD/temp/kubeconfig:/helm/.kube/config:ro" -v "$$PWD:/wd" --workdir /wd ghcr.io/helmfile/helmfile:v$(HELMFILE_VERSION) helmfile sync; \
-	else \
-		echo "helmfile found, using local helmfile"; \
-	    source temp/secrets.sh; \
-		helmfile sync --kubeconfig temp/kubeconfig; \
-	fi
+	@ ./scripts/install.sh
 
 login:
 	@ . temp/secrets.sh; \

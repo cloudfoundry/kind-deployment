@@ -2,7 +2,11 @@
 
 set -e
 
+. scripts/tools.sh
+
 script_full_path=$(dirname "$0")
+
+tools::install::kind
 
 kind delete cluster --name cfk8s
 
