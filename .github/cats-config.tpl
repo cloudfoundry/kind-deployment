@@ -36,7 +36,7 @@
     "include_routing": false,
     "include_routing_isolation_segments": false,
     "include_security_groups": false,
-    "include_service_credential_binding_rotation": true,
+    "include_service_credential_binding_rotation": false,
     "include_service_discovery": {{env "OPTIONAL_TESTS" | default "true"}},
     "include_service_instance_sharing": {{env "OPTIONAL_TESTS" | default "true"}},
     "include_services": false,
