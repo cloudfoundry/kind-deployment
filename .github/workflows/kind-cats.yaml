@@ -101,6 +101,7 @@ jobs:
           test-repo: cf-acceptance-tests
           config-template: ./.github/cats-config.tpl
           config-output: ./.github/cats-config.json
+          optional-tests: ${{ steps.validation.outcome != 'skipped' && 'false' || 'true' }}
         env:
           CATS_PRIVATE_DOCKER_USERNAME: ${{ secrets.CATS_PRIVATE_DOCKER_USERNAME }}
           CATS_PRIVATE_DOCKER_PASSWORD: ${{ secrets.CATS_PRIVATE_DOCKER_PASSWORD }}

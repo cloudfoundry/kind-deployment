@@ -19,6 +19,11 @@ inputs:
   config-output:
     description: 'Config output file path'
     required: true
+  optional-tests:
+    description: 'Should optional tests b executed'
+    required: false
+    type: boolean
+    default: true
 
 outputs:
   test-repo-path:
@@ -45,6 +50,8 @@ runs:
       with:
         python-version: "3"
     - name: templating config
+      env:
+        OPTIONAL_TESTS: ${{ inputs.optional-tests }}
       shell: bash
       run: |
         source temp/secrets.sh
