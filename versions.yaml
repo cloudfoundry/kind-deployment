@@ -55,7 +55,6 @@ charts:
   uaa:
     url: cloudfoundry-k8s/uaa
     version: 78.16.0
-
 buildpacks:
   binary-buildpack:
     image: ghcr.io/cloudfoundry/k8s/binary-buildpack
@@ -90,3 +89,6 @@ buildpacks:
   staticfile-buildpack:
     image: ghcr.io/cloudfoundry/k8s/staticfile-buildpack
     tag: 1.6.38
+stacks:
+  cflinuxfs4:
+    version: "1.321.0"
