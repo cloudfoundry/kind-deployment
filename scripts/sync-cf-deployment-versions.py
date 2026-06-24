@@ -18,6 +18,7 @@ BOSH_RELEASES = {
     "routing": "routing",
     "uaa": "uaa",
     "nfs-volume": "nfsVolume",
+    "cflinuxfs4": "cflinuxfs4",
 }
 
 BUILDPACKS = [
@@ -33,6 +34,12 @@ BUILDPACKS = [
     "ruby-buildpack",
     "staticfile-buildpack",
 ]
+
+STACKS = [
+    "cflinuxfs4",
+]
+
+MANAGED_RELEASES = set(BOSH_RELEASES.keys()) | set(BUILDPACKS) | set(STACKS)
 
 
 def latest_cf_deployment_release() -> str:
@@ -116,7 +123,7 @@ def main():
         release_versions["cf-deployment"] = manifest_version
 
     for r in releases:
-        if (r["name"] not in BOSH_RELEASES) and (r["name"] not in BUILDPACKS):
+        if r["name"] not in MANAGED_RELEASES:
             print(
                 f"Skipping release update of '{r['name']}': not a managed release",
                 file=sys.stderr,
@@ -129,6 +136,9 @@ def main():
         elif r["name"] in BUILDPACKS and r["name"] in values.get("buildpacks", {}):
             values["buildpacks"][r["name"]]["tag"] = str(r["version"])
             print(f"Updated buildpack '{r['name']}' to version {r['version']}")
+        elif r["name"] in STACKS and r["name"] in values.get("stacks", {}):
+            values["stacks"][r["name"]]["tag"] = str(r["version"])
+            print(f"Updated stack '{r['name']}' to version {r['version']}")
         else:
             print(
                 f"error in release update of '{r['name']}': no value found",

@@ -10,7 +10,6 @@
     {
       "customType": "regex",
       "managerFilePatterns": [
-        "/^values.yaml.gotmpl$/",
         "/^versions.yaml$/",
         "/^Makefile$/",
         "/^\\.github/workflows/.+\\.yaml$/"
