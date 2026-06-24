@@ -376,7 +376,7 @@ releases:
         file: {{ .Values.certsDir }}/ca.crt
     values:
       - stacks:
-          cflinuxfs4: ghcr.io/cloudfoundry/k8s/cflinuxfs4:{{ .Values.stacks.cflinuxfs4.version }}
+          cflinuxfs4: {{ .Values.stacks.cflinuxfs4.image }}:{{ .Values.stacks.cflinuxfs4.tag }}
       - workloadsNamespace: {{ .Values.workloadsNamespace }}
       - containerProxyVerifySubjectAltName:
           - gorouter

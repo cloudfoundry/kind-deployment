@@ -91,4 +91,5 @@ buildpacks:
     tag: 1.6.38
 stacks:
   cflinuxfs4:
-    version: "1.321.0"
+    image: ghcr.io/cloudfoundry/k8s/cflinuxfs4
+    tag: 1.321.0
