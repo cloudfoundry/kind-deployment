@@ -55,10 +55,10 @@ jobs:
         if: steps.check_changes.outputs.skip != 'true'
         run: |
           sudo sysctl -w fs.inotify.max_user_instances=512
-          sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
       - name: Set kernel settings (Podman extras)
         if: steps.check_changes.outputs.skip != 'true' && inputs.container-runtime == 'podman'
         run: |
+          sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
           # Mount BPF filesystem on the host (needed by kindnet on some kernels)
           sudo mount bpffs /sys/fs/bpf -t bpf -o nosuid,nodev,noexec,relatime || true
       - name: Install podman-compose

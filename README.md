@@ -55,24 +55,19 @@ You can configure the installation by setting the environment variable `INSTALL_
 
 Podman is supported as a drop-in replacement for Docker. The runtime is detected automatically; no aliasing is required.
 
-### Linux (rootless Podman)
-
-Rootless Podman is fully supported on Linux. The following kernel settings must be applied before running `make up` — either manually or via your system's sysctl configuration:
-
-```bash
-sudo sysctl -w fs.inotify.max_user_instances=512
-sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
-```
-
-The first setting prevents inotify exhaustion under heavy workloads. The second allows the kind node containers and pods to bind privileged ports (80, 443, 2222) without root.
-
 ### macOS / Windows (Podman Desktop)
 
 A Podman machine is created and configured automatically by `make up`. The machine is created in rootful mode with 4 CPUs, 8 GB RAM, and 60 GB disk. No manual configuration is needed.
 
-### Limitations
+### Linux (rootful Podman)
 
-- **CNI:** Cilium is skipped under rootless Podman (Linux CI / rootless desktop) because Cilium 1.18.x requires `CAP_NET_ADMIN` in the host user namespace, which rootless containers cannot provide. [kindnet](https://github.com/aojea/kindnet) is used instead, providing full pod-to-pod connectivity without eBPF privileges. Cilium network policies are therefore not enforced in this mode.
+Rootful Podman is supported on Linux. The following kernel setting must be applied before running `make up` — either manually or via your system's sysctl configuration:
+
+```bash
+sudo sysctl -w fs.inotify.max_user_instances=512
+```
+
+This prevents inotify exhaustion under heavy workloads.
 
 ## ARM / Apple Silicon Limitations
 

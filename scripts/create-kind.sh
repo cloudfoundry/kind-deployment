@@ -65,23 +65,18 @@ if [ "${IS_PODMAN}" = "true" ]; then
   "${script_full_path}/setup-podman-vm.sh"
 fi
 
+# On Linux with Podman, lower the privileged port threshold on the host so that
+# Podman can publish ports 80/443/2222 when creating the kind node containers.
+if [ "${IS_PODMAN}" = "true" ] && [ "$(uname -s)" = "Linux" ]; then
+  sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
+fi
+
 if kind get clusters | grep -q "cfk8s"; then
   echo "Kind cluster 'cfk8s' already exists."
   exit 0
 fi
 
 kind create cluster --name "cfk8s" --config="$KIND_CONFIG"
-
-# Under rootless Podman each kind node container has its own network namespace
-# with the kernel default ip_unprivileged_port_start=1024. HAProxy inside
-# cf-tcp-router binds :80 for its health check, so we lower the threshold to 0
-# on every node right after cluster creation.
-if [ "${IS_PODMAN}" = "true" ]; then
-  echo "Setting ip_unprivileged_port_start=0 on all kind nodes..."
-  for node in $(kind get nodes --name cfk8s); do
-    ${CONTAINER_RUNTIME} exec "$node" sysctl -w net.ipv4.ip_unprivileged_port_start=0
-  done
-fi
 
 echo "Applying taints to workload nodes..."
 kubectl taint nodes -l cloudfoundry.org/cell=true cloudfoundry.org/cell=true:NoSchedule --overwrite || true

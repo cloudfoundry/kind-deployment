@@ -2,7 +2,7 @@ caCert: ""
 caKey: ""
 tlsCert: ""
 tlsKey: ""
-# Set to false when Cilium is not installed (e.g. rootless Podman CI).
+# Set to false when Cilium is not installed (e.g. rootful Podman CI).
 # CiliumClusterwideNetworkPolicy CRDs won't exist without Cilium.
 ciliumNetworkPolicies:
   enabled: true

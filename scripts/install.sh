@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
-. temp/secrets.sh
-. scripts/tools.sh
+source "$(dirname "$0")/detect-runtime.sh"
+source "$(dirname "$0")/tools.sh"
 
 tools::install::helmfile
-tools::install::helm
-tools::install::kind
+
+if [ "${IS_PODMAN}" = "true" ]; then
+  export SKIP_CILIUM="true"
+fi
 
 kind get kubeconfig --name cfk8s > temp/kubeconfig
-helmfile sync --kubeconfig temp/kubeconfig
+
+source temp/secrets.sh
+
+CILIUM_EXTRA_VALUES="${CILIUM_EXTRA_VALUES:-}" SKIP_CILIUM="${SKIP_CILIUM:-}" helmfile sync --kubeconfig temp/kubeconfig
