@@ -1,16 +1,16 @@
 charts:
   capi:
     url: cloudfoundry-k8s/capi
-    version: 1.237.1-fix1
+    version: 1.238.0
   cfNetworking:
     url: cloudfoundry-k8s/cf-networking
-    version: 3.115.0
+    version: 3.116.0
   cilium:
     url: cilium/cilium
     version: 1.18.4
   credhub:
     url: cloudfoundry-k8s/credhub
-    version: 2.15.9
+    version: 2.15.11
   diego:
     url: cloudfoundry-k8s/diego
     version: 2.138.0
@@ -54,11 +54,11 @@ charts:
     version: 0.385.0
   uaa:
     url: cloudfoundry-k8s/uaa
-    version: 78.16.0
+    version: 79.3.0
 buildpacks:
   binary-buildpack:
     image: ghcr.io/cloudfoundry/k8s/binary-buildpack
-    tag: 1.1.21
+    tag: 2.0.0
   dotnet-core-buildpack:
     image: ghcr.io/cloudfoundry/k8s/dotnet-core-buildpack
     tag: 2.4.51
