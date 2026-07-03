@@ -48,7 +48,7 @@ jobs:
           mv cf8 $HOME/.local/bin/cf
         env:
           # renovate: dataSource=github-releases depName=cloudfoundry/cli
-          CF_CLI_VERSION: "8.18.3"
+          CF_CLI_VERSION: "8.18.4"
       - name: Use develop versions of cf-deployment
         id: validation
         if: steps.check_changes.outputs.skip != 'true' && github.event_name == 'workflow_dispatch' && github.event.inputs.fresh-validation == 'true'
