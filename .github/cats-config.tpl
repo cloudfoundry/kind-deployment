@@ -36,6 +36,7 @@
     "include_routing": true,
     "include_routing_isolation_segments": false,
     "include_security_groups": true,
+    "include_service_credential_binding_rotation": true,
     "include_service_discovery": true,
     "include_service_instance_sharing": true,
     "include_services": true,
