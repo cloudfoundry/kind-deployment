@@ -22,5 +22,11 @@
   ],
   "helm-values": {
     "enabled": false
-  }
+  },
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    }
+  ]
 }
