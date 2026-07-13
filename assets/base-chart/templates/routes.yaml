@@ -1,0 +1,142 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: capi
+spec:
+  parentRefs:
+    - name: istio-gateway
+  hostnames:
+    - "api.127-0-0-1.nip.io"
+  rules:
+    - backendRefs:
+        - name: gorouter
+          port: 443
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: fileserver
+spec:
+  parentRefs:
+    - name: istio-gateway
+  hostnames:
+    - "fileserver.127-0-0-1.nip.io"
+  rules:
+    - backendRefs:
+        - name: fileserver
+          port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: ssh-proxy
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: ssh-proxy
+  rules:
+    - backendRefs:
+      - name: ssh-proxy
+        port: 2222
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: gorouter-tls
+spec:
+  targetRefs:
+    - kind: Service
+      group: ""
+      name: gorouter
+  validation:
+    hostname: "gorouter.127-0-0-1.nip.io"
+    caCertificateRefs:
+      - kind: ConfigMap
+        group: ""
+        name: ca
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: gorouter
+spec:
+  parentRefs:
+    - name: istio-gateway
+  hostnames:
+    - "*.apps.127-0-0-1.nip.io"
+  rules:
+    - backendRefs:
+        - name: gorouter
+          port: 443
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: policy-server
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: policy-server
+  rules:
+    - backendRefs:
+        - name: policy-server
+          port: 4003
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: log-cache-api
+spec:
+  parentRefs:
+    - name: istio-gateway
+  hostnames:
+    - "log-cache-api.127-0-0-1.nip.io"
+  rules:
+    - backendRefs:
+        - name: log-cache-api
+          port: 8083
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: log-api
+spec:
+  targetRefs:
+    - kind: Service
+      group: ""
+      name: log-api
+  validation:
+    hostname: "log-api"
+    caCertificateRefs:
+      - kind: ConfigMap
+        group: ""
+        name: ca
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: log-stream
+spec:
+  parentRefs:
+    - name: istio-gateway
+  hostnames:
+    - "log-stream.127-0-0-1.nip.io"
+  rules:
+    - backendRefs:
+        - name: log-api
+          port: 8088
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: doppler
+spec:
+  parentRefs:
+    - name: istio-gateway
+  hostnames:
+    - "doppler.127-0-0-1.nip.io"
+  rules:
+    - backendRefs:
+        - name: log-api
+          port: 8081

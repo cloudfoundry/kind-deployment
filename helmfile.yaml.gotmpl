@@ -180,6 +180,8 @@ releases:
           certificateSecret: all-in-one-tls
       - udpForwarder:
           certificateSecret: all-in-one-tls
+      - gatewayObjects:
+          enabled: false
 
   - name: tcp-routing
     namespace: {{ .Values.systemNamespace }}
@@ -206,6 +208,8 @@ releases:
           enabled: true
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
           certificateSecret: all-in-one-tls
+      - gatewayObjects:
+          enabled: false
 
   - name: loggregator
     namespace: {{ .Values.systemNamespace }}
@@ -226,6 +230,8 @@ releases:
           certificateSecret: all-in-one-tls
       - trafficcontroller:
           certificateSecret: all-in-one-tls
+      - gatewayObjects:
+          enabled: false
 
   - name: log-cache
     namespace: {{ .Values.systemNamespace }}
@@ -239,6 +245,8 @@ releases:
           certificateSecret: all-in-one-tls
       - logCacheBackend:
           certificateSecret: all-in-one-tls
+      - gatewayObjects:
+          enabled: false
 
   - name: uaa
     namespace: {{ .Values.systemNamespace }}
@@ -287,6 +295,8 @@ releases:
       - locket:
           enabled: true
           certificateSecret: all-in-one-tls
+      - gatewayObjects:
+          enabled: false
 
   - name: diego
     namespace: {{ .Values.systemNamespace }}
@@ -324,6 +334,8 @@ releases:
       - sshProxy:
           enabled: true
           certificateSecret: all-in-one-tls
+      - gatewayObjects:
+          enabled: false
 
   - name: tps-watcher
     namespace: {{ .Values.systemNamespace }}
@@ -406,6 +418,8 @@ releases:
       - diego
       - postgresql
     values:
+      - gatewayObjects:
+          enabled: false
       - cloudController:
           enabled: true
           certificateSecret: all-in-one-tls
@@ -464,6 +478,8 @@ releases:
           certificateSecret: all-in-one-tls
       - boshDns:
           certificateSecret: all-in-one-tls
+      - gatewayObjects:
+          enabled: false
 
   - name: policy-agent
     namespace: {{ .Values.systemNamespace }}
