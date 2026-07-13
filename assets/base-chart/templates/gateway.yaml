@@ -492,3 +492,18 @@ spec:
     - backendRefs:
         - name: minio
           port: 9000
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: wildcard-gorouter
+  namespace: {{ .Release.Namespace }}
+spec:
+  parentRefs:
+    - name: istio-gateway
+  hostnames:
+  - "*.127-0-0-1.nip.io"
+  rules:
+    - backendRefs:
+        - name: gorouter
+          port: 443
