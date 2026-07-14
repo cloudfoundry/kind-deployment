@@ -11,6 +11,8 @@ export HELM_VERSION="4.2.2"
 export KIND_VERSION="0.32.0"
 # renovate: dataSource=github-releases depName=kubernetes/kubectl
 export KUBECTL_VERSION="1.36.2"
+# renovate: dataSource=github-releases depName=google/go-containerregistry
+export CRANE_VERSION="0.21.7"
 export TOOLS_BIN_DIR="$(realpath $(dirname "${BASH_SOURCE[0]}"))/../bin"
 
 function tools::export_path() {
@@ -43,7 +45,7 @@ function util::tools::arch() {
       ;;
 
     amd64|x86_64)
-        echo "amd64"
+      echo "amd64"
       ;;
 
     *)
@@ -121,4 +123,23 @@ function tools::install::kind() {
     echo "Installing kind from ${url}..."
     curl -sSL -o "${TOOLS_BIN_DIR}/kind" "${url}"
     chmod +x "${TOOLS_BIN_DIR}/kind"
+}
+
+function tools::install::crane() {
+    tools::export_path
+
+    local bin="${TOOLS_BIN_DIR}/crane"
+    if [[ -x "${bin}" ]] && "${bin}" version 2>/dev/null | grep -q "${CRANE_VERSION}\b"; then
+        return 0
+    fi
+
+    local os=$(uname)
+    local arch=$(uname -m)
+    # crane releases use uname-style names: Darwin/Linux and x86_64; normalize aarch64 to arm64
+    [[ "${arch}" == "aarch64" ]] && arch="arm64"
+    local url="https://github.com/google/go-containerregistry/releases/download/v${CRANE_VERSION}/go-containerregistry_${os}_${arch}.tar.gz"
+    mkdir -p "${TOOLS_BIN_DIR}"
+
+    echo "Installing crane from ${url}..."
+    curl -sSL -o - "${url}" | tar -xz -C "${TOOLS_BIN_DIR}" crane
 }

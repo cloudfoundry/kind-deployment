@@ -314,12 +314,6 @@ releases:
           enabled: true
           certificateSecret: all-in-one-tls
       - fileserver:
-          buildpacks: 
-          {{ range $name, $buildpack := .Values.buildpacks }}
-            {{ $name }}:
-              image: {{ $buildpack.image }}
-              tag: {{ $buildpack.tag }}
-          {{ end }}
           enabled: true
       - sshProxy:
           enabled: true
