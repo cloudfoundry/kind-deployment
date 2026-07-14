@@ -215,7 +215,7 @@ spec:
         typed_extension_protocol_options:
           envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
             '@type': type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
-            explicit_http_config:
+            use_downstream_protocol_config:
               http2_protocol_options:
                 max_inbound_window_update_frames_per_data_frame_sent: 10000
   workloadSelector:
