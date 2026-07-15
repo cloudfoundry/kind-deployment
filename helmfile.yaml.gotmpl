@@ -370,8 +370,11 @@ releases:
         file: {{ .Values.certsDir }}/ca.crt
     values:
       - stacks:
-          cflinuxfs4: {{ .Values.stacks.cflinuxfs4.image }}:{{ .Values.stacks.cflinuxfs4.tag }}
-          cflinuxfs5: {{ .Values.stacks.cflinuxfs5.image }}:{{ .Values.stacks.cflinuxfs5.tag }}
+        {{- range $stackName, $stackConfig := .Values.stacks }}
+          {{- if kindIs "map" $stackConfig }}
+          {{ $stackName }}: "{{ $stackConfig.image }}:{{ $stackConfig.tag }}"
+          {{- end }}
+        {{- end }}
       - workloadsNamespace: {{ .Values.workloadsNamespace }}
       - containerProxyVerifySubjectAltName:
           - gorouter
