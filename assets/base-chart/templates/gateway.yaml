@@ -507,3 +507,16 @@ spec:
     - backendRefs:
         - name: gorouter
           port: 443
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: ssh-proxy
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: ssh-proxy
+  rules:
+    - backendRefs:
+      - name: ssh-proxy
+        port: 2222
