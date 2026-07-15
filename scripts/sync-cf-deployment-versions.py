@@ -37,6 +37,7 @@ BUILDPACKS = [
 
 STACKS = [
     "cflinuxfs4",
+    "cflinuxfs5",
 ]
 
 MANAGED_RELEASES = set(BOSH_RELEASES.keys()) | set(BUILDPACKS) | set(STACKS)

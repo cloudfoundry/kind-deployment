@@ -371,6 +371,7 @@ releases:
     values:
       - stacks:
           cflinuxfs4: {{ .Values.stacks.cflinuxfs4.image }}:{{ .Values.stacks.cflinuxfs4.tag }}
+          cflinuxfs5: {{ .Values.stacks.cflinuxfs5.image }}:{{ .Values.stacks.cflinuxfs5.tag }}
       - workloadsNamespace: {{ .Values.workloadsNamespace }}
       - containerProxyVerifySubjectAltName:
           - gorouter
@@ -408,6 +409,22 @@ releases:
               aws_secret_access_key: {{ .Values.secrets.blobstorePassword }}
           sshProxyKeyFingerprint: {{ .Values.secrets.sshProxyKeyFingerprint | quote }}
           enableCommaDelimitedDestinations: true
+          stacks:
+          - description: Cloud Foundry Linux-based filesystem (Ubuntu 22.04)
+            name: cflinuxfs4
+          - description: Cloud Foundry Linux-based filesystem (Ubuntu 24.04)
+            name: cflinuxfs5
+          default_stack: {{ .Values.stacks.default }}
+          lifecycle_bundles:
+            buildpack/cflinuxfs4: buildpack_app_lifecycle/buildpack_app_lifecycle.tgz
+            cnb/cflinuxfs4: cnb_app_lifecycle/cnb_app_lifecycle.tgz
+            buildpack/cflinuxfs5: buildpack_app_lifecycle/buildpack_app_lifecycle.tgz
+            cnb/cflinuxfs5: cnb_app_lifecycle/cnb_app_lifecycle.tgz
+            docker: docker_app_lifecycle/docker_app_lifecycle.tgz
+          droplet_destinations:
+            cflinuxfs4: /home/vcap
+            cflinuxfs5: /home/vcap
+          docker_staging_stack: {{ .Values.stacks.default }}
       - ccUploader:
           certificateSecret: all-in-one-tls
       - ccdb:

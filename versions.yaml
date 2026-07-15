@@ -90,6 +90,10 @@ buildpacks:
     image: ghcr.io/cloudfoundry/k8s/staticfile-buildpack
     tag: 1.6.39
 stacks:
+  default: cflinuxfs4
   cflinuxfs4:
     image: ghcr.io/cloudfoundry/k8s/cflinuxfs4
     tag: 1.321.0
+  cflinuxfs5:
+    image: ghcr.io/cloudfoundry/k8s/cflinuxfs5
+    tag: 0.31.0-beta
