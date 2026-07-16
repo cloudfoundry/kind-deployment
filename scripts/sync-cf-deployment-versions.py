@@ -64,6 +64,12 @@ def should_apply_version_update(current_version: str, new_version: str, release_
             file=sys.stderr,
         )
         return False
+    elif new_semver == current_semver:
+        print(
+            f"Skipping {target_type} '{release_name}' version={current_version} unchanged",
+            file=sys.stderr,
+        )
+        return False
 
     return True
 
@@ -161,7 +167,7 @@ def main():
             new_version = str(r["version"])
             if should_apply_version_update(current_version, new_version, r["name"], "release"):
                 values["charts"][yaml_key]["version"] = new_version
-                print(f"Updated release '{r['name']}' to version {new_version}")
+                print(f"Updated release '{r['name']}' from version {current_version} to version {new_version}")
         elif r["name"] in BUILDPACKS and r["name"] in values.get("buildpacks", {}):
             current_version = str(values["buildpacks"][r["name"]]["tag"])
             new_version = str(r["version"])
