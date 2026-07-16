@@ -318,6 +318,8 @@ releases:
       - sshProxy:
           enabled: true
           certificateSecret: all-in-one-tls
+      - gatewayObjects:
+          enabled: false
 
   - name: tps-watcher
     namespace: {{ .Values.systemNamespace }}

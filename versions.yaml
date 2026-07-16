@@ -1,7 +1,7 @@
 charts:
   capi:
     url: cloudfoundry-k8s/capi
-    version: 1.239.0
+    version: 1.239.1-1
   cfNetworking:
     url: cloudfoundry-k8s/cf-networking
     version: 3.117.0
