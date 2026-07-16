@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import re
 from ruamel.yaml import YAML
 import yaml
 import sys
@@ -40,6 +41,82 @@ STACKS = [
 ]
 
 MANAGED_RELEASES = set(BOSH_RELEASES.keys()) | set(BUILDPACKS) | set(STACKS)
+
+SEMVER_RE = re.compile(
+    r"^v?(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)"
+    r"(?:-(?P<prerelease>[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?"
+    r"(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$"
+)
+
+
+def parse_semver(version: str):
+    match = SEMVER_RE.match(version)
+    if not match:
+        return None
+
+    prerelease = match.group("prerelease")
+    prerelease_parts = []
+    if prerelease:
+        for part in prerelease.split("."):
+            if part.isdigit():
+                prerelease_parts.append((0, int(part)))
+            else:
+                prerelease_parts.append((1, part))
+
+    return (
+        int(match.group("major")),
+        int(match.group("minor")),
+        int(match.group("patch")),
+        prerelease_parts,
+    )
+
+
+def compare_semver(left, right) -> int:
+    for left_part, right_part in zip(left[:3], right[:3]):
+        if left_part < right_part:
+            return -1
+        if left_part > right_part:
+            return 1
+
+    left_prerelease = left[3]
+    right_prerelease = right[3]
+
+    if not left_prerelease and not right_prerelease:
+        return 0
+    if not left_prerelease:
+        return 1
+    if not right_prerelease:
+        return -1
+
+    for left_id, right_id in zip(left_prerelease, right_prerelease):
+        if left_id == right_id:
+            continue
+        if left_id[0] != right_id[0]:
+            return -1 if left_id[0] < right_id[0] else 1
+        return -1 if left_id[1] < right_id[1] else 1
+
+    if len(left_prerelease) < len(right_prerelease):
+        return -1
+    if len(left_prerelease) > len(right_prerelease):
+        return 1
+    return 0
+
+
+def should_apply_version_update(current_version: str, new_version: str, release_name: str, target_type: str) -> bool:
+    current_semver = parse_semver(current_version)
+    new_semver = parse_semver(new_version)
+
+    if not current_semver or not new_semver:
+        return True
+
+    if compare_semver(new_semver, current_semver) < 0:
+        print(
+            f"Skipping {target_type} '{release_name}' downgrade: current={current_version}, new={new_version}",
+            file=sys.stderr,
+        )
+        return False
+
+    return True
 
 
 def latest_cf_deployment_release() -> str:
@@ -131,14 +208,23 @@ def main():
             continue
         yaml_key = BOSH_RELEASES.get(r["name"], "unknown")
         if yaml_key in values.get("charts", {}):
-            values["charts"][yaml_key]["version"] = str(r["version"])
-            print(f"Updated release '{r['name']}' to version {r['version']}")
+            current_version = str(values["charts"][yaml_key]["version"])
+            new_version = str(r["version"])
+            if should_apply_version_update(current_version, new_version, r["name"], "release"):
+                values["charts"][yaml_key]["version"] = new_version
+                print(f"Updated release '{r['name']}' to version {new_version}")
         elif r["name"] in BUILDPACKS and r["name"] in values.get("buildpacks", {}):
-            values["buildpacks"][r["name"]]["tag"] = str(r["version"])
-            print(f"Updated buildpack '{r['name']}' to version {r['version']}")
+            current_version = str(values["buildpacks"][r["name"]]["tag"])
+            new_version = str(r["version"])
+            if should_apply_version_update(current_version, new_version, r["name"], "buildpack"):
+                values["buildpacks"][r["name"]]["tag"] = new_version
+                print(f"Updated buildpack '{r['name']}' to version {new_version}")
         elif r["name"] in STACKS and r["name"] in values.get("stacks", {}):
-            values["stacks"][r["name"]]["tag"] = str(r["version"])
-            print(f"Updated stack '{r['name']}' to version {r['version']}")
+            current_version = str(values["stacks"][r["name"]]["tag"])
+            new_version = str(r["version"])
+            if should_apply_version_update(current_version, new_version, r["name"], "stack"):
+                values["stacks"][r["name"]]["tag"] = new_version
+                print(f"Updated stack '{r['name']}' to version {new_version}")
         else:
             print(
                 f"error in release update of '{r['name']}': no value found",
