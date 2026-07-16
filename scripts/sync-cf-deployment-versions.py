@@ -2,11 +2,11 @@
 
 import argparse
 import os
-import re
 from ruamel.yaml import YAML
 import yaml
 import sys
 import requests
+import semver
 
 BOSH_RELEASES = {
     "capi": "capi",
@@ -42,64 +42,13 @@ STACKS = [
 
 MANAGED_RELEASES = set(BOSH_RELEASES.keys()) | set(BUILDPACKS) | set(STACKS)
 
-SEMVER_RE = re.compile(
-    r"^v?(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)"
-    r"(?:-(?P<prerelease>[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?"
-    r"(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$"
-)
-
 
 def parse_semver(version: str):
-    match = SEMVER_RE.match(version)
-    if not match:
+    normalized = version.lstrip("v")
+    try:
+        return semver.VersionInfo.parse(normalized)
+    except ValueError:
         return None
-
-    prerelease = match.group("prerelease")
-    prerelease_parts = []
-    if prerelease:
-        for part in prerelease.split("."):
-            if part.isdigit():
-                prerelease_parts.append((0, int(part)))
-            else:
-                prerelease_parts.append((1, part))
-
-    return (
-        int(match.group("major")),
-        int(match.group("minor")),
-        int(match.group("patch")),
-        prerelease_parts,
-    )
-
-
-def compare_semver(left, right) -> int:
-    for left_part, right_part in zip(left[:3], right[:3]):
-        if left_part < right_part:
-            return -1
-        if left_part > right_part:
-            return 1
-
-    left_prerelease = left[3]
-    right_prerelease = right[3]
-
-    if not left_prerelease and not right_prerelease:
-        return 0
-    if not left_prerelease:
-        return 1
-    if not right_prerelease:
-        return -1
-
-    for left_id, right_id in zip(left_prerelease, right_prerelease):
-        if left_id == right_id:
-            continue
-        if left_id[0] != right_id[0]:
-            return -1 if left_id[0] < right_id[0] else 1
-        return -1 if left_id[1] < right_id[1] else 1
-
-    if len(left_prerelease) < len(right_prerelease):
-        return -1
-    if len(left_prerelease) > len(right_prerelease):
-        return 1
-    return 0
 
 
 def should_apply_version_update(current_version: str, new_version: str, release_name: str, target_type: str) -> bool:
@@ -109,7 +58,7 @@ def should_apply_version_update(current_version: str, new_version: str, release_
     if not current_semver or not new_semver:
         return True
 
-    if compare_semver(new_semver, current_semver) < 0:
+    if new_semver < current_semver:
         print(
             f"Skipping {target_type} '{release_name}' downgrade: current={current_version}, new={new_version}",
             file=sys.stderr,
