@@ -162,21 +162,19 @@ def main():
             )
             continue
         yaml_key = BOSH_RELEASES.get(r["name"], "unknown")
+        new_version = str(r["version"])
         if yaml_key in values.get("charts", {}):
             current_version = str(values["charts"][yaml_key]["version"])
-            new_version = str(r["version"])
             if should_apply_version_update(current_version, new_version, r["name"], "release"):
                 values["charts"][yaml_key]["version"] = new_version
                 print(f"Updated release '{r['name']}' from version {current_version} to version {new_version}")
         elif r["name"] in BUILDPACKS and r["name"] in values.get("buildpacks", {}):
             current_version = str(values["buildpacks"][r["name"]]["tag"])
-            new_version = str(r["version"])
             if should_apply_version_update(current_version, new_version, r["name"], "buildpack"):
                 values["buildpacks"][r["name"]]["tag"] = new_version
                 print(f"Updated buildpack '{r['name']}' to version {new_version}")
         elif r["name"] in STACKS and r["name"] in values.get("stacks", {}):
             current_version = str(values["stacks"][r["name"]]["tag"])
-            new_version = str(r["version"])
             if should_apply_version_update(current_version, new_version, r["name"], "stack"):
                 values["stacks"][r["name"]]["tag"] = new_version
                 print(f"Updated stack '{r['name']}' to version {new_version}")
