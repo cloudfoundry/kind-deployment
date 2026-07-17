@@ -1,3 +1,4 @@
 requests
 PyYAML
 ruamel.yaml
+semver

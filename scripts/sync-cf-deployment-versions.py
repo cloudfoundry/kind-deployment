@@ -6,6 +6,7 @@ from ruamel.yaml import YAML
 import yaml
 import sys
 import requests
+import semver
 
 BOSH_RELEASES = {
     "capi": "capi",
@@ -41,6 +42,37 @@ STACKS = [
 ]
 
 MANAGED_RELEASES = set(BOSH_RELEASES.keys()) | set(BUILDPACKS) | set(STACKS)
+
+
+def parse_semver(version: str):
+    normalized = version.lstrip("v")
+    try:
+        return semver.VersionInfo.parse(normalized)
+    except ValueError:
+        return None
+
+
+def should_apply_version_update(current_version: str, new_version: str, release_name: str, target_type: str) -> bool:
+    current_semver = parse_semver(current_version)
+    new_semver = parse_semver(new_version)
+
+    if not current_semver or not new_semver:
+        return True
+
+    if new_semver < current_semver:
+        print(
+            f"Skipping {target_type} '{release_name}' downgrade: current={current_version}, new={new_version}",
+            file=sys.stderr,
+        )
+        return False
+    elif new_semver == current_semver:
+        print(
+            f"Skipping {target_type} '{release_name}' version={current_version} unchanged",
+            file=sys.stderr,
+        )
+        return False
+
+    return True
 
 
 def latest_cf_deployment_release() -> str:
@@ -131,15 +163,22 @@ def main():
             )
             continue
         yaml_key = BOSH_RELEASES.get(r["name"], "unknown")
+        new_version = str(r["version"])
         if yaml_key in values.get("charts", {}):
-            values["charts"][yaml_key]["version"] = str(r["version"])
-            print(f"Updated release '{r['name']}' to version {r['version']}")
+            current_version = str(values["charts"][yaml_key]["version"])
+            if should_apply_version_update(current_version, new_version, r["name"], "release"):
+                values["charts"][yaml_key]["version"] = new_version
+                print(f"Updated release '{r['name']}' from version {current_version} to version {new_version}")
         elif r["name"] in BUILDPACKS and r["name"] in values.get("buildpacks", {}):
-            values["buildpacks"][r["name"]]["tag"] = str(r["version"])
-            print(f"Updated buildpack '{r['name']}' to version {r['version']}")
+            current_version = str(values["buildpacks"][r["name"]]["tag"])
+            if should_apply_version_update(current_version, new_version, r["name"], "buildpack"):
+                values["buildpacks"][r["name"]]["tag"] = new_version
+                print(f"Updated buildpack '{r['name']}' to version {new_version}")
         elif r["name"] in STACKS and r["name"] in values.get("stacks", {}):
-            values["stacks"][r["name"]]["tag"] = str(r["version"])
-            print(f"Updated stack '{r['name']}' to version {r['version']}")
+            current_version = str(values["stacks"][r["name"]]["tag"])
+            if should_apply_version_update(current_version, new_version, r["name"], "stack"):
+                values["stacks"][r["name"]]["tag"] = new_version
+                print(f"Updated stack '{r['name']}' to version {new_version}")
         else:
             print(
                 f"error in release update of '{r['name']}': no value found",
