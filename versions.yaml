@@ -51,7 +51,7 @@ charts:
     version: 16.7.27
   routing:
     url: cloudfoundry-k8s/routing
-    version: 0.386.0
+    version: 0.387.0
   uaa:
     url: cloudfoundry-k8s/uaa
     version: 79.3.0

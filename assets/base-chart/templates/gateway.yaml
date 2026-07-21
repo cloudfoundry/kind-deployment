@@ -215,7 +215,7 @@ spec:
         typed_extension_protocol_options:
           envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
             '@type': type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
-            explicit_http_config:
+            use_downstream_protocol_config:
               http2_protocol_options:
                 max_inbound_window_update_frames_per_data_frame_sent: 10000
   workloadSelector:
@@ -520,3 +520,33 @@ spec:
     - backendRefs:
       - name: ssh-proxy
         port: 2222
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: gorouter-tls
+spec:
+  targetRefs:
+    - kind: Service
+      group: ""
+      name: gorouter
+  validation:
+    hostname: gorouter.127-0-0-1.nip.io
+    caCertificateRefs:
+      - kind: ConfigMap
+        group: ""
+        name: ca
+{{- range $index := until 20 }}
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: cf-tcp-router-{{ add $index 1 }}
+spec:
+  parentRefs:
+    - name: istio-gateway
+      sectionName: tcp-route-{{ add $index 1 }}
+  rules:
+    - backendRefs:
+      - name: cf-tcp-router
+        port: {{ add 32000 $index }}
+{{- end }}
