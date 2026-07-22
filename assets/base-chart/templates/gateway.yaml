@@ -520,6 +520,7 @@ spec:
     - backendRefs:
       - name: ssh-proxy
         port: 2222
+---
 apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
