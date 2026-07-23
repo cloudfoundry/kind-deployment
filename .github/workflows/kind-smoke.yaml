@@ -23,106 +23,21 @@ on:
 
 jobs:
   kind-smoke:
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/smoke-run.yaml
     permissions:
       id-token: write
       contents: read
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - name: Check if only ignored paths changed
-        id: check_changes
-        run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
-            RELEVANT_FILES=$(echo "$CHANGED_FILES" | grep -v -E '.*\.Dockerfile|^releases/.*/files/|^\.github/|^docs/|\.md$|^renovate\.json$' || true)
-            if [ -z "$RELEVANT_FILES" ]; then
-              echo "Only ignored paths were changed. Skipping workflow."
-              echo "skip=true" >> $GITHUB_OUTPUT
-            else
-              echo "skip=false" >> $GITHUB_OUTPUT
-            fi
-          else
-            echo "skip=false" >> $GITHUB_OUTPUT
-          fi
-      - name: Set kernel settings
-        if: steps.check_changes.outputs.skip != 'true'
-        run: |
-          docker run --rm \
-            --privileged \
-            --pid host \
-            alpine sh -c "sysctl -w fs.inotify.max_user_instances=512"
-      - name: Install CF CLI
-        if: steps.check_changes.outputs.skip != 'true'
-        run: |
-          mkdir -p $HOME/.local/bin && echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=${CF_CLI_VERSION}&source=github" | tar -zx
-          mv cf8 $HOME/.local/bin/cf
-        env:
-          # renovate: dataSource=github-releases depName=cloudfoundry/cli
-          CF_CLI_VERSION: "8.18.4"
-      - name: Use develop versions of cf-deployment
-        id: pre_validation
-        if: steps.check_changes.outputs.skip != 'true' && github.event_name == 'workflow_dispatch' && github.event.inputs.fresh-validation == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          pip3 install -r scripts/requirements.txt
-          python3 scripts/sync-cf-deployment-versions.py --ref develop
-      - name: Run make up (default)
-        if: steps.check_changes.outputs.skip != 'true' && github.event_name == 'pull_request'
-        run: make up
-      - name: Run make up
-        if: steps.check_changes.outputs.skip != 'true' && github.event_name != 'pull_request'
-        run: make up
-        env:
-          INSTALL_OPTIONAL_COMPONENTS: ${{ inputs.minimal }}  
-      - name: Login
-        if: steps.check_changes.outputs.skip != 'true'
-        run: make login
-      - name: Init
-        if: steps.check_changes.outputs.skip != 'true'
-        run: make bootstrap-complete
-      - name: setup CF tests
-        if: steps.check_changes.outputs.skip != 'true'
-        uses: ./.github/actions/setup-cf-tests
-        with:
-          test-repo: cf-smoke-tests
-          test-branch: main
-          config-template: ./.github/smoke-config.tpl
-          config-output: ./.github/smoke-config.json
-      - name: run smoke test
-        if: steps.check_changes.outputs.skip != 'true'
-        env:
-          CONFIG: "${{ github.workspace }}/.github/smoke-config.json"
-          GINKGO_NO_COLOR: "true"
-        run: |
-          ./cf-smoke-tests/bin/test --no-color --github-output --timeout=30m --procs=4 --json-report report.json
-      - name: debug events
-        if: failure()
-        run: kubectl get events -A --sort-by='.lastTimestamp'
-      - name: debug pods
-        if: failure()
-        run: |
-          echo "===== CLOUD_CONTROLLER ====="
-          kubectl get pod -n cf-system -l app.kubernetes.io/name=cloud-controller -o wide
-          kubectl get pod -n cf-system -l app.kubernetes.io/name=cloud-controller -o jsonpath='{.status.containerStatuses[*].state}' | jq
-          kubectl logs -n cf-system -l app.kubernetes.io/name=cloud-controller --all-containers=true
-          echo "===== CC_WORKER ====="
-          kubectl get pod -n cf-system -l app.kubernetes.io/name=cc-worker -o wide
-          kubectl logs -n cf-system -l app.kubernetes.io/name=cc-worker
-          echo "===== CC_UPLOADER ====="
-          kubectl get pod -n cf-system -l app=cc-uploader -o wide
-          kubectl logs -n cf-system -l app=cc-uploader
-          echo "===== CC_DEPLOYMENT_UPDATER ====="
-          kubectl get pod -n cf-system -l app.kubernetes.io/name=cc-deployment-updater -o wide
-          kubectl logs -n cf-system -l app.kubernetes.io/name=cc-deployment-updater
-          echo "===== CC_WORKER_CLOCK ====="
-          kubectl get pod -n cf-system -l app.kubernetes.io/name=cc-worker-clock -o wide
-          kubectl logs -n cf-system -l app.kubernetes.io/name=cc-worker-clock
-      - uses: actions/upload-artifact@v7
-        if: always()
-        with:
-          name: report.json
-          path: ./cf-smoke-tests/report.json
+    with:
+      container-runtime: docker
+      install-optional-components: ${{ github.event_name == 'pull_request' && 'false' || inputs.minimal != true && 'true' || 'false' }}
+      artifact-name: report.json
+
+  kind-smoke-podman:
+    uses: ./.github/workflows/smoke-run.yaml
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      container-runtime: podman
+      install-optional-components: ${{ github.event_name == 'pull_request' && 'false' || inputs.minimal != true && 'true' || 'false' }}
+      artifact-name: report-podman.json

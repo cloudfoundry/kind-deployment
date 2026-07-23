@@ -2,7 +2,8 @@
 
 set -e
 
-. scripts/tools.sh
+# Auto-detect Docker or Podman
+source "$(dirname "$0")/detect-runtime.sh"
 
 configure_registry_mirror() {
   local cache_name=$1
@@ -13,10 +14,10 @@ configure_registry_mirror() {
     echo "Configuring cache ${cache_name} on all nodes..."
     for node in $(kind get nodes --name cfk8s); do
         # Create containerd registry config directories
-        docker exec "$node" mkdir -p /etc/containerd/certs.d/${registry_uri}
+        ${CONTAINER_RUNTIME} exec "$node" mkdir -p /etc/containerd/certs.d/${registry_uri}
 
         # Configure registry to use cache as mirror (expand variables!)
-        cat <<EOF | docker exec -i "$node" sh -c "cat > /etc/containerd/certs.d/${registry_uri}/hosts.toml"
+        cat <<EOF | ${CONTAINER_RUNTIME} exec -i "$node" sh -c "cat > /etc/containerd/certs.d/${registry_uri}/hosts.toml"
 server = "${remote_url}"
 
 [host."http://${cache_name}:5000"]
@@ -26,9 +27,18 @@ EOF
     done
 }
 
+evaluate_progress_option() {
+    # Podman compose does not support --progress
+    if [ "${IS_PODMAN}" = "true" ]; then
+      echo ""
+    else
+      echo "--progress plain"
+    fi
+}
+
 setup_registry_caches() {
-    echo "Starting registry pull-through caches with docker-compose..."
-    docker compose -p cache -f "${script_full_path}/docker-compose-registries.yaml" --progress plain up -d
+    echo "Starting registry pull-through caches with ${COMPOSE_CMD}..."
+    ${COMPOSE_CMD} -p cache -f "${script_full_path}/docker-compose-registries.yaml" $(evaluate_progress_option) up -d
 
     configure_registry_mirror "docker-io" "https://registry-1.docker.io" "docker.io"
     configure_registry_mirror "ghcr-io" "https://ghcr.io" "ghcr.io"
@@ -36,21 +46,42 @@ setup_registry_caches() {
 }
 
 setup_nfs() {
-    echo "Starting NFS server with docker-compose..."
-    docker compose -p nfs -f "${script_full_path}/docker-compose-nfs.yaml" --progress plain up -d
+    echo "Starting NFS server with ${COMPOSE_CMD}..."
+    ${COMPOSE_CMD} -p nfs -f "${script_full_path}/docker-compose-nfs.yaml" $(evaluate_progress_option) up -d
 }
 
 script_full_path=$(dirname "$0")
 
-tools::install::kind
-tools::install::kubectl
+# Select kind config based on runtime
+if [ "${IS_PODMAN}" = "true" ]; then
+  KIND_CONFIG="$script_full_path/../kind-podman.yaml"
+else
+  KIND_CONFIG="$script_full_path/../kind.yaml"
+fi
+
+# When running under Podman, ensure the Podman VM is ready (NFS modules, inotify, …)
+if [ "${IS_PODMAN}" = "true" ]; then
+  echo "Podman detected – ensuring Podman VM is configured..."
+  "${script_full_path}/setup-podman-vm.sh"
+fi
 
 if kind get clusters | grep -q "cfk8s"; then
   echo "Kind cluster 'cfk8s' already exists."
   exit 0
 fi
 
-kind create cluster --name "cfk8s" --config="$script_full_path/../kind.yaml"
+kind create cluster --name "cfk8s" --config="$KIND_CONFIG"
+
+# Under rootless Podman each kind node container has its own network namespace
+# with the kernel default ip_unprivileged_port_start=1024. HAProxy inside
+# cf-tcp-router binds :80 for its health check, so we lower the threshold to 0
+# on every node right after cluster creation.
+if [ "${IS_PODMAN}" = "true" ]; then
+  echo "Setting ip_unprivileged_port_start=0 on all kind nodes..."
+  for node in $(kind get nodes --name cfk8s); do
+    ${CONTAINER_RUNTIME} exec "$node" sysctl -w net.ipv4.ip_unprivileged_port_start=0
+  done
+fi
 
 echo "Applying taints to workload nodes..."
 kubectl taint nodes -l cloudfoundry.org/cell=true cloudfoundry.org/cell=true:NoSchedule --overwrite || true
