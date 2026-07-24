@@ -1,19 +1,19 @@
 charts:
   capi:
     url: cloudfoundry-k8s/capi
-    version: 1.239.1-1
+    version: 1.240.0
   cfNetworking:
     url: cloudfoundry-k8s/cf-networking
-    version: 3.117.0
+    version: 3.119.0
   cilium:
     url: cilium/cilium
     version: 1.18.4
   credhub:
     url: cloudfoundry-k8s/credhub
-    version: 2.15.12
+    version: 2.15.14
   diego:
     url: cloudfoundry-k8s/diego
-    version: 2.141.0
+    version: 2.142.0
   istioBase:
     url: istio/base
     version: 1.29.1
@@ -41,7 +41,7 @@ charts:
     version: 2.12.4
   nfsVolume:
     url: cloudfoundry-k8s/nfs-volume
-    version: 7.65.0
+    version: 7.67.0
   policyAgent:
     url: cloudfoundry-k8s/policy-agent
     # renovate: dataSource=github-releases depName=cloudfoundry/k8s-policy-agent
@@ -54,7 +54,7 @@ charts:
     version: 0.387.0
   uaa:
     url: cloudfoundry-k8s/uaa
-    version: 79.3.0
+    version: 79.4.0
 buildpacks:
   binary-buildpack:
     image: ghcr.io/cloudfoundry/k8s/binary-buildpack
@@ -64,7 +64,7 @@ buildpacks:
     tag: 2.4.51
   java-buildpack:
     image: ghcr.io/cloudfoundry/k8s/java-buildpack
-    tag: 5.0.5
+    tag: 5.0.6
   go-buildpack:
     image: ghcr.io/cloudfoundry/k8s/go-buildpack
     tag: 1.10.48
@@ -76,7 +76,7 @@ buildpacks:
     tag: 1.9.3
   php-buildpack:
     image: ghcr.io/cloudfoundry/k8s/php-buildpack
-    tag: 5.0.6
+    tag: 5.1.0
   python-buildpack:
     image: ghcr.io/cloudfoundry/k8s/python-buildpack
     tag: 1.9.2
@@ -93,7 +93,7 @@ stacks:
   default: cflinuxfs4
   cflinuxfs4:
     image: ghcr.io/cloudfoundry/k8s/cflinuxfs4
-    tag: 1.321.0
+    tag: 1.323.0
   cflinuxfs5:
     image: ghcr.io/cloudfoundry/k8s/cflinuxfs5
-    tag: 0.31.0-beta
+    tag: 0.43.0
