@@ -57,6 +57,11 @@ jobs:
         run: |
           pip3 install -r scripts/requirements.txt
           python3 scripts/sync-cf-deployment-versions.py --ref develop
+      - name: Clone cf-k8s-releases
+        uses: actions/checkout@v7
+        with:
+          repository: cloudfoundry/cf-k8s-releases
+          path: cf-k8s-releases
       - name: Run make up
         if: steps.check_changes.outputs.skip != 'true'
         run: |
