@@ -23,7 +23,7 @@ charts:
   k8sRep:
     url: cloudfoundry-k8s/k8s-rep
     # renovate: dataSource=github-releases depName=cloudfoundry/k8s-garden-client
-    version: 0.6.4
+    version: 0.6.5
   logCache:
     url: cloudfoundry-k8s/log-cache
     version: 3.2.12
