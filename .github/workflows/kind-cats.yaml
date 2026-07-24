@@ -78,6 +78,8 @@ jobs:
       - name: Init
         if: steps.check_changes.outputs.skip != 'true'
         run: make bootstrap-complete
+      - name: debug SecurityGroups
+        run: kubectl get ciliumnetworkpolicies -n cf-workloads -o yaml
       - name: Minimal Test
         if: steps.check_changes.outputs.skip != 'true'
         run: |
