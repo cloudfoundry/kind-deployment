@@ -2,7 +2,7 @@
 {
     "admin_password": "${CC_ADMIN_PASSWORD}",
     "admin_user": "ccadmin",
-    "api": "api.127-0-0-1.nip.io",
+    "api": "api.cf.127-0-0-1.nip.io",
     "apps_domain": "apps.127-0-0-1.nip.io",
     "comma_delim_asgs_enabled": true,
     "credhub_client": "credhub_admin_client",
