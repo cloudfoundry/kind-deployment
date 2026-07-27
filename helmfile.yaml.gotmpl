@@ -401,6 +401,9 @@ releases:
     namespace: {{ .Values.systemNamespace }}
     chart: {{ .Values.charts.capi.url }}
     version: {{ .Values.charts.capi.version }}
+    postRenderer: kustomize
+    postRendererArgs:
+      - ./assets/kustomize/capi
     needs:
       - minio
       - diego

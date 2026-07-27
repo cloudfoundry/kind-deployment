@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+tempdir=$(mktemp -d)
+trap 'rm -rf "$tempdir"' EXIT
+
+cat <&0 > "${tempdir}/all.yaml"
+cp -a "${1}/." "${tempdir}"
+
+kubectl kustomize "${tempdir}"
+	
