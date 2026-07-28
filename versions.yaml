@@ -1,10 +1,10 @@
 charts:
   capi:
     url: cloudfoundry-k8s/capi
-    version: 1.240.0
+    version: 1.240.1-2
   cfNetworking:
     url: cloudfoundry-k8s/cf-networking
-    version: 3.119.0
+    version: 3.120.1-1
   cilium:
     url: cilium/cilium
     version: 1.18.4
@@ -13,7 +13,7 @@ charts:
     version: 2.15.14
   diego:
     url: cloudfoundry-k8s/diego
-    version: 2.142.0
+    version: 2.143.1-1
   istioBase:
     url: istio/base
     version: 1.29.1
@@ -26,13 +26,13 @@ charts:
     version: 0.6.5
   logCache:
     url: cloudfoundry-k8s/log-cache
-    version: 3.2.12
+    version: 3.2.13-1
   loggregator:
     url: cloudfoundry-k8s/loggregator
-    version: 107.0.33
+    version: 107.0.34-1
   loggregatorAgent:
     url: cloudfoundry-k8s/loggregator-agent
-    version: 8.3.24
+    version: 8.3.25-1
   minio:
     url: bitnami/minio
     version: 17.0.21
@@ -51,10 +51,10 @@ charts:
     version: 16.7.27
   routing:
     url: cloudfoundry-k8s/routing
-    version: 0.387.0
+    version: 0.387.1-1
   uaa:
     url: cloudfoundry-k8s/uaa
-    version: 79.4.0
+    version: 79.5.1-1
 buildpacks:
   binary-buildpack:
     image: ghcr.io/cloudfoundry/k8s/binary-buildpack
