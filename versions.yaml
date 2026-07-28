@@ -10,10 +10,10 @@ charts:
     version: 1.18.4
   credhub:
     url: cloudfoundry-k8s/credhub
-    version: 2.15.14
+    version: 2.15.15
   diego:
     url: cloudfoundry-k8s/diego
-    version: 2.142.0
+    version: 2.143.0
   istioBase:
     url: istio/base
     version: 1.29.1
@@ -54,7 +54,7 @@ charts:
     version: 0.387.0
   uaa:
     url: cloudfoundry-k8s/uaa
-    version: 79.4.0
+    version: 79.5.0
 buildpacks:
   binary-buildpack:
     image: ghcr.io/cloudfoundry/k8s/binary-buildpack
@@ -93,7 +93,7 @@ stacks:
   default: cflinuxfs4
   cflinuxfs4:
     image: ghcr.io/cloudfoundry/k8s/cflinuxfs4
-    tag: 1.323.0
+    tag: 1.324.0
   cflinuxfs5:
     image: ghcr.io/cloudfoundry/k8s/cflinuxfs5
-    tag: 0.43.0
+    tag: 0.44.0
