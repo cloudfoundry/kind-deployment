@@ -4,3 +4,11 @@ resources:
   - all.yaml
 patchesStrategicMerge:
   - patch-cloud-controller-telegraf.yaml
+  - patch-cc-worker-telegraf.yaml
+  - patch-scheduler-telegraf.yaml
+configMapGenerator:
+  - name: telegraf-config
+    files:
+      - capi.telegraf.conf
+      - worker.telegraf.conf
+      - scheduler.telegraf.conf

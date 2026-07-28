@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cloud-controller
+  name: cc-worker
 spec:
   template:
     spec:
@@ -12,7 +12,7 @@ spec:
           volumeMounts:
             - name: telegraf-config
               mountPath: /etc/telegraf/telegraf.conf
-              subPath: capi.telegraf.conf
+              subPath: worker.telegraf.conf
             - name: var-run
               mountPath: /var/run
       volumes:
