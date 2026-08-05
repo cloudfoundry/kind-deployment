@@ -1,7 +1,7 @@
 charts:
   capi:
     url: cloudfoundry-k8s/capi
-    version: 1.240.1-2
+    version: 1.241.0
   cfNetworking:
     url: cloudfoundry-k8s/cf-networking
     version: 3.120.1-1
@@ -10,7 +10,7 @@ charts:
     version: 1.18.4
   credhub:
     url: cloudfoundry-k8s/credhub
-    version: 2.15.15
+    version: 2.15.16
   diego:
     url: cloudfoundry-k8s/diego
     version: 2.143.1-1
@@ -51,7 +51,7 @@ charts:
     version: 16.7.27
   routing:
     url: cloudfoundry-k8s/routing
-    version: 0.387.1-1
+    version: 0.388.0
   uaa:
     url: cloudfoundry-k8s/uaa
     version: 79.5.1-1
@@ -96,4 +96,4 @@ stacks:
     tag: 1.324.0
   cflinuxfs5:
     image: ghcr.io/cloudfoundry/k8s/cflinuxfs5
-    tag: 0.44.0
+    tag: 0.51.0
