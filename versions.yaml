@@ -45,7 +45,7 @@ charts:
   policyAgent:
     url: cloudfoundry-k8s/policy-agent
     # renovate: dataSource=github-releases depName=cloudfoundry/k8s-policy-agent
-    version: 0.3.4
+    version: 0.3.5
   postgres:
     url: bitnami/postgresql
     version: 16.7.27
