@@ -27,7 +27,7 @@ create-org:
 bootstrap: create-org
 	@ ./scripts/upload_buildpacks.sh
 
-bootstrap-complete: create-org 
+bootstrap-complete: create-org
 	@ ALL_BUILDPACKS=true ./scripts/upload_buildpacks.sh
 
 up: create-kind init install
@@ -35,4 +35,4 @@ up: create-kind init install
 down: delete-kind
 	@ rm -rf temp
 
-PHONY: install login create-kind delete-kind up down create-org bootstrap bootstrap-complete
+.PHONY: install login create-kind delete-kind up down create-org bootstrap bootstrap-complete
