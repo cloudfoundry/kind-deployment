@@ -4,6 +4,7 @@ set -e
 
 # Auto-detect Docker or Podman
 source "$(dirname "$0")/detect-runtime.sh"
+source "$(dirname "$0")/tools.sh"
 
 configure_registry_mirror() {
   local cache_name=$1
@@ -52,6 +53,9 @@ setup_nfs() {
 
 script_full_path=$(dirname "$0")
 
+tools::install::kind
+tools::install::kubectl
+
 # Select kind config based on runtime
 if [ "${IS_PODMAN}" = "true" ]; then
   KIND_CONFIG="$script_full_path/../kind-podman.yaml"
@@ -65,11 +69,6 @@ if [ "${IS_PODMAN}" = "true" ]; then
   "${script_full_path}/setup-podman-vm.sh"
 fi
 
-# On Linux with Podman, lower the privileged port threshold on the host so that
-# Podman can publish ports 80/443/2222 when creating the kind node containers.
-if [ "${IS_PODMAN}" = "true" ] && [ "$(uname -s)" = "Linux" ]; then
-  sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
-fi
 
 if kind get clusters | grep -q "cfk8s"; then
   echo "Kind cluster 'cfk8s' already exists."

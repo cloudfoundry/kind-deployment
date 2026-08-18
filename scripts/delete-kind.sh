@@ -4,6 +4,7 @@ set -e
 
 # Auto-detect Docker or Podman
 source "$(dirname "$0")/detect-runtime.sh"
+source "$(dirname "$0")/tools.sh"
 
 script_full_path=$(dirname "$0")
 

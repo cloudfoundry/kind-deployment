@@ -32,7 +32,6 @@ releases:
     namespace: kube-system
     chart: {{ .Values.charts.cilium.url }}
     version: {{ .Values.charts.cilium.version }}
-    installed: {{ ne (env "SKIP_CILIUM") "true" }}
     values:
       - ./assets/values/cilium.yaml
       {{- if env "CILIUM_EXTRA_VALUES" }}
@@ -53,9 +52,7 @@ releases:
     chart: {{ .Values.charts.istioBase.url }}
     version: {{ .Values.charts.istioBase.version }}
     needs:
-      {{- if ne (env "SKIP_CILIUM") "true" }}
       - kube-system/cilium
-      {{- end }}
     values:
       - defaultRevision: minimal
 
@@ -80,9 +77,7 @@ releases:
     namespace: {{ .Values.systemNamespace }}
     chart: ./assets/base-chart
     needs:
-      {{- if ne (env "SKIP_CILIUM") "true" }}
       - kube-system/cilium
-      {{- end }}
       - istio-system/istiod
     set:
       - name: caCert
@@ -93,8 +88,6 @@ releases:
         file: {{ .Values.certsDir }}/all-in-one.crt
       - name: tlsKey
         file: {{ .Values.certsDir }}/all-in-one.key
-      - name: ciliumNetworkPolicies.enabled
-        value: {{ ne (env "SKIP_CILIUM") "true" }}
     hooks:
       - events: ["presync"]
         showlogs: true
