@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Extra args are forwarded to bin/test, e.g. `bash scripts/cats.sh --focus="…"`.
+
 CATS_PATH="${CATS_PATH:-../cf-acceptance-tests}"
 CATS_TEMPLATE="${CATS_TEMPLATE:-.github/cats-config.tpl}"
 CATS_CONFIG="${CATS_CONFIG:-.github/cats-config.json}"
@@ -15,4 +17,4 @@ if [ -n "${RENDER_ONLY}" ]; then
   exit 0
 fi
 
-CONFIG=$(realpath ${CATS_CONFIG}) ${CATS_PATH}/bin/test --timeout=180m --procs=4 --flake-attempts=1
+CONFIG=$(realpath ${CATS_CONFIG}) ${CATS_PATH}/bin/test --timeout=180m --procs=4 --flake-attempts=1 "$@"
