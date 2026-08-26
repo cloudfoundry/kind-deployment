@@ -1,16 +1,18 @@
+BASE_DOMAIN ?= "127-0-0-1.nip.io"
+
 init: temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub temp/secrets.sh temp/secrets.env
 
 temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub temp/secrets.sh temp/secrets.env:
-	@ ./scripts/init.sh
+	@ ./scripts/init.sh $(BASE_DOMAIN)
 
 install:
 	@ ./scripts/install.sh
 
 login:
 	@ . temp/secrets.sh; \
-	curl --silent --show-error --fail --insecure --retry 9 --retry-delay 5 --retry-all-errors --output /dev/null "https://api.cf.127-0-0-1.nip.io/v2/info"; \
+	curl --silent --show-error --fail --insecure --retry 9 --retry-delay 5 --retry-all-errors --output /dev/null "https://api.cf.$(BASE_DOMAIN)/v2/info"; \
 	echo "API is ready. Logging in..."; \
-	cf login -a https://api.cf.127-0-0-1.nip.io -u ccadmin -p "$$CC_ADMIN_PASSWORD" --skip-ssl-validation
+	cf login -a https://api.cf.$(BASE_DOMAIN) -u ccadmin -p "$$CC_ADMIN_PASSWORD" --skip-ssl-validation
 
 create-kind:
 	@ ./scripts/create-kind.sh

@@ -3,7 +3,9 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    networking.istio.io/service-type: NodePort
+    networking.istio.io/service-type: LoadBalancer
+    dns.gardener.cloud/class: garden
+    dns.gardener.cloud/dnsnames: "*.{{ .Values.systemDomain }},*.{{ .Values.appsDomain }}"
   labels:
     gateway.istio.io/managed: istio.io-gateway-controller
     gateway.networking.k8s.io/gateway-name: istio-gateway
@@ -15,187 +17,157 @@ spec:
   ports:
   - appProtocol: tcp
     name: status-port
-    nodePort: 31381
     port: 15021
     protocol: TCP
     targetPort: 15021
   - appProtocol: tcp
     name: policy-server
-    nodePort: 32212
     port: 4003
     protocol: TCP
     targetPort: 4003
   - appProtocol: tcp
     name: service-discovery-controller
-    nodePort: 32213
     port: 8054
     protocol: TCP
     targetPort: 8054
   - appProtocol: http
     name: http
-    nodePort: 31080
     port: 80
     protocol: TCP
     targetPort: 80
   - appProtocol: https
     name: https
-    nodePort: 31443
     port: 443
     protocol: TCP
     targetPort: 443
   - appProtocol: tcp
     name: log-cache-api
-    nodePort: 31880
     port: 8080
     protocol: TCP
     targetPort: 8080
   - appProtocol: tcp
     name: log-cache-syslog
-    nodePort: 31882
     port: 8082
     protocol: TCP
     targetPort: 8082
   - appProtocol: tcp
     name: doppler
-    nodePort: 31883
     port: 8083
     protocol: TCP
     targetPort: 8083
   - appProtocol: tcp
     name: ssh-proxy
-    nodePort: 31222
     port: 2222
     protocol: TCP
     targetPort: 2222
   - appProtocol: tcp
     name: syslog-binding-cache
-    nodePort: 31914
     port: 9000
     protocol: TCP
     targetPort: 9000
   - appProtocol: tcp
     name: tcp-route-1
-    nodePort: 32000
     port: 32000
     protocol: TCP
     targetPort: 32000
   - appProtocol: tcp
     name: tcp-route-2
-    nodePort: 32001
     port: 32001
     protocol: TCP
     targetPort: 32001
   - appProtocol: tcp
     name: tcp-route-3
-    nodePort: 32002
     port: 32002
     protocol: TCP
     targetPort: 32002
   - appProtocol: tcp
     name: tcp-route-4
-    nodePort: 32003
     port: 32003
     protocol: TCP
     targetPort: 32003
   - appProtocol: tcp
     name: tcp-route-5
-    nodePort: 32004
     port: 32004
     protocol: TCP
     targetPort: 32004
   - appProtocol: tcp
     name: tcp-route-6
-    nodePort: 32005
     port: 32005
     protocol: TCP
     targetPort: 32005
   - appProtocol: tcp
     name: tcp-route-7
-    nodePort: 32006
     port: 32006
     protocol: TCP
     targetPort: 32006
   - appProtocol: tcp
     name: tcp-route-8
-    nodePort: 32007
     port: 32007
     protocol: TCP
     targetPort: 32007
   - appProtocol: tcp
     name: tcp-route-9
-    nodePort: 32008
     port: 32008
     protocol: TCP
     targetPort: 32008
   - appProtocol: tcp
     name: tcp-route-10
-    nodePort: 32009
     port: 32009
     protocol: TCP
     targetPort: 32009
   - appProtocol: tcp
     name: tcp-route-11
-    nodePort: 32010
     port: 32010
     protocol: TCP
     targetPort: 32010
   - appProtocol: tcp
     name: tcp-route-12
-    nodePort: 32011
     port: 32011
     protocol: TCP
     targetPort: 32011
   - appProtocol: tcp
     name: tcp-route-13
-    nodePort: 32012
     port: 32012
     protocol: TCP
     targetPort: 32012
   - appProtocol: tcp
     name: tcp-route-14
-    nodePort: 32013
     port: 32013
     protocol: TCP
     targetPort: 32013
   - appProtocol: tcp
     name: tcp-route-15
-    nodePort: 32014
     port: 32014
     protocol: TCP
     targetPort: 32014
   - appProtocol: tcp
     name: tcp-route-16
-    nodePort: 32015
     port: 32015
     protocol: TCP
     targetPort: 32015
   - appProtocol: tcp
     name: tcp-route-17
-    nodePort: 32016
     port: 32016
     protocol: TCP
     targetPort: 32016
   - appProtocol: tcp
     name: tcp-route-18
-    nodePort: 32017
     port: 32017
     protocol: TCP
     targetPort: 32017
   - appProtocol: tcp
     name: tcp-route-19
-    nodePort: 32018
     port: 32018
     protocol: TCP
     targetPort: 32018
   - appProtocol: tcp
     name: tcp-route-20
-    nodePort: 32019
     port: 32019
     protocol: TCP
     targetPort: 32019
   selector:
     gateway.networking.k8s.io/gateway-name: istio-gateway
-  type: NodePort
+  type: LoadBalancer
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
@@ -226,7 +198,7 @@ apiVersion: gateway.networking.k8s.io/v1beta1
 kind: Gateway
 metadata:
   annotations:
-    networking.istio.io/service-type: NodePort
+    networking.istio.io/service-type: LoadBalancer
   name: istio-gateway
   namespace: {{ .Release.Namespace }}
 spec:
@@ -235,14 +207,14 @@ spec:
   - allowedRoutes:
       namespaces:
         from: All
-    hostname: '*.127-0-0-1.nip.io'
+    hostname: '*.{{ .Values.baseDomain }}'
     name: http
     port: 80
     protocol: HTTP
   - allowedRoutes:
       namespaces:
         from: All
-    hostname: '*.127-0-0-1.nip.io'
+    hostname: '*.{{ .Values.baseDomain }}'
     name: https
     port: 443
     protocol: HTTPS
@@ -486,8 +458,8 @@ spec:
   parentRefs:
     - name: istio-gateway
   hostnames:
-    - blobstore.127-0-0-1.nip.io
-    - "*.blobstore.127-0-0-1.nip.io"
+    - blobstore.{{ .Values.baseDomain }}
+    - "*.blobstore.{{ .Values.baseDomain }}"
   rules:
     - backendRefs:
         - name: minio
@@ -502,7 +474,7 @@ spec:
   parentRefs:
     - name: istio-gateway
   hostnames:
-  - "*.127-0-0-1.nip.io"
+  - "*.{{ .Values.baseDomain }}"
   rules:
     - backendRefs:
         - name: gorouter
@@ -531,7 +503,7 @@ spec:
       group: ""
       name: gorouter
   validation:
-    hostname: gorouter.127-0-0-1.nip.io
+    hostname: gorouter.{{ .Values.baseDomain }}
     caCertificateRefs:
       - kind: ConfigMap
         group: ""

@@ -21,42 +21,15 @@ repositories:
     url: https://istio-release.storage.googleapis.com/charts
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
-  - name: cilium
-    url: https://helm.cilium.io/
   - name: cloudfoundry-k8s
     oci: true
     url: ghcr.io/cloudfoundry/helm
 
 releases:
-  - name: cilium
-    namespace: kube-system
-    chart: {{ .Values.charts.cilium.url }}
-    version: {{ .Values.charts.cilium.version }}
-    values:
-      - ./assets/values/cilium.yaml
-    hooks:
-      - events: ["postsync"]
-        showlogs: true
-        command: "/bin/sh"
-        args:
-          - "-c"
-          - |
-            echo "Waiting for nodes to become ready after CNI installation..."
-            kubectl wait --for=condition=Ready nodes --all --timeout=300s
-
-            corefile=$(kubectl -n kube-system get configmap coredns -o jsonpath='{.data.Corefile}' | sed '/kubernetes/i \
-              rewrite name regex (.*)\\.127-0-0-1\\.nip\\.io istio-gateway-istio.{{ .Values.systemNamespace }}.svc.cluster.local answer auto\
-            ')
-            kubectl -n kube-system patch configmap coredns --type=json \
-              -p="$(jq -n --arg cf "$corefile" '[{"op":"replace","path":"/data/Corefile","value":$cf}]')"
-            kubectl -n kube-system rollout restart deployment/coredns
-
   - name: istio-base
     namespace: istio-system
     chart: {{ .Values.charts.istioBase.url }}
     version: {{ .Values.charts.istioBase.version }}
-    needs:
-      - kube-system/cilium
     values:
       - defaultRevision: minimal
 
@@ -81,7 +54,6 @@ releases:
     namespace: {{ .Values.systemNamespace }}
     chart: ./assets/base-chart
     needs:
-      - kube-system/cilium
       - istio-system/istiod
     set:
       - name: caCert
@@ -92,6 +64,12 @@ releases:
         file: {{ .Values.certsDir }}/all-in-one.crt
       - name: tlsKey
         file: {{ .Values.certsDir }}/all-in-one.key
+      - name: baseDomain
+        value: "apps.{{ .Values.baseDomain }}"
+      - name: systemDomain
+        value: "cf.{{ .Values.baseDomain }}"
+      - name: appsDomain
+        value: "apps.{{ .Values.baseDomain }}"
     hooks:
       - events: ["presync"]
         showlogs: true
@@ -193,7 +171,7 @@ releases:
       - postgresql
     values:
       - routingApi:
-          enabled: true
+          enabled: false
           sqldb:
             password: {{ .Values.secrets.dbPassword }}
             caCertificateSecret: all-in-one-tls
@@ -214,6 +192,7 @@ releases:
     needs:
       - {{ .Values.systemNamespace }}/base
     values:
+      - systemDomain: "cf.{{ .Values.baseDomain }}"
       - loggregator:
           enabled: true
       - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
@@ -237,6 +216,7 @@ releases:
       - logCacheApi:
           certificateSecret: all-in-one-tls
       - logCacheBackend:
+          systemDomain: "cf.{{ .Values.baseDomain }}"
           certificateSecret: all-in-one-tls
 
   - name: uaa
@@ -247,6 +227,7 @@ releases:
       - postgresql
       - {{ .Values.systemNamespace }}/base
     values:
+      - systemDomain: "cf.{{ .Values.baseDomain }}"
       - ccAdminPassword: {{ .Values.secrets.ccAdminPassword }}
       - uaadb:
           password: {{ .Values.secrets.dbPassword }}
@@ -255,21 +236,6 @@ releases:
       - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
       - uaaAdminSecret: {{ .Values.secrets.uaaAdminSecret }}
       - certificateSecret: all-in-one-tls
-
-  - name: credhub
-    namespace: {{ .Values.systemNamespace }}
-    chart: {{ .Values.charts.credhub.url }}
-    version: {{ .Values.charts.credhub.version }}
-    installed: {{ .Values.installOptionalComponents }}
-    needs:
-      - uaa
-      - postgresql
-    values:
-      - caCertificateSecret: instance-identity
-      - db:
-          password: {{ .Values.secrets.dbPassword }}
-          caCertificateSecret: all-in-one-tls
-          skipSSLVerify: false
 
   - name: locket
     namespace: {{ .Values.systemNamespace }}
@@ -408,8 +374,12 @@ releases:
       - cloudController:
           enabled: true
           certificateSecret: all-in-one-tls
+          appDomains:
+            - apps.{{ .Values.baseDomain }}
+          systemDomain: cf.{{ .Values.baseDomain }}
           blobstore:
             storage_cli:
+              host: http://minio.{{ .Values.systemNamespace }}.svc.cluster.local:9000
               aws_secret_access_key: {{ .Values.secrets.blobstorePassword }}
           sshProxyKeyFingerprint: {{ .Values.secrets.sshProxyKeyFingerprint | quote }}
           enableCommaDelimitedDestinations: true
@@ -437,21 +407,6 @@ releases:
           skipSSLVerify: false
       - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
 
-  - name: nfs-volume
-    namespace: {{ .Values.systemNamespace }}
-    chart: {{ .Values.charts.nfsVolume.url }}
-    version: {{ .Values.charts.nfsVolume.version }}
-    installed: {{ .Values.installOptionalComponents }}
-    needs:
-      - capi
-    values:
-      - nfsbroker:
-          enabled: true
-          certificateSecret: all-in-one-tls
-          oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
-      - nfsv3driver:
-          enabled: true
-
   - name: cf-networking
     namespace: {{ .Values.systemNamespace }}
     chart: {{ .Values.charts.cfNetworking.url }}
@@ -464,7 +419,7 @@ releases:
       - loggregator-agent
     values:
       - policyServer:
-          enabled: true
+          enabled: false
           networkpolicydb:
             password: {{ .Values.secrets.dbPassword }}
             caCertificateSecret: all-in-one-tls
@@ -479,33 +434,3 @@ releases:
           certificateSecret: all-in-one-tls
       - boshDns:
           certificateSecret: all-in-one-tls
-
-  - name: policy-agent
-    namespace: {{ .Values.systemNamespace }}
-    chart: {{ .Values.charts.policyAgent.url }}
-    version: {{ .Values.charts.policyAgent.version }}
-    installed: {{ .Values.installOptionalComponents }}
-    needs:
-      - cf-networking
-    set:
-      - name: certificateSecret
-        value: all-in-one-tls
-      - name: pollInterval
-        value: "5s"
-    hooks:
-      - events: ["postsync"]
-        showlogs: true
-        command: "/bin/sh"
-        args:
-          - "-c"
-          - |
-            kubectl get configmap coredns -n kube-system -o jsonpath='{.data.Corefile}' | grep -q "apps.internal:53" || {
-              echo "Patching CoreDNS to forward apps.internal to bosh-dns"
-              BOSH_DNS_IP=$(kubectl get svc bosh-dns -n {{ .Values.systemNamespace }} -o jsonpath='{.spec.clusterIP}')
-              COREFILE=$(kubectl get configmap coredns -n kube-system -o jsonpath='{.data.Corefile}')
-              printf '%s\n\n%s' "apps.internal:53 {
-                errors
-                forward . ${BOSH_DNS_IP}
-              }" "$COREFILE" | kubectl create configmap coredns -n kube-system --from-file=Corefile=/dev/stdin --dry-run=client -o yaml | kubectl apply -f -
-              kubectl rollout restart deployment coredns -n kube-system
-            }

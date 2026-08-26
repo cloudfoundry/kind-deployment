@@ -2,6 +2,7 @@
 certsDir: "./temp/certs"
 systemNamespace: "cf-system"
 workloadsNamespace: "cf-workloads"
+baseDomain: {{ requiredEnv "BASE_DOMAIN" }}
 
 installOptionalComponents: {{ "INSTALL_OPTIONAL_COMPONENTS" | env | default "true" }}
 secrets:

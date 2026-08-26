@@ -4,7 +4,10 @@ set -euo pipefail
 
 mkdir -p temp/certs
 
-OPENSSL="docker run --rm -v $(pwd)/temp/certs:/certs -v $(pwd)/certs/all-in-one.conf:/all-in-one.conf alpine/openssl"
+BASE_DOMAIN="${1}"
+sed "s/\${BASE_DOMAIN}/${BASE_DOMAIN}/g" certs/all-in-one.conf.tpl > temp/certs/all-in-one.conf
+
+OPENSSL="docker run --rm -v $(pwd)/temp/certs:/certs -v $(pwd)/temp/certs/all-in-one.conf:/all-in-one.conf alpine/openssl"
 SSH_KEYGEN="docker run --rm -v $(pwd)/temp/certs:/certs --entrypoint /usr/bin/ssh-keygen linuxserver/openssh-server"
 
 $OPENSSL genrsa -traditional -out /certs/ca.key 4096
