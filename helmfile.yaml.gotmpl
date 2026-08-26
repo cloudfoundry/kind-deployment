@@ -65,7 +65,7 @@ releases:
       - name: tlsKey
         file: {{ .Values.certsDir }}/all-in-one.key
       - name: baseDomain
-        value: "apps.{{ .Values.baseDomain }}"
+        value: {{ .Values.baseDomain }}
       - name: systemDomain
         value: "cf.{{ .Values.baseDomain }}"
       - name: appsDomain
