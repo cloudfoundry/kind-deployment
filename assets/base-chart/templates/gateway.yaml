@@ -3,9 +3,8 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    networking.istio.io/service-type: LoadBalancer
-    dns.gardener.cloud/class: garden
-    dns.gardener.cloud/dnsnames: "*.{{ .Values.systemDomain }},*.{{ .Values.appsDomain }}"
+    networking.istio.io/service-type: {{ if .Values.useNodePort }}NodePort{{ else }}LoadBalancer{{ end }}
+{{ tpl (toYaml .Values.serviceAnnotations) . | indent 4 }}
   labels:
     gateway.istio.io/managed: istio.io-gateway-controller
     gateway.networking.k8s.io/gateway-name: istio-gateway
@@ -17,157 +16,247 @@ spec:
   ports:
   - appProtocol: tcp
     name: status-port
+    {{- if .Values.useNodePort }}
+    nodePort: 31381
+    {{- end }}
     port: 15021
     protocol: TCP
     targetPort: 15021
   - appProtocol: tcp
     name: policy-server
+    {{- if .Values.useNodePort }}
+    nodePort: 32212
+    {{- end }}
     port: 4003
     protocol: TCP
     targetPort: 4003
   - appProtocol: tcp
     name: service-discovery-controller
+    {{- if .Values.useNodePort }}
+    nodePort: 32213
+    {{- end }}
     port: 8054
     protocol: TCP
     targetPort: 8054
   - appProtocol: http
     name: http
+    {{- if .Values.useNodePort }}
+    nodePort: 31080
+    {{- end }}
     port: 80
     protocol: TCP
     targetPort: 80
   - appProtocol: https
     name: https
+    {{- if .Values.useNodePort }}
+    nodePort: 31443
+    {{- end }}
     port: 443
     protocol: TCP
     targetPort: 443
   - appProtocol: tcp
     name: log-cache-api
+    {{- if .Values.useNodePort }}
+    nodePort: 31880
+    {{- end }}
     port: 8080
     protocol: TCP
     targetPort: 8080
   - appProtocol: tcp
     name: log-cache-syslog
+    {{- if .Values.useNodePort }}
+    nodePort: 31882
+    {{- end }}
     port: 8082
     protocol: TCP
     targetPort: 8082
   - appProtocol: tcp
     name: doppler
+    {{- if .Values.useNodePort }}
+    nodePort: 31883
+    {{- end }}
     port: 8083
     protocol: TCP
     targetPort: 8083
   - appProtocol: tcp
     name: ssh-proxy
+    {{- if .Values.useNodePort }}
+    nodePort: 31222
+    {{- end }}
     port: 2222
     protocol: TCP
     targetPort: 2222
   - appProtocol: tcp
     name: syslog-binding-cache
+    {{- if .Values.useNodePort }}
+    nodePort: 31914
+    {{- end }}
     port: 9000
     protocol: TCP
     targetPort: 9000
   - appProtocol: tcp
     name: tcp-route-1
+    {{- if .Values.useNodePort }}
+    nodePort: 32000
+    {{- end }}
     port: 32000
     protocol: TCP
     targetPort: 32000
   - appProtocol: tcp
     name: tcp-route-2
+    {{- if .Values.useNodePort }}
+    nodePort: 32001
+    {{- end }}
     port: 32001
     protocol: TCP
     targetPort: 32001
   - appProtocol: tcp
     name: tcp-route-3
+    {{- if .Values.useNodePort }}
+    nodePort: 32002
+    {{- end }}
     port: 32002
     protocol: TCP
     targetPort: 32002
   - appProtocol: tcp
     name: tcp-route-4
+    {{- if .Values.useNodePort }}
+    nodePort: 32003
+    {{- end }}
     port: 32003
     protocol: TCP
     targetPort: 32003
   - appProtocol: tcp
     name: tcp-route-5
+    {{- if .Values.useNodePort }}
+    nodePort: 32004
+    {{- end }}
     port: 32004
     protocol: TCP
     targetPort: 32004
   - appProtocol: tcp
     name: tcp-route-6
+    {{- if .Values.useNodePort }}
+    nodePort: 32005
+    {{- end }}
     port: 32005
     protocol: TCP
     targetPort: 32005
   - appProtocol: tcp
     name: tcp-route-7
+    {{- if .Values.useNodePort }}
+    nodePort: 32006
+    {{- end }}
     port: 32006
     protocol: TCP
     targetPort: 32006
   - appProtocol: tcp
     name: tcp-route-8
+    {{- if .Values.useNodePort }}
+    nodePort: 32007
+    {{- end }}
     port: 32007
     protocol: TCP
     targetPort: 32007
   - appProtocol: tcp
     name: tcp-route-9
+    {{- if .Values.useNodePort }}
+    nodePort: 32008
+    {{- end }}
     port: 32008
     protocol: TCP
     targetPort: 32008
   - appProtocol: tcp
     name: tcp-route-10
+    {{- if .Values.useNodePort }}
+    nodePort: 32009
+    {{- end }}
     port: 32009
     protocol: TCP
     targetPort: 32009
   - appProtocol: tcp
     name: tcp-route-11
+    {{- if .Values.useNodePort }}
+    nodePort: 32010
+    {{- end }}
     port: 32010
     protocol: TCP
     targetPort: 32010
   - appProtocol: tcp
     name: tcp-route-12
+    {{- if .Values.useNodePort }}
+    nodePort: 32011
+    {{- end }}
     port: 32011
     protocol: TCP
     targetPort: 32011
   - appProtocol: tcp
     name: tcp-route-13
+    {{- if .Values.useNodePort }}
+    nodePort: 32012
+    {{- end }}
     port: 32012
     protocol: TCP
     targetPort: 32012
   - appProtocol: tcp
     name: tcp-route-14
+    {{- if .Values.useNodePort }}
+    nodePort: 32013
+    {{- end }}
     port: 32013
     protocol: TCP
     targetPort: 32013
   - appProtocol: tcp
     name: tcp-route-15
+    {{- if .Values.useNodePort }}
+    nodePort: 32014
+    {{- end }}
     port: 32014
     protocol: TCP
     targetPort: 32014
   - appProtocol: tcp
     name: tcp-route-16
+    {{- if .Values.useNodePort }}
+    nodePort: 32015
+    {{- end }}
     port: 32015
     protocol: TCP
     targetPort: 32015
   - appProtocol: tcp
     name: tcp-route-17
+    {{- if .Values.useNodePort }}
+    nodePort: 32016
+    {{- end }}
     port: 32016
     protocol: TCP
     targetPort: 32016
   - appProtocol: tcp
     name: tcp-route-18
+    {{- if .Values.useNodePort }}
+    nodePort: 32017
+    {{- end }}
     port: 32017
     protocol: TCP
     targetPort: 32017
   - appProtocol: tcp
     name: tcp-route-19
+    {{- if .Values.useNodePort }}
+    nodePort: 32018
+    {{- end }}
     port: 32018
     protocol: TCP
     targetPort: 32018
   - appProtocol: tcp
     name: tcp-route-20
+    {{- if .Values.useNodePort }}
+    nodePort: 32019
+    {{- end }}
     port: 32019
     protocol: TCP
-    targetPort: 32019
+    targetPort: 32019  
   selector:
     gateway.networking.k8s.io/gateway-name: istio-gateway
-  type: LoadBalancer
+  type: {{ if .Values.useNodePort }}NodePort{{ else }}LoadBalancer{{ end }}
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
@@ -198,7 +287,7 @@ apiVersion: gateway.networking.k8s.io/v1beta1
 kind: Gateway
 metadata:
   annotations:
-    networking.istio.io/service-type: LoadBalancer
+    networking.istio.io/service-type: {{ if .Values.useNodePort }}NodePort{{ else }}LoadBalancer{{ end }}
   name: istio-gateway
   namespace: {{ .Release.Namespace }}
 spec:

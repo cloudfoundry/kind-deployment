@@ -2,3 +2,5 @@ caCert: ""
 caKey: ""
 tlsCert: ""
 tlsKey: ""
+useNodePort: true
+serviceAnnotations: {}
