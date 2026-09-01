@@ -35,4 +35,10 @@ up: create-kind init install
 down: delete-kind
 	@ rm -rf temp
 
-PHONY: install login create-kind delete-kind up down create-org bootstrap bootstrap-complete
+smoke:
+	@ ./scripts/smoke.sh
+
+cats:
+	@ ./scripts/cats.sh
+
+.PHONY: install login create-kind delete-kind up down create-org bootstrap bootstrap-complete smoke cats
