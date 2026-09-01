@@ -227,6 +227,12 @@ releases:
               agent: all-in-one-tls
               cache: all-in-one-tls
               metrics: all-in-one-tls
+          otelCollector:
+            enabled: {{ .Values.otelCollector.enabled }}
+            certificateSecret: all-in-one-tls
+            # TODO add new template instead
+            # exporter:
+            #   endpoint: {{ .Values.otelCollector.exporter.endpoint | quote }}
 
   - name: gorouter
     namespace: {{ .Values.systemNamespace }}

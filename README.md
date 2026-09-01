@@ -69,6 +69,13 @@ postgresql:
       max_connections = 500
 ```
 
+### OpenTelemetry Collector
+
+An OpenTelemetry Collector sidecar can be enabled in every forwarder-agent
+DaemonSet Pod to receive CF logs, metrics, and traces over mTLS. See
+[OpenTelemetry Collector](docs/otel-collector.md) for configuration and
+verification.
+
 ## Using the `setup-cf` GitHub Action
 
 This repository ships a composite action at `.github/actions/setup-cf` that provisions a full Cloud Foundry environment on a KinD cluster inside a GitHub Actions workflow. After it completes, the generated credentials from `temp/secrets.env` are exported into `$GITHUB_ENV`, so later steps can use the CF CLI directly.
@@ -101,6 +108,7 @@ Inputs (all optional):
 ## Read More Documentation
 
 - [Local Development Guide](docs/local-development-guide.md)
+- [OpenTelemetry Collector](docs/otel-collector.md)
 - [FAQs](docs/faq.md)
 
 ## Contributing
