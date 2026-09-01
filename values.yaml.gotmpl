@@ -11,6 +11,7 @@ installOptionalComponents: {{ "INSTALL_OPTIONAL_COMPONENTS" | env | default "tru
 gateway:
   infrastructure: {}
 postgresql: {}
+installOtelCollector: {{ "INSTALL_OTEL_COLLECTOR" | env | default "false" }}
 secrets:
   dbPassword: {{ requiredEnv "DB_PASSWORD" }}
   blobstorePassword: {{ requiredEnv "BLOBSTORE_PASSWORD" }}
