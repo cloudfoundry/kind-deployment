@@ -21,6 +21,8 @@ repositories:
     url: https://istio-release.storage.googleapis.com/charts
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
+  - name: open-telemetry
+    url: https://open-telemetry.github.io/opentelemetry-helm-charts
   - name: cilium
     url: https://helm.cilium.io/
   - name: cloudfoundry-k8s
@@ -166,6 +168,64 @@ releases:
           certificateSecret: all-in-one-tls
       - syslogAgent:
           certificateSecret: all-in-one-tls
+
+  - name: otel-collector
+    namespace: {{ .Values.systemNamespace }}
+    chart: open-telemetry/opentelemetry-collector
+    version: {{ .Values.charts.otelCollector.version }}
+    needs:
+      - {{ .Values.systemNamespace }}/base
+    values:
+      - mode: deployment
+        image:
+          repository: ghcr.io/cloudfoundry/k8s/otel-collector
+          tag: {{ .Values.charts.otelCollector.imageTag | quote }}
+        command:
+          name: ""
+        ports:
+          jaeger-compact:
+            enabled: false
+          jaeger-thrift:
+            enabled: false
+          jaeger-grpc:
+            enabled: false
+          zipkin:
+            enabled: false
+        alternateConfig:
+          receivers:
+            otlp:
+              protocols:
+                grpc:
+                  endpoint: 0.0.0.0:4317
+                http:
+                  endpoint: 0.0.0.0:4318
+          processors:
+            batch: {}
+            memory_limiter:
+              check_interval: 5s
+              limit_percentage: 80
+              spike_limit_percentage: 25
+          extensions:
+            health_check:
+              endpoint: ${env:MY_POD_IP}:13133
+          exporters:
+            debug:
+              verbosity: detailed
+          service:
+            extensions: [health_check]
+            pipelines:
+              metrics:
+                receivers: [otlp]
+                processors: [memory_limiter, batch]
+                exporters: [debug]
+              logs:
+                receivers: [otlp]
+                processors: [memory_limiter, batch]
+                exporters: [debug]
+              traces:
+                receivers: [otlp]
+                processors: [memory_limiter, batch]
+                exporters: [debug]
 
   - name: gorouter
     namespace: {{ .Values.systemNamespace }}
