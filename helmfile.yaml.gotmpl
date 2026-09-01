@@ -173,6 +173,7 @@ releases:
     namespace: {{ .Values.systemNamespace }}
     chart: open-telemetry/opentelemetry-collector
     version: {{ .Values.charts.otelCollector.version }}
+    installed: {{ .Values.installOtelCollector }}
     needs:
       - {{ .Values.systemNamespace }}/base
     values:
