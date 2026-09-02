@@ -8,6 +8,9 @@ charts:
   cilium:
     url: cilium/cilium
     version: 1.18.4
+  calico:
+    url: projectcalico/tigera-operator
+    version: 3.32.2
   credhub:
     url: cloudfoundry-k8s/credhub
     version: 2.15.21

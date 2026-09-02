@@ -26,15 +26,42 @@ repositories:
   - name: cloudfoundry-k8s
     oci: true
     url: ghcr.io/cloudfoundry/helm
+  - name: projectcalico
+    url: https://docs.tigera.io/calico/charts
+
+{{- $cniReleaseNamespace := "kube-system" }}
+{{- $cniChart := .Values.charts.cilium.url }}
+{{- $cniVersion := .Values.charts.cilium.version }}
+
+{{- if eq .Values.cni "calico" }}
+{{- $cniReleaseNamespace = "tigera-operator" }}
+{{- $cniChart = .Values.charts.calico.url }}
+{{- $cniVersion = .Values.charts.calico.version }}
+{{- end }}
+
+{{- $cniRelease := printf "%s/%s" $cniReleaseNamespace .Values.cni }}
 
 releases:
-  - name: cilium
-    namespace: kube-system
-    chart: {{ .Values.charts.cilium.url }}
-    version: {{ .Values.charts.cilium.version }}
+  - name: {{ .Values.cni }}
+    namespace: {{ $cniReleaseNamespace }}
+    chart: {{ $cniChart }}
+    version: {{ $cniVersion }}
     values:
+      {{- if eq .Values.cni "cilium" }}
       - ./assets/values/cilium.yaml
+      {{- else }}
+      - ./assets/values/calico.yaml
+      {{- end }}
     hooks:
+      {{- if eq .Values.cni "calico" }}
+      - events: ["presync"]
+        showlogs: true
+        command: "/bin/sh"
+        args:
+          - "-c"
+          - |
+            helm template calico-crds projectcalico/crd.projectcalico.org.v1 --version {{ $cniVersion }} | kubectl apply --server-side -f -
+      {{- end }}
       - events: ["postsync"]
         showlogs: true
         command: "/bin/sh"
@@ -56,7 +83,7 @@ releases:
     chart: {{ .Values.charts.istioBase.url }}
     version: {{ .Values.charts.istioBase.version }}
     needs:
-      - kube-system/cilium
+      - {{ $cniRelease }}
     values:
       - defaultRevision: minimal
 
@@ -81,7 +108,7 @@ releases:
     namespace: {{ .Values.systemNamespace }}
     chart: ./assets/base-chart
     needs:
-      - kube-system/cilium
+      - {{ $cniRelease }}
       - istio-system/istiod
     set:
       - name: caCert
@@ -92,6 +119,8 @@ releases:
         file: {{ .Values.certsDir }}/all-in-one.crt
       - name: tlsKey
         file: {{ .Values.certsDir }}/all-in-one.key
+    values:
+      - cni: {{ .Values.cni }} 
     hooks:
       - events: ["presync"]
         showlogs: true

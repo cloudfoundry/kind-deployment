@@ -44,13 +44,21 @@ script_full_path=$(dirname "$0")
 
 tools::install::kind
 tools::install::kubectl
+tools::install::yq
 
 if kind get clusters | grep -q "cfk8s"; then
   echo "Kind cluster 'cfk8s' already exists."
   exit 0
 fi
 
-kind create cluster --name "cfk8s" --config="$script_full_path/../kind.yaml"
+kind_config="$script_full_path/../kind.yaml"
+if [ "${CNI}" = "calico" ]; then
+  echo "Removing networking.kubeProxyMode from kind config for Calico CNI..."
+  yq eval 'del(.networking.kubeProxyMode)' "$kind_config" > "$kind_config.tmp"
+  kind_config="$kind_config.tmp"
+fi
+
+kind create cluster --name "cfk8s" --config=$kind_config
 
 echo "Applying taints to workload nodes..."
 kubectl taint nodes -l cloudfoundry.org/cell=true cloudfoundry.org/cell=true:NoSchedule --overwrite || true

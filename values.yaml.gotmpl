@@ -2,6 +2,7 @@
 certsDir: "./temp/certs"
 systemNamespace: "cf-system"
 workloadsNamespace: "cf-workloads"
+cni: {{ "CNI" | env | default "cilium" }}
 
 installOptionalComponents: {{ "INSTALL_OPTIONAL_COMPONENTS" | env | default "true" }}
 secrets:
