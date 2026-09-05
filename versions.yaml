@@ -1,7 +1,7 @@
 charts:
   capi:
     url: cloudfoundry-k8s/capi
-    version: 1.241.0
+    version: 1.244.0
   cfNetworking:
     url: cloudfoundry-k8s/cf-networking
     version: 3.122.0
@@ -10,10 +10,10 @@ charts:
     version: 1.18.4
   credhub:
     url: cloudfoundry-k8s/credhub
-    version: 2.15.18
+    version: 2.15.21
   diego:
     url: cloudfoundry-k8s/diego
-    version: 2.146.0
+    version: 2.149.0
   istioBase:
     url: istio/base
     version: 1.29.1
@@ -41,7 +41,7 @@ charts:
     version: 2.12.4
   nfsVolume:
     url: cloudfoundry-k8s/nfs-volume
-    version: 7.69.0
+    version: 7.70.0
   policyAgent:
     url: cloudfoundry-k8s/policy-agent
     # renovate: dataSource=github-releases depName=cloudfoundry/k8s-policy-agent
@@ -51,20 +51,20 @@ charts:
     version: 16.7.27
   routing:
     url: cloudfoundry-k8s/routing
-    version: 0.391.0
+    version: 0.393.0
   uaa:
     url: cloudfoundry-k8s/uaa
-    version: 79.5.1-1
+    version: 79.7.0
 buildpacks:
   binary-buildpack:
     image: ghcr.io/cloudfoundry/k8s/binary-buildpack
     tag: 2.0.0
   dotnet-core-buildpack:
     image: ghcr.io/cloudfoundry/k8s/dotnet-core-buildpack
-    tag: 2.4.51
+    tag: 2.4.52
   java-buildpack:
     image: ghcr.io/cloudfoundry/k8s/java-buildpack
-    tag: 5.0.6
+    tag: 5.0.7
   go-buildpack:
     image: ghcr.io/cloudfoundry/k8s/go-buildpack
     tag: 1.11.0
@@ -76,10 +76,10 @@ buildpacks:
     tag: 1.9.4
   php-buildpack:
     image: ghcr.io/cloudfoundry/k8s/php-buildpack
-    tag: 5.1.1
+    tag: 5.1.2
   python-buildpack:
     image: ghcr.io/cloudfoundry/k8s/python-buildpack
-    tag: 1.9.3
+    tag: 1.9.4
   r-buildpack:
     image: ghcr.io/cloudfoundry/k8s/r-buildpack
     tag: 1.2.28
