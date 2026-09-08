@@ -333,8 +333,6 @@ releases:
           caCertificateSecret: all-in-one-tls
           skipSSLVerify: false
         diegoSSHCredentials: {{ .Values.secrets.diegoSSHCredentials }}
-        sshProxy:
-          oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
         auctioneer:
           enabled: true
           certificateSecret: all-in-one-tls
@@ -346,6 +344,7 @@ releases:
         sshProxy:
           enabled: true
           certificateSecret: all-in-one-tls
+          oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
         gatewayObjects:
           enabled: false
 
