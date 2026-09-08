@@ -1,0 +1,29 @@
+installation:
+  kubernetesProvider: Kind
+  controlPlaneReplicas: 1
+  cni:
+    type: Calico
+  calicoNetwork:
+    linuxDataplane: BPF
+    bpfNetworkBootstrap: Enabled
+    kubeProxyManagement: Enabled
+    bgp: Disabled
+    ipPools:
+      - name: default-ipv4-ippool
+        blockSize: 26
+        cidr: 10.244.0.0/16
+        encapsulation: VXLANCrossSubnet
+        natOutgoing: Enabled
+        nodeSelector: all()
+        assignmentMode: Automatic
+        disableBGPExport: false
+        disableNewAllocations: false 
+        allowedUses:
+          - Workload
+          - Tunnel
+
+goldmane:
+  enabled: false
+
+whisker:
+  enabled: false

@@ -1,0 +1,87 @@
+{{- if eq .Values.cni "calico" }}
+---
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: public-networks
+spec:
+  selector: has(cloudfoundry.org/app-guid)
+  types:
+    - Egress
+  egress:
+    - action: Allow
+      destination:
+        nets:
+          - 0.0.0.0/0
+        notNets:
+          - 10.0.0.0/8
+          - 169.254.0.0/16
+          - 172.16.0.0/12
+          - 192.168.0.0/16
+    - action: Allow
+      protocol: TCP
+      destination:
+        namespaceSelector: kubernetes.io/metadata.name == "{{ .Release.Namespace }}"
+        selector: service.istio.io/canonical-name == "istio-gateway-istio"
+        ports:
+          - 80
+          - 443
+---
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: dns
+spec:
+  selector: has(cloudfoundry.org/app-guid)
+  types:
+    - Egress
+  egress:
+    - action: Allow
+      protocol: UDP
+      destination:
+        namespaceSelector: kubernetes.io/metadata.name == "kube-system"
+        selector: k8s-app == "kube-dns"
+        ports:
+          - 53
+    - action: Allow
+      protocol: TCP
+      destination:
+        namespaceSelector: kubernetes.io/metadata.name == "kube-system"
+        selector: k8s-app == "kube-dns"
+        ports:
+          - 53
+---
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: credhub
+spec:
+  selector: has(cloudfoundry.org/app-guid)
+  types:
+    - Egress
+  egress:
+    - action: Allow
+      protocol: TCP
+      destination:
+        namespaceSelector: kubernetes.io/metadata.name == "{{ .Release.Namespace }}"
+        selector: app == "credhub"
+        ports:
+          - 8844
+---
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: uaa
+spec:
+  selector: has(cloudfoundry.org/app-guid)
+  types:
+    - Egress
+  egress:
+    - action: Allow
+      protocol: TCP
+      destination:
+        namespaceSelector: kubernetes.io/metadata.name == "{{ .Release.Namespace }}"
+        selector: app == "uaa"
+        ports:
+          - 8443
+{{- end }}

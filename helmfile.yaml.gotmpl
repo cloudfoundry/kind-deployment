@@ -26,15 +26,42 @@ repositories:
   - name: cloudfoundry-k8s
     oci: true
     url: ghcr.io/cloudfoundry/helm
+  - name: projectcalico
+    url: https://docs.tigera.io/calico/charts
+
+{{- $cniReleaseNamespace := "kube-system" }}
+{{- $cniChart := .Values.charts.cilium.url }}
+{{- $cniVersion := .Values.charts.cilium.version }}
+
+{{- if eq .Values.cni "calico" }}
+{{- $cniReleaseNamespace = "tigera-operator" }}
+{{- $cniChart = .Values.charts.calico.url }}
+{{- $cniVersion = .Values.charts.calico.version }}
+{{- end }}
+
+{{- $cniRelease := printf "%s/%s" $cniReleaseNamespace .Values.cni }}
 
 releases:
-  - name: cilium
-    namespace: kube-system
-    chart: {{ .Values.charts.cilium.url }}
-    version: {{ .Values.charts.cilium.version }}
+  - name: {{ .Values.cni }}
+    namespace: {{ $cniReleaseNamespace }}
+    chart: {{ $cniChart }}
+    version: {{ $cniVersion }}
     values:
+      {{- if eq .Values.cni "cilium" }}
       - ./assets/values/cilium.yaml
+      {{- else }}
+      - ./assets/values/calico.yaml
+      {{- end }}
     hooks:
+      {{- if eq .Values.cni "calico" }}
+      - events: ["presync"]
+        showlogs: true
+        command: "/bin/sh"
+        args:
+          - "-c"
+          - |
+            helm template calico-crds projectcalico/crd.projectcalico.org.v1 --version {{ $cniVersion }} | kubectl apply --server-side -f -
+      {{- end }}
       - events: ["postsync"]
         showlogs: true
         command: "/bin/sh"
@@ -56,7 +83,7 @@ releases:
     chart: {{ .Values.charts.istioBase.url }}
     version: {{ .Values.charts.istioBase.version }}
     needs:
-      - kube-system/cilium
+      - {{ $cniRelease }}
     values:
       - defaultRevision: minimal
 
@@ -81,7 +108,7 @@ releases:
     namespace: {{ .Values.systemNamespace }}
     chart: ./assets/base-chart
     needs:
-      - kube-system/cilium
+      - {{ $cniRelease }}
       - istio-system/istiod
     set:
       - name: caCert
@@ -92,6 +119,8 @@ releases:
         file: {{ .Values.certsDir }}/all-in-one.crt
       - name: tlsKey
         file: {{ .Values.certsDir }}/all-in-one.key
+    values:
+      - cni: {{ .Values.cni }} 
     hooks:
       - events: ["presync"]
         showlogs: true
@@ -131,17 +160,17 @@ releases:
       - extraEnvVars:
           - name: MINIO_DOMAIN
             value: blobstore.127-0-0-1.nip.io
-      - console:
+        console:
           enabled: false
-      - resourcesPreset: small
-      - auth:
+        resourcesPreset: small
+        auth:
           rootPassword: {{ .Values.secrets.blobstorePassword }}
-      - image:
+        image:
           repository: bitnamilegacy/minio
-      - global:
+        global:
           security:
             allowInsecureImages: true
-      - persistence:
+        persistence:
           enabled: true
           size: 10Gi
           # Ensure blobstore data survives MinIO pod restarts.
@@ -159,12 +188,12 @@ releases:
       - syslogBindingCache:
           enabled: true
           certificateSecret: all-in-one-tls
-      - forwarderAgent:
+        forwarderAgent:
           enabled: true
           certificateSecret: all-in-one-tls
-      - loggregatorAgent:
+        loggregatorAgent:
           certificateSecret: all-in-one-tls
-      - syslogAgent:
+        syslogAgent:
           certificateSecret: all-in-one-tls
 
   - name: gorouter
@@ -178,7 +207,7 @@ releases:
       - gorouter:
           enabled: true
           certificateSecret: all-in-one-tls
-      - udpForwarder:
+        udpForwarder:
           certificateSecret: all-in-one-tls
 
   - name: tcp-routing
@@ -201,7 +230,7 @@ releases:
           certificateSecret: all-in-one-tls
           locketCertificateSecret: all-in-one-tls
           uaaCertificateSecret: all-in-one-tls
-      - tcpRouter:
+        tcpRouter:
           enabled: true
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
           certificateSecret: all-in-one-tls
@@ -216,14 +245,14 @@ releases:
     values:
       - loggregator:
           enabled: true
-      - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
-      - doppler:
+        oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
+        doppler:
           certificateSecret: all-in-one-tls
-      - reverseLogProxy:
+        reverseLogProxy:
           certificateSecret: all-in-one-tls
-      - reverseLogProxyGateway:
+        reverseLogProxyGateway:
           certificateSecret: all-in-one-tls
-      - trafficcontroller:
+        trafficcontroller:
           certificateSecret: all-in-one-tls
 
   - name: log-cache
@@ -236,7 +265,7 @@ releases:
     values:
       - logCacheApi:
           certificateSecret: all-in-one-tls
-      - logCacheBackend:
+        logCacheBackend:
           certificateSecret: all-in-one-tls
 
   - name: uaa
@@ -248,13 +277,13 @@ releases:
       - {{ .Values.systemNamespace }}/base
     values:
       - ccAdminPassword: {{ .Values.secrets.ccAdminPassword }}
-      - uaadb:
+        uaadb:
           password: {{ .Values.secrets.dbPassword }}
           caCertificateSecret: all-in-one-tls
           skipSSLVerify: false
-      - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
-      - uaaAdminSecret: {{ .Values.secrets.uaaAdminSecret }}
-      - certificateSecret: all-in-one-tls
+        oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
+        uaaAdminSecret: {{ .Values.secrets.uaaAdminSecret }}
+        certificateSecret: all-in-one-tls
 
   - name: credhub
     namespace: {{ .Values.systemNamespace }}
@@ -266,7 +295,7 @@ releases:
       - postgresql
     values:
       - caCertificateSecret: instance-identity
-      - db:
+        db:
           password: {{ .Values.secrets.dbPassword }}
           caCertificateSecret: all-in-one-tls
           skipSSLVerify: false
@@ -283,7 +312,7 @@ releases:
           password: {{ .Values.secrets.dbPassword }}
           caCertificateSecret: all-in-one-tls
           skipSSLVerify: false
-      - locket:
+        locket:
           enabled: true
           certificateSecret: all-in-one-tls
 
@@ -303,21 +332,20 @@ releases:
           password: {{ .Values.secrets.dbPassword }}
           caCertificateSecret: all-in-one-tls
           skipSSLVerify: false
-      - diegoSSHCredentials: {{ .Values.secrets.diegoSSHCredentials }}
-      - sshProxy:
+        diegoSSHCredentials: {{ .Values.secrets.diegoSSHCredentials }}
+        auctioneer:
+          enabled: true
+          certificateSecret: all-in-one-tls
+        bbs:
+          enabled: true
+          certificateSecret: all-in-one-tls
+        fileserver:
+          enabled: true
+        sshProxy:
+          enabled: true
+          certificateSecret: all-in-one-tls
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
-      - auctioneer:
-          enabled: true
-          certificateSecret: all-in-one-tls
-      - bbs:
-          enabled: true
-          certificateSecret: all-in-one-tls
-      - fileserver:
-          enabled: true
-      - sshProxy:
-          enabled: true
-          certificateSecret: all-in-one-tls
-      - gatewayObjects:
+        gatewayObjects:
           enabled: false
 
   - name: tps-watcher
@@ -330,7 +358,7 @@ releases:
       - tpsWatcher:
           enabled: true
           certificateSecret: all-in-one-tls
-      - oauthClientsSecret: ""
+        oauthClientsSecret: ""
 
   - name: route-emitter
     namespace: {{ .Values.systemNamespace }}
@@ -344,8 +372,8 @@ releases:
     {{ end }}
     values:
       - diegoSSHCredentials: ""
-      - sshProxyHostKey: ""
-      - routeEmitter:
+        sshProxyHostKey: ""
+        routeEmitter:
           enabled: true
           certificateSecret: all-in-one-tls
           routingApi:
@@ -376,14 +404,14 @@ releases:
           {{ $stackName }}: "{{ $stackConfig.image }}:{{ $stackConfig.tag }}"
           {{- end }}
         {{- end }}
-      - workloadsNamespace: {{ .Values.workloadsNamespace }}
-      - containerProxyVerifySubjectAltName:
+        workloadsNamespace: {{ .Values.workloadsNamespace }}
+        containerProxyVerifySubjectAltName:
           - gorouter
           - ssh-proxy
           - cf-tcp-router
-      - loggregator:
+        loggregator:
           certificateSecret: all-in-one-tls
-      - locket:
+        locket:
           certificateSecret: all-in-one-tls
 
     hooks:
@@ -429,13 +457,13 @@ releases:
             cflinuxfs4: /home/vcap
             cflinuxfs5: /home/vcap
           docker_staging_stack: {{ .Values.stacks.default }}
-      - ccUploader:
+        ccUploader:
           certificateSecret: all-in-one-tls
-      - ccdb:
+        ccdb:
           password: {{ .Values.secrets.dbPassword }}
           caCertificateSecret: all-in-one-tls
           skipSSLVerify: false
-      - oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
+        oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
 
   - name: nfs-volume
     namespace: {{ .Values.systemNamespace }}
@@ -449,7 +477,7 @@ releases:
           enabled: true
           certificateSecret: all-in-one-tls
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
-      - nfsv3driver:
+        nfsv3driver:
           enabled: true
 
   - name: cf-networking
@@ -471,13 +499,13 @@ releases:
             skipSSLVerify: false
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
           certificateSecret: all-in-one-tls
-      - serviceDiscoveryController:
+        serviceDiscoveryController:
           enabled: true
           certificateSecret: all-in-one-tls
-      - boshDnsAdapter:
+        boshDnsAdapter:
           enabled: true
           certificateSecret: all-in-one-tls
-      - boshDns:
+        boshDns:
           certificateSecret: all-in-one-tls
 
   - name: policy-agent
@@ -487,11 +515,10 @@ releases:
     installed: {{ .Values.installOptionalComponents }}
     needs:
       - cf-networking
-    set:
-      - name: certificateSecret
-        value: all-in-one-tls
-      - name: pollInterval
-        value: "5s"
+    values:
+      - certificateSecret: all-in-one-tls
+        pollInterval: "5s"
+        cni: {{ .Values.cni }}
     hooks:
       - events: ["postsync"]
         showlogs: true

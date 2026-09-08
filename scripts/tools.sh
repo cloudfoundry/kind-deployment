@@ -13,6 +13,9 @@ export KIND_VERSION="0.32.0"
 export KUBECTL_VERSION="1.36.2"
 # renovate: dataSource=github-releases depName=google/go-containerregistry
 export CRANE_VERSION="0.21.7"
+# renovate: dataSource=github-releases depName=mikefarah/yq
+export YQ_VERSION="4.53.6"
+
 export TOOLS_BIN_DIR="$(realpath $(dirname "${BASH_SOURCE[0]}"))/../bin"
 
 function tools::export_path() {
@@ -142,4 +145,22 @@ function tools::install::crane() {
 
     echo "Installing crane from ${url}..."
     curl -sSL -o - "${url}" | tar -xz -C "${TOOLS_BIN_DIR}" crane
+}
+
+function tools::install::yq() {
+    tools::export_path
+
+    local bin="${TOOLS_BIN_DIR}/yq"
+    if [[ -x "${bin}" ]] && "${bin}" --version 2>/dev/null | grep -q "v4\."; then
+        return 0
+    fi
+
+    local os=$(util::tools::os)
+    local arch=$(util::tools::arch)
+    local url="https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_${os}_${arch}"
+    mkdir -p "${TOOLS_BIN_DIR}"
+
+    echo "Installing yq from ${url}..."
+    curl -sSL -o "${TOOLS_BIN_DIR}/yq" "${url}"
+    chmod +x "${TOOLS_BIN_DIR}/yq"
 }
