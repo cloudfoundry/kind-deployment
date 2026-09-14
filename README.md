@@ -8,8 +8,6 @@ The following tools need to be installed:
 
 - [`docker`](https://docs.docker.com/engine/install/) or [podman](https://podman.io/docs/installation)
 - [`docker-compose`](https://docs.docker.com/compose/install) or [podman-compose](https://github.com/containers/podman-compose)
-- [`kind`](https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries) (v0.31.0 or higher)
-- [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl) (v1.35.1 or higher)
 - `make`:
   - It should be already installed on MacOS and Linux.
   - For Windows installation see: <https://gnuwin32.sourceforge.net/packages/make.htm>
