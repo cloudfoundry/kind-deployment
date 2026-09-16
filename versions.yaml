@@ -23,10 +23,6 @@ charts:
   istiod:
     url: istio/istiod
     version: 1.29.1
-  k8sRep:
-    url: cloudfoundry-k8s/k8s-rep
-    # renovate: dataSource=github-releases depName=cloudfoundry/k8s-garden-client
-    version: 0.7.0
   logCache:
     url: cloudfoundry-k8s/log-cache
     version: 3.2.13
