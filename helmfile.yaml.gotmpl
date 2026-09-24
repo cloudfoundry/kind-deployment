@@ -208,10 +208,7 @@ releases:
     values:
       - mode: deployment
         image:
-          repository: ghcr.io/cloudfoundry/k8s/otel-collector
-          tag: {{ .Values.charts.otelCollector.imageTag | quote }}
-        command:
-          name: ""
+          repository: otel/opentelemetry-collector-contrib
         ports:
           jaeger-compact:
             enabled: false
@@ -221,14 +218,30 @@ releases:
             enabled: false
           zipkin:
             enabled: false
+        extraVolumes:
+          - name: otel-collector-tls
+            secret:
+              secretName: all-in-one-tls
+        extraVolumeMounts:
+          - name: otel-collector-tls
+            mountPath: /etc/otel/certs
+            readOnly: true
+        # Derived from the upstream chart's default `config`:
+        # https://github.com/open-telemetry/opentelemetry-helm-charts/blob/main/charts/opentelemetry-collector/values.yaml
+        # Differences: single mTLS OTLP receiver mirroring otel-collector-release
+        # (BOSH) `otlp/cf-internal-local`; jaeger/zipkin/prometheus receivers dropped;
+        # otlp exporter added alongside debug for local egress.
         alternateConfig:
           receivers:
-            otlp:
+            otlp/cf-internal-local:
               protocols:
                 grpc:
                   endpoint: 0.0.0.0:4317
-                http:
-                  endpoint: 0.0.0.0:4318
+                  tls:
+                    client_ca_file: /etc/otel/certs/ca.crt
+                    cert_file: /etc/otel/certs/tls.crt
+                    key_file: /etc/otel/certs/tls.key
+                    min_version: "1.3"
           processors:
             batch: {}
             memory_limiter:
@@ -241,21 +254,25 @@ releases:
           exporters:
             debug:
               verbosity: detailed
+            otlp:
+              endpoint: {{ .Values.charts.otelCollector.exportEndpoint }}
+              tls:
+                insecure: true
           service:
             extensions: [health_check]
             pipelines:
               metrics:
-                receivers: [otlp]
+                receivers: [otlp/cf-internal-local]
                 processors: [memory_limiter, batch]
-                exporters: [debug]
+                exporters: [debug, otlp]
               logs:
-                receivers: [otlp]
+                receivers: [otlp/cf-internal-local]
                 processors: [memory_limiter, batch]
-                exporters: [debug]
+                exporters: [debug, otlp]
               traces:
-                receivers: [otlp]
+                receivers: [otlp/cf-internal-local]
                 processors: [memory_limiter, batch]
-                exporters: [debug]
+                exporters: [debug, otlp]
 
   - name: gorouter
     namespace: {{ .Values.systemNamespace }}
