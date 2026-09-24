@@ -7,3 +7,4 @@ k8sServiceHost: cfk8s-control-plane
 k8sServicePort: 6443
 operator:
   replicas: 1
+kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256

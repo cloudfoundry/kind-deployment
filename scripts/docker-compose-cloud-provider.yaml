@@ -1,0 +1,17 @@
+services:
+  cloud-provider:
+    image: registry.k8s.io/cloud-provider-kind/cloud-controller-manager:v0.11.1
+    container_name: cloud-provider
+    restart: always
+    privileged: true
+    networks:
+      - kind
+    command: --enable-default-ingress=false --gateway-channel=disabled --enable-lb-port-mapping
+    volumes:
+      - type: bind
+        source: ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}
+        target: /var/run/docker.sock
+
+networks:
+  kind:
+    external: true

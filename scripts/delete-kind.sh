@@ -21,3 +21,4 @@ fi
 echo "Deleting registry cache containers..."
 docker compose -p cache -f "${script_full_path}/docker-compose-registries.yaml" $container_runtime_spects down
 docker compose -p nfs -f "${script_full_path}/docker-compose-nfs.yaml" $container_runtime_spects down
+docker compose -p cloud-provider -f "${script_full_path}/docker-compose-cloud-provider.yaml" $container_runtime_spect down

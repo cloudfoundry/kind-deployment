@@ -27,26 +27,31 @@ EOF
 }
 
 evaluate_docker_progress_option() {
-    # Detect container runtime behind docker (Docker vs Podman)
-    if echo $(docker version) | grep -qi 'Podman'; then
-      echo ""
-    else
-      echo "--progress plain"
-    fi
+  # Detect container runtime behind docker (Docker vs Podman)
+  if echo $(docker version) | grep -qi 'Podman'; then
+    echo ""
+  else
+    echo "--progress plain"
+  fi
 }
 
 setup_registry_caches() {
-    echo "Starting registry pull-through caches with docker-compose..."
-    docker compose -p cache -f "${script_full_path}/docker-compose-registries.yaml" $(evaluate_docker_progress_option) up -d
+  echo "Starting registry pull-through caches with docker-compose..."
+  docker compose -p cache -f "${script_full_path}/docker-compose-registries.yaml" $(evaluate_docker_progress_option) up -d
 
-    configure_registry_mirror "docker-io" "https://registry-1.docker.io" "docker.io"
-    configure_registry_mirror "ghcr-io" "https://ghcr.io" "ghcr.io"
-    configure_registry_mirror "quay-io" "https://quay.io" "quay.io"
+  configure_registry_mirror "docker-io" "https://registry-1.docker.io" "docker.io"
+  configure_registry_mirror "ghcr-io" "https://ghcr.io" "ghcr.io"
+  configure_registry_mirror "quay-io" "https://quay.io" "quay.io"
 }
 
 setup_nfs() {
-    echo "Starting NFS server with docker-compose..."
-    docker compose -p nfs -f "${script_full_path}/docker-compose-nfs.yaml" $(evaluate_docker_progress_option) up -d
+  echo "Starting NFS server with docker-compose..."
+  docker compose -p nfs -f "${script_full_path}/docker-compose-nfs.yaml" $(evaluate_docker_progress_option) up -d
+}
+
+setupCloudProviderKind() {
+  echo "Setting up cloud provider for kind..."
+  docker compose -p cloud-provider -f "${script_full_path}/docker-compose-cloud-provider.yaml" $(evaluate_docker_progress_option) up -d
 }
 
 script_full_path=$(dirname "$0")
@@ -85,3 +90,4 @@ if [ "${INSTALL_OPTIONAL_COMPONENTS:-true}" = "true" ]; then
   setup_nfs
 fi
 
+setupCloudProviderKind
