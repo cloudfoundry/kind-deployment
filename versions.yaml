@@ -16,7 +16,7 @@ charts:
     version: 2.15.21
   diego:
     url: cloudfoundry-k8s/diego
-    version: 2.149.0
+    version: 2.151.0
   istioBase:
     url: istio/base
     version: 1.29.1
