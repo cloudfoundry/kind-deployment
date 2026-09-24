@@ -1,16 +1,20 @@
+DEFAULT_CLUSTER_DOMAIN := 127-0-0-1.nip.io
+CLUSTER_DOMAIN ?= $(DEFAULT_CLUSTER_DOMAIN)
+LOCAL_DEPLOYMENT = $(if $(filter $(DEFAULT_CLUSTER_DOMAIN),$(CLUSTER_DOMAIN)),true,false)
+
 init: temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub temp/secrets.sh temp/secrets.env
 
 temp/certs/ca.key temp/certs/ca.crt temp/certs/ssh_key temp/certs/ssh_key.pub temp/secrets.sh temp/secrets.env:
-	@ ./scripts/init.sh
+	@ ./scripts/init.sh $(CLUSTER_DOMAIN)
 
 install:
-	@ ./scripts/install.sh
+	@ LOCAL_DEPLOYMENT=$(LOCAL_DEPLOYMENT) ./scripts/install.sh $(CLUSTER_DOMAIN)
 
 login:
 	@ . temp/secrets.sh; \
-	curl --silent --show-error --fail --insecure --retry 9 --retry-delay 5 --retry-all-errors --output /dev/null "https://api.cf.127-0-0-1.nip.io/v3/info"; \
+	curl --silent --show-error --fail --insecure --retry 9 --retry-delay 5 --retry-all-errors --output /dev/null "https://api.cf.$(CLUSTER_DOMAIN)/v3/info"; \
 	echo "API is ready. Logging in..."; \
-	cf login -a https://api.cf.127-0-0-1.nip.io -u ccadmin -p "$$CC_ADMIN_PASSWORD" --skip-ssl-validation
+	cf login -a https://api.cf.$(CLUSTER_DOMAIN) -u ccadmin -p "$$CC_ADMIN_PASSWORD" --skip-ssl-validation
 
 create-kind:
 	@ ./scripts/create-kind.sh

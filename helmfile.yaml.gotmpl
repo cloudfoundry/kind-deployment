@@ -42,6 +42,7 @@ repositories:
 {{- $cniRelease := printf "%s/%s" $cniReleaseNamespace .Values.cni }}
 
 releases:
+  {{- if .Values.useNodePort }}
   - name: {{ .Values.cni }}
     namespace: {{ $cniReleaseNamespace }}
     chart: {{ $cniChart }}
@@ -77,13 +78,16 @@ releases:
             kubectl -n kube-system patch configmap coredns --type=json \
               -p="$(jq -n --arg cf "$corefile" '[{"op":"replace","path":"/data/Corefile","value":$cf}]')"
             kubectl -n kube-system rollout restart deployment/coredns
+  {{- end }}
 
   - name: istio-base
     namespace: istio-system
     chart: {{ .Values.charts.istioBase.url }}
     version: {{ .Values.charts.istioBase.version }}
     needs:
+      {{- if .Values.useNodePort }}
       - {{ $cniRelease }}
+      {{- end }}
     values:
       - defaultRevision: minimal
 
@@ -108,8 +112,17 @@ releases:
     namespace: {{ .Values.systemNamespace }}
     chart: ./assets/base-chart
     needs:
+      {{- if .Values.useNodePort }}
       - {{ $cniRelease }}
+      {{- end }}
       - istio-system/istiod
+    values:
+      - serviceAnnotations: {{ .Values.serviceAnnotations | toYaml | nindent 10 }}
+        cni: {{ .Values.cni }}
+        useNodePort: {{ .Values.useNodePort }}
+        baseDomain: {{ .Values.baseDomain }}
+        systemDomain: "cf.{{ .Values.baseDomain }}"
+        appsDomain: "apps.{{ .Values.baseDomain }}"
     set:
       - name: caCert
         file: {{ .Values.certsDir }}/ca.crt
@@ -119,8 +132,6 @@ releases:
         file: {{ .Values.certsDir }}/all-in-one.crt
       - name: tlsKey
         file: {{ .Values.certsDir }}/all-in-one.key
-    values:
-      - cni: {{ .Values.cni }} 
     hooks:
       - events: ["presync"]
         showlogs: true
@@ -230,6 +241,7 @@ releases:
           certificateSecret: all-in-one-tls
           locketCertificateSecret: all-in-one-tls
           uaaCertificateSecret: all-in-one-tls
+          systemDomain: "cf.{{ .Values.baseDomain }}"
         tcpRouter:
           enabled: true
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
@@ -243,7 +255,8 @@ releases:
     needs:
       - {{ .Values.systemNamespace }}/base
     values:
-      - loggregator:
+      - systemDomain: "cf.{{ .Values.baseDomain }}"
+        loggregator:
           enabled: true
         oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
         doppler:
@@ -266,6 +279,7 @@ releases:
       - logCacheApi:
           certificateSecret: all-in-one-tls
         logCacheBackend:
+          systemDomain: "cf.{{ .Values.baseDomain }}"
           certificateSecret: all-in-one-tls
 
   - name: uaa
@@ -276,7 +290,8 @@ releases:
       - postgresql
       - {{ .Values.systemNamespace }}/base
     values:
-      - ccAdminPassword: {{ .Values.secrets.ccAdminPassword }}
+      - systemDomain: "cf.{{ .Values.baseDomain }}"
+        ccAdminPassword: {{ .Values.secrets.ccAdminPassword }}
         uaadb:
           password: {{ .Values.secrets.dbPassword }}
           caCertificateSecret: all-in-one-tls
@@ -437,8 +452,12 @@ releases:
       - cloudController:
           enabled: true
           certificateSecret: all-in-one-tls
+          appDomains:
+            - apps.{{ .Values.baseDomain }}
+          systemDomain: cf.{{ .Values.baseDomain }}
           blobstore:
             storage_cli:
+              host: http://minio.{{ .Values.systemNamespace }}.svc.cluster.local:9000
               aws_secret_access_key: {{ .Values.secrets.blobstorePassword }}
           sshProxyKeyFingerprint: {{ .Values.secrets.sshProxyKeyFingerprint | quote }}
           enableCommaDelimitedDestinations: true
@@ -495,6 +514,7 @@ releases:
     values:
       - policyServer:
           enabled: true
+          systemDomain: cf.{{ .Values.baseDomain }}
           networkpolicydb:
             password: {{ .Values.secrets.dbPassword }}
             caCertificateSecret: all-in-one-tls

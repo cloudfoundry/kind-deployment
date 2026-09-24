@@ -1,0 +1,3 @@
+serviceAnnotations:
+  dns.gardener.cloud/class: garden
+  dns.gardener.cloud/dnsnames: "*.{{ .Values.systemDomain }},*.{{ .Values.appsDomain }}"

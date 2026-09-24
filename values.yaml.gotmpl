@@ -4,6 +4,9 @@ systemNamespace: "cf-system"
 workloadsNamespace: "cf-workloads"
 cni: {{ "CNI" | env | default "cilium" }}
 
+baseDomain: {{ "CLUSTER_DOMAIN" | env | default "127-0-0-1.nip.io" }}
+useNodePort: {{ "LOCAL_DEPLOYMENT" | env | default "true" }}
+serviceAnnotations: {}
 installOptionalComponents: {{ "INSTALL_OPTIONAL_COMPONENTS" | env | default "true" }}
 secrets:
   dbPassword: {{ requiredEnv "DB_PASSWORD" }}

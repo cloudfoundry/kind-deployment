@@ -3,3 +3,5 @@ caKey: ""
 tlsCert: ""
 tlsKey: ""
 cni: ""
+useNodePort: true
+serviceAnnotations: {}
