@@ -195,6 +195,78 @@ releases:
           certificateSecret: all-in-one-tls
         syslogAgent:
           certificateSecret: all-in-one-tls
+        otelCollector:
+          enabled: {{ .Values.installOtelCollector }}
+          image: otel/opentelemetry-collector-contrib
+          imageTag: {{ .Values.charts.otelCollector.imageTag }}
+          certificateSecret: all-in-one-tls
+          config:
+            receivers:
+              otlp/cf-internal-local:
+                protocols:
+                  grpc:
+                    endpoint: 127.0.0.1:4317
+                    tls:
+                      client_ca_file: /etc/otel/certs/ca.crt
+                      cert_file: /etc/otel/certs/tls.crt
+                      key_file: /etc/otel/certs/tls.key
+                      min_version: "1.3"
+            processors:
+              batch: {}
+              memory_limiter:
+                check_interval: 5s
+                limit_percentage: 80
+                spike_limit_percentage: 25
+            exporters:
+              debug:
+                verbosity: detailed
+              otlp:
+                endpoint: {{ .Values.charts.otelCollector.exportEndpoint }}
+                tls:
+                  insecure: true
+            service:
+              pipelines:
+                metrics:
+                  receivers: [otlp/cf-internal-local]
+                  processors: [memory_limiter, batch]
+                  exporters: [debug, otlp]
+                logs:
+                  receivers: [otlp/cf-internal-local]
+                  processors: [memory_limiter, batch]
+                  exporters: [debug, otlp]
+                traces:
+                  receivers: [otlp/cf-internal-local]
+                  processors: [memory_limiter, batch]
+                  exporters: [debug, otlp]
+      {{- if .Values.installOtelCollector }}
+      - forwarderAgent:
+          env:
+            DOWNSTREAM_INGRESS_PORT_GLOB: /etc/forwarder/downstream/*.yml
+            EMIT_OTEL_METRICS: "true"
+            EMIT_OTEL_LOGS: "true"
+            EMIT_OTEL_TRACES: "true"
+          extraVolumeMounts:
+            - name: forwarder-downstream
+              mountPath: /etc/forwarder/downstream
+              readOnly: true
+          extraVolumes:
+            - name: forwarder-downstream
+              configMap:
+                name: forwarder-agent-downstream
+      {{- end }}
+    hooks:
+      {{- if .Values.installOtelCollector }}
+      - events: ["presync"]
+        showlogs: true
+        command: "/bin/sh"
+        args:
+          - "-c"
+          - |
+            kubectl create configmap forwarder-agent-downstream \
+              --namespace {{ .Values.systemNamespace }} \
+              --from-literal=ingress_port.yml="$(printf 'ingress: "4317"\nprotocol: otelcol\n')" \
+              --dry-run=client -o yaml | kubectl apply -f -
+      {{- end }}
 
   - name: gorouter
     namespace: {{ .Values.systemNamespace }}

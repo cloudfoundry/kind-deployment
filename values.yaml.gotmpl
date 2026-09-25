@@ -5,6 +5,7 @@ workloadsNamespace: "cf-workloads"
 cni: {{ "CNI" | env | default "cilium" }}
 
 installOptionalComponents: {{ "INSTALL_OPTIONAL_COMPONENTS" | env | default "true" }}
+installOtelCollector: {{ "INSTALL_OTEL_COLLECTOR" | env | default "false" }}
 secrets:
   dbPassword: {{ requiredEnv "DB_PASSWORD" }}
   blobstorePassword: {{ requiredEnv "BLOBSTORE_PASSWORD" }}
