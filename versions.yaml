@@ -16,17 +16,13 @@ charts:
     version: 2.15.21
   diego:
     url: cloudfoundry-k8s/diego
-    version: 2.149.0
+    version: 2.151.0
   istioBase:
     url: istio/base
     version: 1.29.1
   istiod:
     url: istio/istiod
     version: 1.29.1
-  k8sRep:
-    url: cloudfoundry-k8s/k8s-rep
-    # renovate: dataSource=github-releases depName=cloudfoundry/k8s-garden-client
-    version: 0.7.0
   logCache:
     url: cloudfoundry-k8s/log-cache
     version: 3.2.13

@@ -388,31 +388,33 @@ releases:
           enableInternalEmitter: {{ .Values.installOptionalComponents }}
           enableTcpEmitter: {{ .Values.installOptionalComponents }}
 
-  - name: k8s-rep
+  - name: rep
     namespace: {{ .Values.systemNamespace }}
-    chart: {{ .Values.charts.k8sRep.url }}
-    version: {{ .Values.charts.k8sRep.version }}
+    chart: {{ .Values.charts.diego.url }}
+    version: {{ .Values.charts.diego.version }}
     needs:
       - diego
     set:
-      - name: caCertificate
+      - name: rep.caCertificate
         file: {{ .Values.certsDir }}/ca.crt
     values:
-      - stacks:
-        {{- range $stackName, $stackConfig := .Values.stacks }}
-          {{- if kindIs "map" $stackConfig }}
-          {{ $stackName }}: "{{ $stackConfig.image }}:{{ $stackConfig.tag }}"
+      - rep:
+          enabled: true
+          workloadsNamespace: {{ .Values.workloadsNamespace }}
+          containerProxyVerifySubjectAltName:
+            - gorouter
+            - ssh-proxy
+            - cf-tcp-router
+          loggregator:
+            certificateSecret: all-in-one-tls
+          locket:
+            certificateSecret: all-in-one-tls
+          stacks:
+          {{- range $stackName, $stackConfig := .Values.stacks }}
+            {{- if kindIs "map" $stackConfig }}
+            {{ $stackName }}: "{{ $stackConfig.image }}:{{ $stackConfig.tag }}"
+            {{- end }}
           {{- end }}
-        {{- end }}
-        workloadsNamespace: {{ .Values.workloadsNamespace }}
-        containerProxyVerifySubjectAltName:
-          - gorouter
-          - ssh-proxy
-          - cf-tcp-router
-        loggregator:
-          certificateSecret: all-in-one-tls
-        locket:
-          certificateSecret: all-in-one-tls
 
     hooks:
       - events: ["presync"]
