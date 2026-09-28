@@ -115,9 +115,8 @@ releases:
       - istio-system/istiod
     values:
       - cni: {{ .Values.cni }}
-        baseDomain: {{ .Values.baseDomain }}
-        systemDomain: "cf.{{ .Values.baseDomain }}"
-        appsDomain: "apps.{{ .Values.baseDomain }}"
+        systemDomain: {{ .Values.systemDomain }}
+        appsDomain: {{ .Values.appsDomain }}
     set:
       - name: caCert
         file: {{ .Values.certsDir }}/ca.crt
@@ -165,7 +164,7 @@ releases:
     values:
       - extraEnvVars:
           - name: MINIO_DOMAIN
-            value: blobstore.127-0-0-1.nip.io
+            value: blobstore.{{ .Values.systemDomain }}
         console:
           enabled: false
         resourcesPreset: small
@@ -236,7 +235,7 @@ releases:
           certificateSecret: all-in-one-tls
           locketCertificateSecret: all-in-one-tls
           uaaCertificateSecret: all-in-one-tls
-          systemDomain: "cf.{{ .Values.baseDomain }}"
+          systemDomain: {{ .Values.systemDomain }}
         tcpRouter:
           enabled: true
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
@@ -250,7 +249,7 @@ releases:
     needs:
       - {{ .Values.systemNamespace }}/base
     values:
-      - systemDomain: "cf.{{ .Values.baseDomain }}"
+      - systemDomain: {{ .Values.systemDomain }}
         loggregator:
           enabled: true
         oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
@@ -274,7 +273,7 @@ releases:
       - logCacheApi:
           certificateSecret: all-in-one-tls
         logCacheBackend:
-          systemDomain: "cf.{{ .Values.baseDomain }}"
+          systemDomain: {{ .Values.systemDomain }}
           certificateSecret: all-in-one-tls
 
   - name: uaa
@@ -285,7 +284,7 @@ releases:
       - postgresql
       - {{ .Values.systemNamespace }}/base
     values:
-      - systemDomain: "cf.{{ .Values.baseDomain }}"
+      - systemDomain: {{ .Values.systemDomain }}
         ccAdminPassword: {{ .Values.secrets.ccAdminPassword }}
         uaadb:
           password: {{ .Values.secrets.dbPassword }}
@@ -450,11 +449,11 @@ releases:
           enabled: true
           certificateSecret: all-in-one-tls
           appDomains:
-            - apps.{{ .Values.baseDomain }}
-          systemDomain: cf.{{ .Values.baseDomain }}
+            - {{ .Values.appsDomain }}
+          systemDomain: {{ .Values.systemDomain }}
           blobstore:
             storage_cli:
-              host: http://minio.{{ .Values.systemNamespace }}.svc.cluster.local:9000
+              host: http://blobstore.{{ .Values.systemDomain }}
               aws_secret_access_key: {{ .Values.secrets.blobstorePassword }}
           sshProxyKeyFingerprint: {{ .Values.secrets.sshProxyKeyFingerprint | quote }}
           enableCommaDelimitedDestinations: true
@@ -511,7 +510,7 @@ releases:
     values:
       - policyServer:
           enabled: true
-          systemDomain: cf.{{ .Values.baseDomain }}
+          systemDomain: {{ .Values.systemDomain }}
           networkpolicydb:
             password: {{ .Values.secrets.dbPassword }}
             caCertificateSecret: all-in-one-tls

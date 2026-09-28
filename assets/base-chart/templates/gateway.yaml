@@ -35,14 +35,12 @@ spec:
   - allowedRoutes:
       namespaces:
         from: All
-    hostname: '*.{{ .Values.baseDomain }}'
     name: http
     port: 80
     protocol: HTTP
   - allowedRoutes:
       namespaces:
         from: All
-    hostname: '*.{{ .Values.baseDomain }}'
     name: https
     port: 443
     protocol: HTTPS
@@ -250,8 +248,8 @@ spec:
   parentRefs:
     - name: istio-gateway
   hostnames:
-    - blobstore.{{ .Values.baseDomain }}
-    - "*.blobstore.{{ .Values.baseDomain }}"
+    - blobstore.{{ .Values.systemDomain }}
+    - "*.blobstore.{{ .Values.systemDomain }}"
   rules:
     - backendRefs:
         - name: minio
@@ -266,7 +264,8 @@ spec:
   parentRefs:
     - name: istio-gateway
   hostnames:
-  - "*.{{ .Values.baseDomain }}"
+  - "*.{{ .Values.appsDomain }}"
+  - "*.{{ .Values.systemDomain }}"
   rules:
     - backendRefs:
         - name: gorouter
@@ -295,7 +294,7 @@ spec:
       group: ""
       name: gorouter
   validation:
-    hostname: gorouter.{{ .Values.baseDomain }}
+    hostname: gorouter
     caCertificateRefs:
       - kind: ConfigMap
         group: ""
