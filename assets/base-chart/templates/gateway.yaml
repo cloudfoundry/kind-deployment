@@ -31,6 +31,10 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   gatewayClassName: istio
+  {{- with .Values.gateway.infrastructure }}
+  infrastructure:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   listeners:
   - allowedRoutes:
       namespaces:

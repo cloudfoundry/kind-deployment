@@ -13,6 +13,11 @@ environments:
     values:
       - ./values.yaml.gotmpl
       - ./versions.yaml
+      {{- range (env "ADDITIONAL_VALUES_FILES" | default "" | splitList ",") }}
+      {{- if . }}
+      - {{ . | trim }}
+      {{- end }}
+      {{- end }}
 ---
 repositories:
   - name: nats
@@ -117,6 +122,9 @@ releases:
       - cni: {{ .Values.cni }}
         systemDomain: {{ .Values.systemDomain }}
         appsDomain: {{ .Values.appsDomain }}
+        gateway:
+          infrastructure:
+            {{- toYaml .Values.gateway.infrastructure | nindent 12 }}
     set:
       - name: caCert
         file: {{ .Values.certsDir }}/ca.crt

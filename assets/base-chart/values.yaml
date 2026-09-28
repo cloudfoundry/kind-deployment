@@ -5,3 +5,5 @@ tlsKey: ""
 cni: ""
 systemDomain: ""
 appsDomain: ""
+gateway:
+  infrastructure: {}

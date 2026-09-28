@@ -50,6 +50,14 @@ You can configure the installation by setting the environment variable `INSTALL_
 
 `bosh-dns`, `cf-tcp-router`, `credhub`, `loggregator`, `nfsbroker`, `policy-agent`, `policy-server`, `routing-api`, `service-discovery-controller`
 
+### Custom Helmfile values
+
+Set `ADDITIONAL_VALUES_FILES` environment variable to a comma-separated list of [Helmfile values](https://helmfile.readthedocs.io/en/latest/#environment-values) files. They are merged last, so they can override any value in `values.yaml.gotmpl` (domains, CNI, chart versions, etc.).
+
+```bash
+ADDITIONAL_VALUES_FILES=./my-values.yaml make up
+```
+
 ## Unsupported Features
 
 - Routing isolation segments are not fully feature complete since this relies on more than one gateway which is not possible to realize in a local kind setup (see [FAQ](./docs/faq.md))
