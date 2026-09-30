@@ -1,10 +1,10 @@
 charts:
   capi:
     url: cloudfoundry-k8s/capi
-    version: 1.244.0
+    version: 1.247.0
   cfNetworking:
     url: cloudfoundry-k8s/cf-networking
-    version: 3.122.0
+    version: 3.124.0
   cilium:
     url: cilium/cilium
     version: 1.18.4
@@ -13,7 +13,7 @@ charts:
     version: 3.32.2
   credhub:
     url: cloudfoundry-k8s/credhub
-    version: 2.15.21
+    version: 2.15.24
   diego:
     url: cloudfoundry-k8s/diego
     version: 2.151.0
@@ -25,13 +25,13 @@ charts:
     version: 1.29.1
   logCache:
     url: cloudfoundry-k8s/log-cache
-    version: 3.2.13
+    version: 3.2.14
   loggregator:
     url: cloudfoundry-k8s/loggregator
-    version: 107.0.34
+    version: 107.0.35
   loggregatorAgent:
     url: cloudfoundry-k8s/loggregator-agent
-    version: 8.3.27
+    version: 8.3.28
   minio:
     url: bitnami/minio
     version: 17.0.21
@@ -40,7 +40,7 @@ charts:
     version: 2.12.4
   nfsVolume:
     url: cloudfoundry-k8s/nfs-volume
-    version: 7.70.0
+    version: 7.71.0
   policyAgent:
     url: cloudfoundry-k8s/policy-agent
     # renovate: dataSource=github-releases depName=cloudfoundry/k8s-policy-agent
@@ -50,10 +50,10 @@ charts:
     version: 16.7.27
   routing:
     url: cloudfoundry-k8s/routing
-    version: 0.393.0
+    version: 0.396.0
   uaa:
     url: cloudfoundry-k8s/uaa
-    version: 79.7.0
+    version: 79.8.0
 buildpacks:
   binary-buildpack:
     image: ghcr.io/cloudfoundry/k8s/binary-buildpack
@@ -63,7 +63,7 @@ buildpacks:
     tag: 2.4.52
   java-buildpack:
     image: ghcr.io/cloudfoundry/k8s/java-buildpack
-    tag: 5.0.7
+    tag: 5.1.0
   go-buildpack:
     image: ghcr.io/cloudfoundry/k8s/go-buildpack
     tag: 1.11.0
