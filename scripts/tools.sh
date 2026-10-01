@@ -12,7 +12,7 @@ export KIND_VERSION="0.32.0"
 # renovate: dataSource=github-releases depName=kubernetes/kubectl
 export KUBECTL_VERSION="1.36.2"
 # renovate: dataSource=github-releases depName=google/go-containerregistry
-export CRANE_VERSION="0.21.7"
+export CRANE_VERSION="0.22.1"
 # renovate: dataSource=github-releases depName=mikefarah/yq
 export YQ_VERSION="4.53.6"
 
