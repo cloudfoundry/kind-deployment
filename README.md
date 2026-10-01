@@ -58,6 +58,29 @@ Set `ADDITIONAL_VALUES_FILES` environment variable to a comma-separated list of 
 ADDITIONAL_VALUES_FILES=./my-values.yaml make up
 ```
 
+## Using the `setup-cf` GitHub Action
+
+This repository ships a composite action at `.github/actions/setup-cf` that provisions a full Cloud Foundry environment on a KinD cluster inside a GitHub Actions workflow. After it completes, the generated credentials from `temp/secrets.env` are exported into `$GITHUB_ENV`, so later steps can use the CF CLI directly.
+
+```yaml
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: cloudfoundry/kind-deployment/.github/actions/setup-cf@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: cf push -f examples/hello-js/manifest.yaml
+```
+
+Inputs (all optional):
+
+- `isolated-cell` (boolean, default `false`): add an isolated worker cell for routing isolation segment tests.
+- `install-optional-components` (boolean, default `true`): install optional CF components.
+- `cf-cli-version` (string, default `8.19.0`): CF CLI version to install.
+- `github-token` (string): GitHub API token, used when `use-latest-versions` is enabled to avoid rate limiting.
+- `use-latest-versions` (boolean, default `false`): sync to the latest `develop` versions of cf-deployment before deploying.
+
 ## Unsupported Features
 
 - Routing isolation segments are not fully feature complete since this relies on more than one gateway which is not possible to realize in a local kind setup (see [FAQ](./docs/faq.md))
