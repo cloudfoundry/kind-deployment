@@ -7,9 +7,11 @@ charts:
     version: 3.124.0
   cilium:
     url: cilium/cilium
+    # renovate: dataSource=github-releases depName=cilium/cilium
     version: 1.18.4
   calico:
     url: projectcalico/tigera-operator
+    # renovate: dataSource=github-releases depName=projectcalico/calico
     version: 3.32.2
   credhub:
     url: cloudfoundry-k8s/credhub

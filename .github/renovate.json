@@ -12,10 +12,12 @@
       "managerFilePatterns": [
         "/^versions.yaml$/",
         "/^Makefile$/",
-        "/^\\.github/workflows/.+\\.yaml$/"
+        "/^\\.github/workflows/.+\\.yaml$/",
+        "/^scripts/tools.sh$/"
       ],
       "matchStrings": [
-        "# renovate: dataSource=(?<datasource>.*?) depName=(?<depName>.*?)( packageName=(?<packageName>.*?))?\\s+\\S+?(: | = | \\?= )\"?(?<currentValue>\\d+\\.\\d+\\.\\d+)\"?"
+        "# renovate: dataSource=(?<datasource>.*?) depName=(?<depName>.*?)( packageName=(?<packageName>.*?))?\\s+\\S+?(: | = | \\?= )\"?(?<currentValue>\\d+\\.\\d+\\.\\d+)\"?",
+        "# renovate: dataSource=(?<datasource>.*?) depName=(?<depName>.*?)\\sexport .*?_VERSION=\"(?<currentValue>.*)\""
       ],
       "extractVersionTemplate": "^v?(?<version>.*)$"
     }
