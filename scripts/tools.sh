@@ -8,7 +8,7 @@ export HELMFILE_VERSION="1.5.5"
 # renovate: dataSource=github-releases depName=helm/helm
 export HELM_VERSION="4.2.2"
 # renovate: dataSource=github-releases depName=kubernetes-sigs/kind
-export KIND_VERSION="0.32.0"
+export KIND_VERSION="0.33.0"
 # renovate: dataSource=github-releases depName=kubernetes/kubectl
 export KUBECTL_VERSION="1.36.2"
 # renovate: dataSource=github-releases depName=google/go-containerregistry
