@@ -53,7 +53,7 @@ runs:
         mv cf8 $HOME/.local/bin/cf
     - name: Use develop versions of cf-deployment
       working-directory: kind-deployment
-      if: ${{ inputs.use-latest-versions }}
+      if: ${{ inputs.use-latest-versions == 'true' }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
@@ -68,15 +68,17 @@ runs:
       run: |
         if [ "${{ inputs.isolated-cell }}" = "true" ]; then
           echo '- role: worker
-            labels:
-              cloudfoundry.org/cell: "true"
-              cloudfoundry.org/zone: z2' >> kind.yaml
+          labels:
+            cloudfoundry.org/cell: "true"
+            cloudfoundry.org/zone: z2' >> kind.yaml
         fi
         make create-kind
         if [ "${{ inputs.isolated-cell }}" = "true" ]; then
           kubectl annotate node -l cloudfoundry.org/zone=z2 "cloudfoundry.org/placement-tags=isolated"
         fi
         make up
+
+        cat temp/secrets.env >> "$GITHUB_ENV"
     - name: Login
       shell: bash
       working-directory: kind-deployment
