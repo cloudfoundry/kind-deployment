@@ -3,26 +3,26 @@ description: Common setup for CF testing workflows
 
 inputs:
   test-org:
-    description: 'CF test repository organization name (e.g., cloudfoundry, sap-contributions)'
+    description: "CF test repository organization name (e.g., cloudfoundry, sap-contributions)"
     required: false
-    default: 'cloudfoundry'
+    default: "cloudfoundry"
   test-repo:
-    description: 'CF test repository name (e.g., cf-acceptance-tests, cf-smoke-tests)'
+    description: "CF test repository name (e.g., cf-acceptance-tests, cf-smoke-tests)"
     required: true
   test-branch:
-    description: 'CF test repository branch to checkout'
+    description: "CF test repository branch to checkout"
     required: false
-    default: 'release-candidate'
+    default: "release-candidate"
   config-template:
-    description: 'Config template file path'
+    description: "Config template file path"
     required: true
   config-output:
-    description: 'Config output file path'
+    description: "Config output file path"
     required: true
 
 outputs:
   test-repo-path:
-    description: 'Path to the checked out test repository'
+    description: "Path to the checked out test repository"
     value: ${{ inputs.test-repo }}
 
 runs:
@@ -47,5 +47,4 @@ runs:
     - name: templating config
       shell: bash
       run: |
-        source temp/secrets.sh
         python3 -c 'import os,sys;[sys.stdout.write(os.path.expandvars(l)) for l in sys.stdin]' < ${{ inputs.config-template }} > ${{ inputs.config-output }}
