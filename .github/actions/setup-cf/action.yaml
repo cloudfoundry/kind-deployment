@@ -1,0 +1,87 @@
+name: Setup CF on KinD
+description: Common setup for CF on KinD for use in Github Action Workflows
+
+inputs:
+  isolated-cell:
+    description: Whether to enable isolated cell setup
+    required: false
+    type: boolean
+    default: false
+  install-optional-components:
+    description: Whether to install optional components
+    required: false
+    type: boolean
+    default: true
+  cf-cli-version:
+    description: The version of the CF CLI to install
+    required: false
+    type: string
+    # renovate: dataSource=github-releases depName=cloudfoundry/cli
+    default: "8.19.0"
+  github-token:
+    description: GitHub API Token
+    required: false
+    type: string
+  use-latest-versions:
+    description: Whether to use the latest versions of cf-deployment
+    required: false
+    type: boolean
+    default: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: checkout kind-deployment
+      uses: actions/checkout@v7
+      with:
+        repository: cloudfoundry/kind-deployment
+        ref: main
+        path: kind-deployment
+    - name: Set kernel settings
+      shell: bash
+      run: |
+        docker run --rm \
+          --privileged \
+          --pid host \
+          -v /lib/modules:/lib/modules:ro \
+          alpine sh -c "sysctl -w fs.inotify.max_user_instances=512 && modprobe nfs && modprobe nfsd"
+    - name: Install CF CLI
+      shell: bash
+      run: |
+        mkdir -p $HOME/.local/bin && echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+        curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=${{ inputs.cf-cli-version }}&source=github" | tar -zx
+        mv cf8 $HOME/.local/bin/cf
+    - name: Use develop versions of cf-deployment
+      working-directory: kind-deployment
+      if: ${{ inputs.use-latest-versions }}
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      run: |
+        pip3 install -r scripts/requirements.txt
+        python3 scripts/sync-cf-deployment-versions.py --ref develop
+    - name: Run make up
+      shell: bash
+      working-directory: kind-deployment
+      env:
+        INSTALL_OPTIONAL_COMPONENTS: ${{ inputs.install-optional-components }}
+      run: |
+        if [ "${{ inputs.isolated-cell }}" = "true" ]; then
+          echo '- role: worker
+            labels:
+              cloudfoundry.org/cell: "true"
+              cloudfoundry.org/zone: z2' >> kind.yaml
+        fi
+        make create-kind
+        if [ "${{ inputs.isolated-cell }}" = "true" ]; then
+          kubectl annotate node -l cloudfoundry.org/zone=z2 "cloudfoundry.org/placement-tags=isolated"
+        fi
+        make up
+    - name: Login
+      shell: bash
+      working-directory: kind-deployment
+      run: make login
+    - name: Init
+      shell: bash
+      working-directory: kind-deployment
+      run: make bootstrap-complete
