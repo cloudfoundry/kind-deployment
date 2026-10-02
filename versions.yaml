@@ -12,7 +12,7 @@ charts:
   calico:
     url: projectcalico/tigera-operator
     # renovate: dataSource=github-releases depName=projectcalico/calico
-    version: 3.32.2
+    version: 3.33.0
   credhub:
     url: cloudfoundry-k8s/credhub
     version: 2.15.24
