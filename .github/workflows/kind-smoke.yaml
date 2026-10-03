@@ -46,6 +46,7 @@ jobs:
         uses: ./.github/actions/setup-cf
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.sha }}
           use-latest-versions: ${{ github.event.inputs.fresh-validation == 'true' }}
       - name: setup CF tests
         if: steps.check_changes.outputs.skip != 'true'

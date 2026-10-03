@@ -79,6 +79,7 @@ Inputs (all optional):
 - `install-optional-components` (boolean, default `true`): install optional CF components.
 - `cf-cli-version` (string, default `8.19.0`): CF CLI version to install.
 - `github-token` (string): GitHub API token, used when `use-latest-versions` is enabled to avoid rate limiting.
+- `ref` (string, default `main`): kind-deployment branch, tag or commit SHA that is checked out and deployed. Set it to the same commit as the action's `@<sha>` to get a fully pinned setup.
 - `use-latest-versions` (boolean, default `false`): sync to the latest `develop` versions of cf-deployment before deploying.
 
 ## Unsupported Features
