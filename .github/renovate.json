@@ -27,6 +27,11 @@
   },
   "packageRules": [
     {
+      "description": "cloud-provider-kind >= 0.12.0 publishes LB ports on random host ports, which breaks access via 127.0.0.1:443",
+      "matchPackageNames": ["registry.k8s.io/cloud-provider-kind/cloud-controller-manager"],
+      "allowedVersions": "<0.12.0"
+    },
+    {
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
     }
