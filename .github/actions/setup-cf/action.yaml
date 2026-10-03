@@ -22,6 +22,11 @@ inputs:
     description: GitHub API Token
     required: false
     type: string
+  ref:
+    description: The kind-deployment ref (branch, tag or commit SHA) to check out and deploy
+    required: false
+    type: string
+    default: main
   use-latest-versions:
     description: Whether to use the latest versions of cf-deployment
     required: false
@@ -35,7 +40,7 @@ runs:
       uses: actions/checkout@v7
       with:
         repository: cloudfoundry/kind-deployment
-        ref: main
+        ref: ${{ inputs.ref }}
         path: kind-deployment
     - name: Set kernel settings
       shell: bash
