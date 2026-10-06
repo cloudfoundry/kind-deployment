@@ -32,6 +32,11 @@ inputs:
     required: false
     type: boolean
     default: false
+  additional-values-files:
+    description: Comma-separated list of absolute paths to Helmfile values files to merge last, e.g. to override chart versions.
+    required: false
+    type: string
+    default: ""
 
 runs:
   using: "composite"
@@ -70,6 +75,7 @@ runs:
       working-directory: kind-deployment
       env:
         INSTALL_OPTIONAL_COMPONENTS: ${{ inputs.install-optional-components }}
+        ADDITIONAL_VALUES_FILES: ${{ inputs.additional-values-files }}
       run: |
         if [ "${{ inputs.isolated-cell }}" = "true" ]; then
           echo '- role: worker

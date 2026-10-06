@@ -81,6 +81,7 @@ Inputs (all optional):
 - `github-token` (string): GitHub API token, used when `use-latest-versions` is enabled to avoid rate limiting.
 - `ref` (string, default `main`): kind-deployment branch, tag or commit SHA that is checked out and deployed. Set it to the same commit as the action's `@<sha>` to get a fully pinned setup.
 - `use-latest-versions` (boolean, default `false`): sync to the latest `develop` versions of cf-deployment before deploying.
+- `additional-values-files` (string, default ''): comma-separated list of [Helmfile values](#custom-helmfile-values) files, merged last. Use it to override any value, e.g. a chart version (`charts.capi.version`). Must be absolute paths, e.g. `${{ github.workspace }}/capi-values.yaml`, since Helmfile runs from the checked-out `kind-deployment` directory.
 
 ## Unsupported Features
 
