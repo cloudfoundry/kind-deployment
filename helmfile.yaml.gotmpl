@@ -162,6 +162,7 @@ releases:
       - ./assets/values/postgresql.yaml
       - auth:
           password: {{ .Values.secrets.dbPassword }}
+      - {{- toYaml .Values.postgresql | nindent 8 }}
 
   - name: minio
     namespace: {{ .Values.systemNamespace }}

@@ -58,6 +58,17 @@ Set `ADDITIONAL_VALUES_FILES` environment variable to a comma-separated list of 
 ADDITIONAL_VALUES_FILES=./my-values.yaml make up
 ```
 
+### PostgreSQL configuration
+
+The `postgresql` value is passed to the PostgreSQL chart. For example, to raise `max_connections` (default 100), put this in a values file and use it via `ADDITIONAL_VALUES_FILES` (or the `additional-values-files` input of the `setup-cf` action):
+
+```yaml
+postgresql:
+  primary:
+    extendedConfiguration: |
+      max_connections = 500
+```
+
 ## Using the `setup-cf` GitHub Action
 
 This repository ships a composite action at `.github/actions/setup-cf` that provisions a full Cloud Foundry environment on a KinD cluster inside a GitHub Actions workflow. After it completes, the generated credentials from `temp/secrets.env` are exported into `$GITHUB_ENV`, so later steps can use the CF CLI directly.

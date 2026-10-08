@@ -10,6 +10,7 @@ localDeployment: {{ "LOCAL_DEPLOYMENT" | env | default "true" }}
 installOptionalComponents: {{ "INSTALL_OPTIONAL_COMPONENTS" | env | default "true" }}
 gateway:
   infrastructure: {}
+postgresql: {}
 secrets:
   dbPassword: {{ requiredEnv "DB_PASSWORD" }}
   blobstorePassword: {{ requiredEnv "BLOBSTORE_PASSWORD" }}
