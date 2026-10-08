@@ -38,6 +38,7 @@ jobs:
         with:
           isolated-cell: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.sha }}
           use-latest-versions: ${{ github.event.inputs.fresh-validation == 'true' }}
       - name: Minimal Test
         if: steps.check_changes.outputs.skip != 'true'
