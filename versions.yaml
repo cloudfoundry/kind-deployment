@@ -1,10 +1,10 @@
 charts:
   capi:
     url: cloudfoundry-k8s/capi
-    version: 1.247.0
+    version: 1.248.1-1
   cfNetworking:
     url: cloudfoundry-k8s/cf-networking
-    version: 3.124.0
+    version: 3.125.0
   cilium:
     url: cilium/cilium
     # renovate: dataSource=github-releases depName=cilium/cilium
@@ -15,7 +15,7 @@ charts:
     version: 3.33.0
   credhub:
     url: cloudfoundry-k8s/credhub
-    version: 2.15.24
+    version: 2.15.25
   diego:
     url: cloudfoundry-k8s/diego
     version: 2.151.0
