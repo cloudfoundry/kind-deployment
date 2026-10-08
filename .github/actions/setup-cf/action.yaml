@@ -33,7 +33,7 @@ inputs:
     type: boolean
     default: false
   additional-values-files:
-    description: Comma-separated list of absolute paths to Helmfile values files to merge last, e.g. to override chart versions.
+    description: Comma-separated list of absolute paths to Helmfile values files (`.yaml`, `.yaml.gotmpl` or `.hcl`) to merge last, e.g. to override chart versions. See https://helmfile.readthedocs.io/en/latest/environments/#environment-values for details.
     required: false
     type: string
     default: ""
