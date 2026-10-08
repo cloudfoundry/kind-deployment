@@ -52,7 +52,7 @@ You can configure the installation by setting the environment variable `INSTALL_
 
 ### Custom Helmfile values
 
-Set `ADDITIONAL_VALUES_FILES` environment variable to a comma-separated list of [Helmfile values](https://helmfile.readthedocs.io/en/latest/#environment-values) files. They are merged last, so they can override any value in `values.yaml.gotmpl` (domains, CNI, chart versions, etc.).
+Set `ADDITIONAL_VALUES_FILES` environment variable to a comma-separated list of [Helmfile values](https://helmfile.readthedocs.io/en/latest/environments/#environment-values) files. Supported formats are plain YAML (`.yaml`), Go templates that render to YAML (`.yaml.gotmpl`) and HCL (`.hcl`); the file extension determines how a file is interpreted (see the [Helmfile documentation](https://helmfile.readthedocs.io/en/latest/environments/#environment-values) for details). They are merged last, so they can override any value in `values.yaml.gotmpl` (domains, CNI, chart versions, etc.).
 
 ```bash
 ADDITIONAL_VALUES_FILES=./my-values.yaml make up
@@ -92,7 +92,7 @@ Inputs (all optional):
 - `github-token` (string): GitHub API token, used when `use-latest-versions` is enabled to avoid rate limiting.
 - `ref` (string, default `main`): kind-deployment branch, tag or commit SHA that is checked out and deployed. Set it to the same commit as the action's `@<sha>` to get a fully pinned setup.
 - `use-latest-versions` (boolean, default `false`): sync to the latest `develop` versions of cf-deployment before deploying.
-- `additional-values-files` (string, default ''): comma-separated list of [Helmfile values](#custom-helmfile-values) files, merged last. Use it to override any value, e.g. a chart version (`charts.capi.version`). Must be absolute paths, e.g. `${{ github.workspace }}/capi-values.yaml`, since Helmfile runs from the checked-out `kind-deployment` directory.
+- `additional-values-files` (string, default ''): comma-separated list of [Helmfile values](#custom-helmfile-values) files, merged last. Supported formats are plain YAML (`.yaml`), Go templates that render to YAML (`.yaml.gotmpl`) and HCL (`.hcl`); the file extension determines how a file is interpreted. Use it to override any value, e.g. a chart version (`charts.capi.version`). Must be absolute paths, e.g. `${{ github.workspace }}/capi-values.yaml`, since Helmfile runs from the checked-out `kind-deployment` directory.
 
 ## Unsupported Features
 
