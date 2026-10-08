@@ -37,6 +37,11 @@ inputs:
     required: false
     type: string
     default: ""
+  load-images:
+    description: Comma-separated list of images to load from daemon into cluster.
+    required: false
+    type: string
+    default: ""
 
 runs:
   using: "composite"
@@ -86,6 +91,12 @@ runs:
         make create-kind
         if [ "${{ inputs.isolated-cell }}" = "true" ]; then
           kubectl annotate node -l cloudfoundry.org/zone=z2 "cloudfoundry.org/placement-tags=isolated"
+        fi
+        if [ -n "${{ inputs.load-images }}" ]; then
+          IFS=',' read -ra IMAGES <<< "${{ inputs.load-images }}"
+          for IMAGE in "${IMAGES[@]}"; do
+            kind load docker-image  --name cfk8s "$IMAGE"
+          done
         fi
         make up
 
