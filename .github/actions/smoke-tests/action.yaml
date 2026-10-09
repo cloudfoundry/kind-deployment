@@ -1,0 +1,26 @@
+name: Run CF Smoke Tests
+
+inputs:
+  config-template:
+    description: "Config template file path"
+    required: false
+    default: ".github/smoke-config.tpl"
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v7
+    - name: setup smoke tests
+      uses: ./.github/actions/setup-cf-tests
+      with:
+        test-repo: cf-smoke-tests
+        test-branch: main
+        config-template: ${{ inputs.config-template }}
+        config-output: ${{ github.workspace }}/cf-smoke-tests/smoke-config.yaml
+    - name: run smoke test
+      shell: bash
+      env:
+        CONFIG: "${{ github.workspace }}/cf-smoke-tests/smoke-config.yaml"
+        GINKGO_NO_COLOR: "true"
+      run: |
+        ./cf-smoke-tests/bin/test --no-color --github-output --timeout=30m --procs=4 --json-report report.json
