@@ -210,7 +210,7 @@ releases:
         syslogAgent:
           certificateSecret: all-in-one-tls
         otelCollector:
-          enabled: {{ .Values.installOtelCollector }}
+          enabled: {{ .Values.otelCollector.enabled }}
           image: otel/opentelemetry-collector-contrib
           imageTag: {{ .Values.charts.otelCollector.imageTag }}
           certificateSecret: all-in-one-tls
@@ -235,7 +235,7 @@ releases:
               debug:
                 verbosity: detailed
               otlp:
-                endpoint: {{ .Values.charts.otelCollector.exportEndpoint }}
+                endpoint: {{ .Values.otelCollector.exportEndpoint }}
                 tls:
                   insecure: true
             service:
@@ -252,7 +252,7 @@ releases:
                   receivers: [otlp/cf-internal-local]
                   processors: [memory_limiter, batch]
                   exporters: [debug, otlp]
-      {{- if .Values.installOtelCollector }}
+      {{- if .Values.otelCollector.enabled }}
       - forwarderAgent:
           env:
             DOWNSTREAM_INGRESS_PORT_GLOB: /etc/forwarder/downstream/*.yml
@@ -269,7 +269,7 @@ releases:
                 name: forwarder-agent-downstream
       {{- end }}
     hooks:
-      {{- if .Values.installOtelCollector }}
+      {{- if .Values.otelCollector.enabled }}
       - events: ["presync"]
         showlogs: true
         command: "/bin/sh"
