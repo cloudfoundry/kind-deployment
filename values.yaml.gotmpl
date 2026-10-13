@@ -12,8 +12,9 @@ gateway:
   infrastructure: {}
 postgresql: {}
 otelCollector:
-  enabled: false
-  exportEndpoint: ""
+  enabled: {{ "INSTALL_OTEL_COLLECTOR" | env | default "false" }}
+  exporter:
+    endpoint: {{ "OTEL_COLLECTOR_EXPORT_ENDPOINT" | env | default "" | quote }}
 secrets:
   dbPassword: {{ requiredEnv "DB_PASSWORD" }}
   blobstorePassword: {{ requiredEnv "BLOBSTORE_PASSWORD" }}

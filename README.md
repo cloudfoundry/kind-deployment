@@ -94,6 +94,8 @@ Inputs (all optional):
 - `use-latest-versions` (boolean, default `false`): sync to the latest `develop` versions of cf-deployment before deploying.
 - `additional-values-files` (string, default ''): comma-separated list of [Helmfile values](#custom-helmfile-values) files, merged last. Supported formats are plain YAML (`.yaml`), Go templates that render to YAML (`.yaml.gotmpl`) and HCL (`.hcl`); the file extension determines how a file is interpreted. Use it to override any value, e.g. a chart version (`charts.capi.version`). Must be absolute paths, e.g. `${{ github.workspace }}/capi-values.yaml`, since Helmfile runs from the checked-out `kind-deployment` directory.
 
+Set `INSTALL_OTEL_COLLECTOR=true` to deploy a standalone OpenTelemetry Collector and forward CF logs, metrics, and traces to it over mTLS. See [OpenTelemetry Collector](docs/otel-collector.md) for configuration and verification.
+
 ## Unsupported Features
 
 - Routing isolation segments are not fully feature complete since this relies on more than one gateway which is not possible to realize in a local kind setup (see [FAQ](./docs/faq.md))
@@ -101,6 +103,7 @@ Inputs (all optional):
 ## Read More Documentation
 
 - [Local Development Guide](docs/local-development-guide.md)
+- [OpenTelemetry Collector](docs/otel-collector.md)
 - [FAQs](docs/faq.md)
 
 ## Contributing
