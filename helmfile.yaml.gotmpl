@@ -457,37 +457,54 @@ releases:
       - cloudController:
           enabled: true
           certificateSecret: all-in-one-tls
-          appDomains:
-            - {{ .Values.appsDomain }}
-          systemDomain: {{ .Values.systemDomain }}
-          blobstore:
-            storage_cli:
-              host: http://blobstore.{{ .Values.systemDomain }}
-              aws_secret_access_key: {{ .Values.secrets.blobstorePassword }}
-          sshProxyKeyFingerprint: {{ .Values.secrets.sshProxyKeyFingerprint | quote }}
-          enableCommaDelimitedDestinations: true
-          stacks:
-          - description: Cloud Foundry Linux-based filesystem (Ubuntu 22.04)
-            name: cflinuxfs4
-          - description: Cloud Foundry Linux-based filesystem (Ubuntu 24.04)
-            name: cflinuxfs5
-          default_stack: {{ .Values.stacks.default }}
-          lifecycle_bundles:
-            buildpack/cflinuxfs4: buildpack_app_lifecycle/buildpack_app_lifecycle.tgz
-            cnb/cflinuxfs4: cnb_app_lifecycle/cnb_app_lifecycle.tgz
-            buildpack/cflinuxfs5: buildpack_app_lifecycle/buildpack_app_lifecycle.tgz
-            cnb/cflinuxfs5: cnb_app_lifecycle/cnb_app_lifecycle.tgz
-            docker: docker_app_lifecycle/docker_app_lifecycle.tgz
-          droplet_destinations:
-            cflinuxfs4: /home/vcap
-            cflinuxfs5: /home/vcap
-          docker_staging_stack: {{ .Values.stacks.default }}
+          config:
+            system_domain: {{ .Values.systemDomain }}
+            app_domains:
+              - {{ .Values.appsDomain }}
+              - name: apps.internal
+                internal: true
+            staging_upload_user: cc-staging
+            staging_upload_password: cc-staging-dev
+            db_encryption_key: cc-db-encryption-dev-key
+            enable_statsd_metrics: false
+            security_groups:
+              enable_comma_delimited_destinations: true
+            app_ssh:
+              host_key_fingerprint: {{ .Values.secrets.sshProxyKeyFingerprint | quote }}
+            stacks:
+              - description: Cloud Foundry Linux-based filesystem (Ubuntu 22.04)
+                name: cflinuxfs4
+              - description: Cloud Foundry Linux-based filesystem (Ubuntu 24.04)
+                name: cflinuxfs5
+            default_stack: {{ .Values.stacks.default }}
+            diego:
+              docker_staging_stack: {{ .Values.stacks.default }}
+              lifecycle_bundles:
+                buildpack/cflinuxfs4: buildpack_app_lifecycle/buildpack_app_lifecycle.tgz
+                cnb/cflinuxfs4: cnb_app_lifecycle/cnb_app_lifecycle.tgz
+                buildpack/cflinuxfs5: buildpack_app_lifecycle/buildpack_app_lifecycle.tgz
+                cnb/cflinuxfs5: cnb_app_lifecycle/cnb_app_lifecycle.tgz
+                docker: docker_app_lifecycle/docker_app_lifecycle.tgz
+              droplet_destinations:
+                cflinuxfs4: /home/vcap
+                cflinuxfs5: /home/vcap
+            droplets:
+              connection_config:
+                aws_secret_access_key: {{ .Values.secrets.blobstorePassword }}
+            packages:
+              connection_config:
+                aws_secret_access_key: {{ .Values.secrets.blobstorePassword }}
+            buildpacks:
+              connection_config:
+                aws_secret_access_key: {{ .Values.secrets.blobstorePassword }}
+            resource_pool:
+              connection_config:
+                aws_secret_access_key: {{ .Values.secrets.blobstorePassword }}
         ccUploader:
           certificateSecret: all-in-one-tls
         ccdb:
           password: {{ .Values.secrets.dbPassword }}
           caCertificateSecret: all-in-one-tls
-          skipSSLVerify: false
         oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
 
   - name: nfs-volume
