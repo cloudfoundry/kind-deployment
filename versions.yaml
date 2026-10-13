@@ -43,6 +43,9 @@ charts:
   nfsVolume:
     url: cloudfoundry-k8s/nfs-volume
     version: 7.71.0
+  otelCollector:
+    # renovate: dataSource=helm depName=opentelemetry-collector packageName=open-telemetry/opentelemetry-collector
+    version: 0.172.0
   policyAgent:
     url: cloudfoundry-k8s/policy-agent
     # renovate: dataSource=github-releases depName=cloudfoundry/k8s-policy-agent
