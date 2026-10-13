@@ -1,9 +1,25 @@
 # OpenTelemetry Collector
 
-Set `INSTALL_OTEL_COLLECTOR=true` when creating or updating the deployment:
+To enable the collector, put this in a Helmfile values file and use it via `ADDITIONAL_VALUES_FILES` (or the `additional-values-files` input of the `setup-cf` action):
+
+```yaml
+otelCollector:
+  enabled: true
+  exporter:
+    endpoint: ""
+```
+
+For example, if the configuration is stored in `otel-collector-values.yaml`, run locally:
 
 ```bash
-INSTALL_OTEL_COLLECTOR=true make up
+ADDITIONAL_VALUES_FILES="$PWD/otel-collector-values.yaml" make up
+```
+
+When using the `setup-cf` action, pass the absolute path to the same file:
+
+```yaml
+with:
+  additional-values-files: ${{ github.workspace }}/otel-collector-values.yaml
 ```
 
 This deploys the upstream `open-telemetry/opentelemetry-collector` Helm chart as a standalone `otel-collector` Pod in `cf-system`. The forwarder agent discovers the OTLP gRPC port from its downstream registration and connects to the `otel-collector` Service on port `4317` using mTLS.
@@ -22,7 +38,7 @@ Check the forwarder logs for connection, TLS, or retry failures:
 
 ```bash
 kubectl -n cf-system logs deployment/forwarder-agent -c forwarder-agent \
-  | grep -Ei 'otel-collector:4317|tls|retry|error'
+  | grep -Ei '\[OTEL COLLECTOR CLIENT\].*(retry|error|fail|refused|unavailable)'
 ```
 
 ## Configure external endpoint
@@ -37,13 +53,23 @@ docker run --detach --name otel-collector-outside-kind \
   --config=/etc/otel/config.yaml
 
 make create-kind
-OTEL_COLLECTOR_ADDRESS="$(docker exec cfk8s-control-plane \
-  sh -c "ip route | awk '/default/ {print \$3; exit}'")"
+docker exec cfk8s-control-plane \
+  sh -c "ip route | awk '/default/ {print \$3; exit}'"
+```
 
-INSTALL_OTEL_COLLECTOR=true \
-OTEL_COLLECTOR_EXPORT_ENDPOINT="${OTEL_COLLECTOR_ADDRESS}:4317" \
-make up
+Set `otelCollector.exporter.endpoint` in the additional values file to the printed address and port `4317`, while keeping the collector enabled. For example:
 
+```yaml
+otelCollector:
+  enabled: true
+  exporter:
+    endpoint: "172.18.0.1:4317"
+```
+
+Then deploy the configuration and follow the outside collector's logs:
+
+```bash
+ADDITIONAL_VALUES_FILES="$PWD/otel-collector-values.yaml" make up
 docker logs -f otel-collector-outside-kind
 ```
 
