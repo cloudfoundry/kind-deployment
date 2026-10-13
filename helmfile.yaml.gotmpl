@@ -264,6 +264,10 @@ releases:
               # certificate options can be added when mTLS is supported.
               tls:
                 insecure: true
+{{ else }}
+          exporters:
+            debug:
+              verbosity: detailed
 {{ end }}
           receivers:
             jaeger: null
