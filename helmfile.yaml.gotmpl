@@ -525,13 +525,26 @@ releases:
             skipSSLVerify: false
           oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
           certificateSecret: all-in-one-tls
+          uaaCaSecret: all-in-one-tls
+          ccCaCertSecret: all-in-one-tls
+          internal:
+            certificateSecret: all-in-one-tls
+          asgSyncer:
+            ccInternalClientSecret: all-in-one-tls
+            locketSecret: all-in-one-tls
         serviceDiscoveryController:
           enabled: true
           certificateSecret: all-in-one-tls
+          clientCaSecret: all-in-one-tls
+          nats:
+            certificateSecret: all-in-one-tls
         boshDnsAdapter:
           enabled: true
           certificateSecret: all-in-one-tls
+          serverCaSecret: all-in-one-tls
         boshDns:
+          certificateSecret: all-in-one-tls
+        udpForwarder:
           certificateSecret: all-in-one-tls
 
   - name: policy-agent
