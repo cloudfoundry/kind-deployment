@@ -4,7 +4,7 @@ charts:
     version: 1.249.1-1
   cfNetworking:
     url: cloudfoundry-k8s/cf-networking
-    version: 3.125.0
+    version: 3.127.1-1
   cilium:
     url: cilium/cilium
     # renovate: dataSource=github-releases depName=cilium/cilium

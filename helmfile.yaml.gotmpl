@@ -725,19 +725,38 @@ releases:
       - policyServer:
           enabled: true
           systemDomain: {{ .Values.systemDomain }}
-          networkpolicydb:
+          database:
             password: {{ .Values.secrets.dbPassword }}
-            caCertificateSecret: all-in-one-tls
-            skipSSLVerify: false
-          oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
+            requireSSL: true
+          uaaClientSecret: {{ .Values.secrets.oauthClientsSecret }}
+          certificateSecrets:
+            serverTLS: all-in-one-tls
+            internalTLS: all-in-one-tls
+            uaaCA: all-in-one-tls
+            ccCA: all-in-one-tls
+            ccInternalTLS: all-in-one-tls
+            locketTLS: all-in-one-tls
+            databaseCA: all-in-one-tls
+        routeRegistrar:
           certificateSecret: all-in-one-tls
         serviceDiscoveryController:
           enabled: true
-          certificateSecret: all-in-one-tls
+          certificateSecrets:
+            serverTLS: all-in-one-tls
+            clientCA: all-in-one-tls
+            natsTLS: all-in-one-tls
+          nats:
+            tlsEnabled: true
         boshDnsAdapter:
           enabled: true
-          certificateSecret: all-in-one-tls
+          internalDomains:
+            - apps.internal.
+          certificateSecrets:
+            clientTLS: all-in-one-tls
+            serverCA: all-in-one-tls
         boshDns:
+          certificateSecret: all-in-one-tls
+        udpForwarder:
           certificateSecret: all-in-one-tls
 
   - name: policy-agent
