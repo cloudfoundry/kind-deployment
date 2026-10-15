@@ -359,6 +359,7 @@ releases:
           certificateSecret: all-in-one-tls
         fileserver:
           enabled: true
+          certificateSecret: all-in-one-tls
         sshProxy:
           enabled: true
           certificateSecret: all-in-one-tls
@@ -465,6 +466,8 @@ releases:
               host: http://blobstore.{{ .Values.systemDomain }}
               aws_secret_access_key: {{ .Values.secrets.blobstorePassword }}
           sshProxyKeyFingerprint: {{ .Values.secrets.sshProxyKeyFingerprint | quote }}
+          diego:
+            fileServerUrl: https://fileserver.{{ .Values.systemNamespace }}.svc.cluster.local:8443
           enableCommaDelimitedDestinations: true
           stacks:
           - description: Cloud Foundry Linux-based filesystem (Ubuntu 22.04)
