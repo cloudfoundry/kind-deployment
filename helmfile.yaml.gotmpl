@@ -375,7 +375,7 @@ releases:
     values:
       - tpsWatcher:
           enabled: true
-          certificates:
+          certificateSecrets:
             bbs: all-in-one-tls
             cc: all-in-one-tls
         oauthClientsSecret: ""
@@ -458,7 +458,7 @@ releases:
     values:
       - cloudController:
           enabled: true
-          certificates:
+          certificateSecrets:
             mutualTLS: all-in-one-tls
             loggregatorTLS: all-in-one-tls
             logcacheTLS: all-in-one-tls
@@ -509,7 +509,7 @@ releases:
               connectionConfig:
                 awsSecretAccessKey: {{ .Values.secrets.blobstorePassword }}
         ccUploader:
-          certificates:
+          certificateSecrets:
             ccClient: all-in-one-tls
             server: all-in-one-tls
         routeRegistrar:
