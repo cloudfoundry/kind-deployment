@@ -9,4 +9,4 @@ tools::install::helmfile
 tools::install::helm
 tools::install::kind
 
-helmfile sync
+helmfile sync --track-mode kubedog --track-failed-logs
