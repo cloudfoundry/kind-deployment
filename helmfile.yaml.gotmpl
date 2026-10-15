@@ -375,7 +375,9 @@ releases:
     values:
       - tpsWatcher:
           enabled: true
-          certificateSecret: all-in-one-tls
+          certificateSecrets:
+            bbs: all-in-one-tls
+            cc: all-in-one-tls
         oauthClientsSecret: ""
 
   - name: route-emitter
@@ -456,38 +458,65 @@ releases:
     values:
       - cloudController:
           enabled: true
-          certificateSecret: all-in-one-tls
-          appDomains:
-            - {{ .Values.appsDomain }}
-          systemDomain: {{ .Values.systemDomain }}
-          blobstore:
-            storage_cli:
-              host: http://blobstore.{{ .Values.systemDomain }}
-              aws_secret_access_key: {{ .Values.secrets.blobstorePassword }}
-          sshProxyKeyFingerprint: {{ .Values.secrets.sshProxyKeyFingerprint | quote }}
-          enableCommaDelimitedDestinations: true
-          stacks:
-          - description: Cloud Foundry Linux-based filesystem (Ubuntu 22.04)
-            name: cflinuxfs4
-          - description: Cloud Foundry Linux-based filesystem (Ubuntu 24.04)
-            name: cflinuxfs5
-          default_stack: {{ .Values.stacks.default }}
-          lifecycle_bundles:
-            buildpack/cflinuxfs4: buildpack_app_lifecycle/buildpack_app_lifecycle.tgz
-            cnb/cflinuxfs4: cnb_app_lifecycle/cnb_app_lifecycle.tgz
-            buildpack/cflinuxfs5: buildpack_app_lifecycle/buildpack_app_lifecycle.tgz
-            cnb/cflinuxfs5: cnb_app_lifecycle/cnb_app_lifecycle.tgz
-            docker: docker_app_lifecycle/docker_app_lifecycle.tgz
-          droplet_destinations:
-            cflinuxfs4: /home/vcap
-            cflinuxfs5: /home/vcap
-          docker_staging_stack: {{ .Values.stacks.default }}
+          certificateSecrets:
+            mutualTLS: all-in-one-tls
+            loggregatorTLS: all-in-one-tls
+            logcacheTLS: all-in-one-tls
+            uaaCA: all-in-one-tls
+            credhubCA: all-in-one-tls
+            publicTLS: all-in-one-tls
+          config:
+            systemDomain: {{ .Values.systemDomain }}
+            appDomains:
+              - {{ .Values.appsDomain }}
+              - name: apps.internal
+                internal: true
+            stagingUploadUser: cc-staging
+            stagingUploadPassword: cc-staging-dev
+            dbEncryptionKey: cc-db-encryption-dev-key
+            enableStatsdMetrics: false
+            securityGroups:
+              enableCommaDelimitedDestinations: true
+            appSsh:
+              hostKeyFingerprint: {{ .Values.secrets.sshProxyKeyFingerprint | quote }}
+            stacks:
+              - description: Cloud Foundry Linux-based filesystem (Ubuntu 22.04)
+                name: cflinuxfs4
+              - description: Cloud Foundry Linux-based filesystem (Ubuntu 24.04)
+                name: cflinuxfs5
+            defaultStack: {{ .Values.stacks.default }}
+            diego:
+              dockerStagingStack: {{ .Values.stacks.default }}
+              lifecycleBundles:
+                buildpack/cflinuxfs4: buildpack_app_lifecycle/buildpack_app_lifecycle.tgz
+                cnb/cflinuxfs4: cnb_app_lifecycle/cnb_app_lifecycle.tgz
+                buildpack/cflinuxfs5: buildpack_app_lifecycle/buildpack_app_lifecycle.tgz
+                cnb/cflinuxfs5: cnb_app_lifecycle/cnb_app_lifecycle.tgz
+                docker: docker_app_lifecycle/docker_app_lifecycle.tgz
+              dropletDestinations:
+                cflinuxfs4: /home/vcap
+                cflinuxfs5: /home/vcap
+            droplets:
+              connectionConfig:
+                awsSecretAccessKey: {{ .Values.secrets.blobstorePassword }}
+            packages:
+              connectionConfig:
+                awsSecretAccessKey: {{ .Values.secrets.blobstorePassword }}
+            buildpacks:
+              connectionConfig:
+                awsSecretAccessKey: {{ .Values.secrets.blobstorePassword }}
+            resourcePool:
+              connectionConfig:
+                awsSecretAccessKey: {{ .Values.secrets.blobstorePassword }}
         ccUploader:
+          certificateSecrets:
+            ccClient: all-in-one-tls
+            server: all-in-one-tls
+        routeRegistrar:
           certificateSecret: all-in-one-tls
         ccdb:
           password: {{ .Values.secrets.dbPassword }}
           caCertificateSecret: all-in-one-tls
-          skipSSLVerify: false
         oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
 
   - name: nfs-volume
