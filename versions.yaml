@@ -55,7 +55,7 @@ charts:
     version: 0.396.0
   uaa:
     url: cloudfoundry-k8s/uaa
-    version: 79.8.0
+    version: 79.9.1-1
 buildpacks:
   binary-buildpack:
     image: ghcr.io/cloudfoundry/k8s/binary-buildpack
