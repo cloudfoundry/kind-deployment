@@ -294,14 +294,153 @@ releases:
       - {{ .Values.systemNamespace }}/base
     values:
       - systemDomain: {{ .Values.systemDomain }}
-        ccAdminPassword: {{ .Values.secrets.ccAdminPassword }}
         uaadb:
           password: {{ .Values.secrets.dbPassword }}
+          tls: enabled_skip_hostname_validation
           caCertificateSecret: all-in-one-tls
-          skipSSLVerify: false
-        oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
-        uaaAdminSecret: {{ .Values.secrets.uaaAdminSecret }}
-        certificateSecret: all-in-one-tls
+        certificateSecrets:
+          serverTLS: all-in-one-tls
+        routeRegistrar:
+          certificateSecret: all-in-one-tls
+        uaa:
+          admin:
+            clientSecret: {{ .Values.secrets.uaaAdminSecret | quote }}
+          clients:
+            cc_routing:
+              authorities: routing.router_groups.read
+              authorized-grant-types: client_credentials
+              secret: {{ .Values.secrets.oauthClientsSecret | quote }}
+            cc-service-dashboards:
+              authorities: clients.read,clients.write,clients.admin
+              authorized-grant-types: client_credentials
+              scopes:
+                - openid
+                - cloud_controller_service_permissions.read
+              secret: {{ .Values.secrets.oauthClientsSecret | quote }}
+            cc_service_key_client:
+              authorities: credhub.read,credhub.write
+              authorized-grant-types: client_credentials
+              secret: {{ .Values.secrets.oauthClientsSecret | quote }}
+            cf:
+              authorities: uaa.none
+              authorized-grant-types: password,refresh_token,urn:ietf:params:oauth:grant-type:jwt-bearer
+              scopes:
+                - network.admin
+                - network.write
+                - cloud_controller.read
+                - cloud_controller.write
+                - openid
+                - password.write
+                - cloud_controller.admin
+                - scim.read
+                - scim.write
+                - doppler.firehose
+                - uaa.user
+                - routing.router_groups.read
+                - routing.router_groups.write
+                - cloud_controller.admin_read_only
+                - cloud_controller.global_auditor
+                - perm.admin
+                - clients.read
+              override: true
+              access-token-validity: 1200
+              refresh-token-validity: 2592000
+              secret: ""
+            cf_smoke_tests:
+              authorities: cloud_controller.admin,clients.read
+              authorized-grant-types: client_credentials
+              secret: {{ .Values.secrets.oauthClientsSecret | quote }}
+            cloud_controller_username_lookup:
+              authorities: scim.userids,scim.read
+              authorized-grant-types: client_credentials
+              override: true
+              secret: {{ .Values.secrets.oauthClientsSecret | quote }}
+            credhub_admin_client:
+              authorities: credhub.read,credhub.write
+              authorized-grant-types: client_credentials
+              secret: {{ .Values.secrets.oauthClientsSecret | quote }}
+            doppler:
+              authorities: uaa.resource
+              authorized-grant-types: client_credentials
+              override: true
+              secret: {{ .Values.secrets.oauthClientsSecret | quote }}
+            gorouter:
+              authorities: routing.routes.read
+              authorized-grant-types: client_credentials
+              secret: {{ .Values.secrets.oauthClientsSecret | quote }}
+            ssh-proxy:
+              authorized-grant-types: authorization_code
+              scopes:
+                - openid
+                - cloud_controller.read
+                - cloud_controller.write
+                - cloud_controller.admin
+              autoapprove: true
+              redirect-uri: https://uaa.{{ .Values.systemDomain }}/login
+              override: true
+              secret: {{ .Values.secrets.oauthClientsSecret | quote }}
+            routing_api_client:
+              authorities: routing.routes.write,routing.routes.read,routing.router_groups.read
+              authorized-grant-types: client_credentials
+              secret: {{ .Values.secrets.oauthClientsSecret | quote }}
+            network-policy:
+              authorities: uaa.resource,cloud_controller.admin_read_only
+              authorized-grant-types: client_credentials
+              secret: {{ .Values.secrets.oauthClientsSecret | quote }}
+            tcp_emitter:
+              authorities: routing.routes.write,routing.routes.read
+              authorized-grant-types: client_credentials
+              secret: {{ .Values.secrets.oauthClientsSecret | quote }}
+            tcp_router:
+              authorities: routing.routes.read,routing.router_groups.read
+              authorized-grant-types: client_credentials
+              secret: {{ .Values.secrets.oauthClientsSecret | quote }}
+            nfsbroker-credhub-client:
+              authorities: credhub.read,credhub.write
+              authorized-grant-types: client_credentials
+              secret: {{ .Values.secrets.oauthClientsSecret | quote }}
+          scim:
+            users:
+              - name: ccadmin
+                password: {{ .Values.secrets.ccAdminPassword | quote }}
+                email: ccadmin
+                firstName: ""
+                lastName: ""
+                origin: uaa
+                groups:
+                  - clients.read
+                  - cloud_controller.admin
+                  - doppler.firehose
+                  - network.admin
+                  - openid
+                  - routing.router_groups.read
+                  - routing.router_groups.write
+                  - scim.read
+                  - scim.write
+          jwt:
+            policy:
+              activeKeyId: key-1
+              keys:
+                key-1:
+                  signingAlg: RS256
+        login:
+          saml:
+            activeKeyId: key-1
+            keys:
+              key-1:
+                passphrase: ""
+        encryption:
+          activeKeyLabel: default_key
+          encryptionKeys:
+            - label: default_key
+              passphrase: {{ .Values.secrets.uaaEncryptionKey }}
+    set:
+      - name: uaa.jwt.policy.keys.key-1.signingKey
+        file: {{ .Values.certsDir }}/uaa-jwt-signing.key
+      - name: login.saml.keys.key-1.key
+        file: {{ .Values.certsDir }}/uaa-saml.key
+      - name: login.saml.keys.key-1.certificate
+        file: {{ .Values.certsDir }}/uaa-saml.crt
 
   - name: credhub
     namespace: {{ .Values.systemNamespace }}
