@@ -476,6 +476,11 @@ releases:
             dbEncryptionKey: cc-db-encryption-dev-key
             enableStatsdMetrics: false
             volumeServicesEnabled: true
+            temporaryEnableV2: true
+            ssl:
+              skipCertVerify: true
+            routingApi:
+              enabled: true
             router:
               routeServicesSecret: route-services-dev-secret
             securityGroups:
