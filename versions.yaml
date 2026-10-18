@@ -27,7 +27,7 @@ charts:
     version: 1.29.1
   logCache:
     url: cloudfoundry-k8s/log-cache
-    version: 3.2.14
+    version: 3.2.18-1
   loggregator:
     url: cloudfoundry-k8s/loggregator
     version: 107.0.35

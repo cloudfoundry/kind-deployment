@@ -280,10 +280,21 @@ releases:
       - uaa
     values:
       - logCacheApi:
+          certificateSecrets:
+            logcacheTLS: all-in-one-tls
+            gatewayProxy: all-in-one-tls
+            external: all-in-one-tls
+            proxyCA: all-in-one-tls
+            ccCA: all-in-one-tls
+            uaaCA: all-in-one-tls
+            metrics: all-in-one-tls
+        routeRegistrar:
           certificateSecret: all-in-one-tls
         logCacheBackend:
           systemDomain: {{ .Values.systemDomain }}
-          certificateSecret: all-in-one-tls
+          certificateSecrets:
+            logcacheTLS: all-in-one-tls
+            metrics: all-in-one-tls
 
   - name: uaa
     namespace: {{ .Values.systemNamespace }}
