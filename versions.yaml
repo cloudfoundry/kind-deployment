@@ -30,7 +30,7 @@ charts:
     version: 3.2.18-1
   loggregator:
     url: cloudfoundry-k8s/loggregator
-    version: 107.0.35
+    version: 107.0.39-1
   loggregatorAgent:
     url: cloudfoundry-k8s/loggregator-agent
     version: 8.3.28

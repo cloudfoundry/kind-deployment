@@ -275,6 +275,8 @@ releases:
           uaa:
             clientId: doppler
             clientSecret: {{ .Values.secrets.oauthClientsSecret }}
+          logsProvider:
+            commonName: reverse-log-proxy
         trafficcontroller:
           certificateSecrets:
             routerTLS: all-in-one-tls
