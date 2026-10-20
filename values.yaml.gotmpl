@@ -13,7 +13,8 @@ gateway:
 postgresql: {}
 otelCollector:
   enabled: false
-  exportEndpoint: ""
+  exporter:
+    endpoint: ""
 secrets:
   dbPassword: {{ requiredEnv "DB_PASSWORD" }}
   blobstorePassword: {{ requiredEnv "BLOBSTORE_PASSWORD" }}

@@ -45,6 +45,7 @@ repositories:
 {{- end }}
 
 {{- $cniRelease := printf "%s/%s" $cniReleaseNamespace .Values.cni }}
+{{- $otelExporterEndpoint := .Values.otelCollector.exporter.endpoint }}
 
 releases:
   {{- if .Values.localDeployment }}
@@ -211,8 +212,9 @@ releases:
           certificateSecret: all-in-one-tls
         otelCollector:
           enabled: {{ .Values.otelCollector.enabled }}
-          image: otel/opentelemetry-collector-contrib
-          imageTag: {{ .Values.charts.otelCollector.imageTag }}
+          image:
+            repository: otel/opentelemetry-collector-contrib
+            tag: {{ .Values.charts.otelCollector.imageTag | quote }}
           certificateSecret: all-in-one-tls
           config:
             receivers:
@@ -225,6 +227,8 @@ releases:
                       cert_file: /etc/otel/certs/tls.crt
                       key_file: /etc/otel/certs/tls.key
                       min_version: "1.3"
+            # Keep these processor defaults aligned with the upstream chart:
+            # https://github.com/open-telemetry/opentelemetry-helm-charts/blob/opentelemetry-collector-0.172.0/charts/opentelemetry-collector/values.yaml#L225-L234
             processors:
               batch: {}
               memory_limiter:
@@ -232,55 +236,29 @@ releases:
                 limit_percentage: 80
                 spike_limit_percentage: 25
             exporters:
-              debug:
-                verbosity: detailed
+{{- if $otelExporterEndpoint }}
               otlp:
-                endpoint: {{ .Values.otelCollector.exportEndpoint }}
+                endpoint: {{ $otelExporterEndpoint | quote }}
                 tls:
                   insecure: true
+{{- else }}
+              debug:
+                verbosity: detailed
+{{- end }}
             service:
               pipelines:
                 metrics:
                   receivers: [otlp/cf-internal-local]
                   processors: [memory_limiter, batch]
-                  exporters: [debug, otlp]
+                  exporters: [{{ if $otelExporterEndpoint }}otlp{{ else }}debug{{ end }}]
                 logs:
                   receivers: [otlp/cf-internal-local]
                   processors: [memory_limiter, batch]
-                  exporters: [debug, otlp]
+                  exporters: [{{ if $otelExporterEndpoint }}otlp{{ else }}debug{{ end }}]
                 traces:
                   receivers: [otlp/cf-internal-local]
                   processors: [memory_limiter, batch]
-                  exporters: [debug, otlp]
-      {{- if .Values.otelCollector.enabled }}
-      - forwarderAgent:
-          env:
-            DOWNSTREAM_INGRESS_PORT_GLOB: /etc/forwarder/downstream/*.yml
-            EMIT_OTEL_METRICS: "true"
-            EMIT_OTEL_LOGS: "true"
-            EMIT_OTEL_TRACES: "true"
-          extraVolumeMounts:
-            - name: forwarder-downstream
-              mountPath: /etc/forwarder/downstream
-              readOnly: true
-          extraVolumes:
-            - name: forwarder-downstream
-              configMap:
-                name: forwarder-agent-downstream
-      {{- end }}
-    hooks:
-      {{- if .Values.otelCollector.enabled }}
-      - events: ["presync"]
-        showlogs: true
-        command: "/bin/sh"
-        args:
-          - "-c"
-          - |
-            kubectl create configmap forwarder-agent-downstream \
-              --namespace {{ .Values.systemNamespace }} \
-              --from-literal=ingress_port.yml="$(printf 'ingress: "4317"\nprotocol: otelcol\n')" \
-              --dry-run=client -o yaml | kubectl apply -f -
-      {{- end }}
+                  exporters: [{{ if $otelExporterEndpoint }}otlp{{ else }}debug{{ end }}]
 
   - name: gorouter
     namespace: {{ .Values.systemNamespace }}
