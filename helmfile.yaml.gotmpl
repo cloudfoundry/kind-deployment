@@ -45,7 +45,6 @@ repositories:
 {{- end }}
 
 {{- $cniRelease := printf "%s/%s" $cniReleaseNamespace .Values.cni }}
-{{- $otelExporterEndpoint := .Values.otelCollector.exporter.endpoint }}
 
 releases:
   {{- if .Values.localDeployment }}
@@ -216,49 +215,8 @@ releases:
             repository: otel/opentelemetry-collector-contrib
             tag: {{ .Values.charts.otelCollector.imageTag | quote }}
           certificateSecret: all-in-one-tls
-          config:
-            receivers:
-              otlp/cf-internal-local:
-                protocols:
-                  grpc:
-                    endpoint: 127.0.0.1:4317
-                    tls:
-                      client_ca_file: /etc/otel/certs/ca.crt
-                      cert_file: /etc/otel/certs/tls.crt
-                      key_file: /etc/otel/certs/tls.key
-                      min_version: "1.3"
-            # Keep these processor defaults aligned with the upstream chart:
-            # https://github.com/open-telemetry/opentelemetry-helm-charts/blob/opentelemetry-collector-0.172.0/charts/opentelemetry-collector/values.yaml#L225-L234
-            processors:
-              batch: {}
-              memory_limiter:
-                check_interval: 5s
-                limit_percentage: 80
-                spike_limit_percentage: 25
-            exporters:
-{{- if $otelExporterEndpoint }}
-              otlp:
-                endpoint: {{ $otelExporterEndpoint | quote }}
-                tls:
-                  insecure: true
-{{- else }}
-              debug:
-                verbosity: detailed
-{{- end }}
-            service:
-              pipelines:
-                metrics:
-                  receivers: [otlp/cf-internal-local]
-                  processors: [memory_limiter, batch]
-                  exporters: [{{ if $otelExporterEndpoint }}otlp{{ else }}debug{{ end }}]
-                logs:
-                  receivers: [otlp/cf-internal-local]
-                  processors: [memory_limiter, batch]
-                  exporters: [{{ if $otelExporterEndpoint }}otlp{{ else }}debug{{ end }}]
-                traces:
-                  receivers: [otlp/cf-internal-local]
-                  processors: [memory_limiter, batch]
-                  exporters: [{{ if $otelExporterEndpoint }}otlp{{ else }}debug{{ end }}]
+          exporter:
+            endpoint: {{ .Values.otelCollector.exporter.endpoint | quote }}
 
   - name: gorouter
     namespace: {{ .Values.systemNamespace }}
