@@ -209,6 +209,14 @@ releases:
           certificateSecret: all-in-one-tls
         syslogAgent:
           certificateSecret: all-in-one-tls
+        otelCollector:
+          enabled: {{ .Values.otelCollector.enabled }}
+          image:
+            repository: otel/opentelemetry-collector-contrib
+            tag: {{ .Values.charts.otelCollector.imageTag | quote }}
+          certificateSecret: all-in-one-tls
+          exporter:
+            endpoint: {{ .Values.otelCollector.exporter.endpoint | quote }}
 
   - name: gorouter
     namespace: {{ .Values.systemNamespace }}
