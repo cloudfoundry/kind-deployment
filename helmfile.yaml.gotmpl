@@ -261,14 +261,32 @@ releases:
       - systemDomain: {{ .Values.systemDomain }}
         loggregator:
           enabled: true
-        oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
         doppler:
           certificateSecret: all-in-one-tls
         reverseLogProxy:
           certificateSecret: all-in-one-tls
         reverseLogProxyGateway:
-          certificateSecret: all-in-one-tls
+          certificateSecrets:
+            httpTLS: all-in-one-tls
+            logsProvider: all-in-one-tls
+            cc: all-in-one-tls
+            uaaCA: all-in-one-tls
+            metrics: all-in-one-tls
+          uaa:
+            clientId: doppler
+            clientSecret: {{ .Values.secrets.oauthClientsSecret }}
+          logsProvider:
+            commonName: reverse-log-proxy
         trafficcontroller:
+          certificateSecrets:
+            routerTLS: all-in-one-tls
+            cc: all-in-one-tls
+            outgoing: all-in-one-tls
+            uaaCA: all-in-one-tls
+          skipCertVerify: true
+          uaa:
+            clientSecret: {{ .Values.secrets.oauthClientsSecret }}
+        routeRegistrar:
           certificateSecret: all-in-one-tls
 
   - name: log-cache
