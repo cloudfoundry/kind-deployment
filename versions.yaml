@@ -45,7 +45,7 @@ charts:
     version: 7.71.0
   otelCollector:
     # renovate: dataSource=docker depName=otel/opentelemetry-collector-contrib
-    imageTag: "0.163.0"
+    imageTag: "0.162.0"
   policyAgent:
     url: cloudfoundry-k8s/policy-agent
     # renovate: dataSource=github-releases depName=cloudfoundry/k8s-policy-agent
