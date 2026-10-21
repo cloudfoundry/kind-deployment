@@ -494,13 +494,16 @@ releases:
       - loggregator-agent
       - postgresql
     values:
-      - locketdb:
-          password: {{ .Values.secrets.dbPassword }}
-          caCertificateSecret: all-in-one-tls
-          skipSSLVerify: false
-        locket:
+      - locket:
           enabled: true
-          certificateSecret: all-in-one-tls
+          certificateSecrets:
+            server: all-in-one-tls
+            loggregator: all-in-one-tls
+            databaseCA: all-in-one-tls
+          db:
+            password: {{ .Values.secrets.dbPassword }}
+            requireSSL: true
+            enableIdentityVerification: true
 
   - name: diego
     namespace: {{ .Values.systemNamespace }}
@@ -511,28 +514,54 @@ releases:
       - uaa
       - loggregator-agent
     set:
-      - name: sshProxyHostKey
+      - name: sshProxy.hostKey
         file: {{ .Values.certsDir }}/ssh_key
     values:
-      - diegodb:
-          password: {{ .Values.secrets.dbPassword }}
-          caCertificateSecret: all-in-one-tls
-          skipSSLVerify: false
-        diegoSSHCredentials: {{ .Values.secrets.diegoSSHCredentials }}
-        auctioneer:
+      - auctioneer:
           enabled: true
-          certificateSecret: all-in-one-tls
+          certificateSecrets:
+            server: all-in-one-tls
+            bbs: all-in-one-tls
+            rep: all-in-one-tls
+            loggregator: all-in-one-tls
         bbs:
           enabled: true
-          certificateSecret: all-in-one-tls
+          activeKeyLabel: key1
+          encryptionKeys:
+            key1: bbs-encryption-dev-key
+          certificateSecrets:
+            server: all-in-one-tls
+            auctioneer: all-in-one-tls
+            rep: all-in-one-tls
+            loggregator: all-in-one-tls
+            databaseCA: all-in-one-tls
+          db:
+            password: {{ .Values.secrets.dbPassword }}
+            requireSSL: true
+            enableIdentityVerification: true
         fileserver:
           enabled: true
+          certificateSecrets:
+            loggregator: all-in-one-tls
         sshProxy:
           enabled: true
-          certificateSecret: all-in-one-tls
-          oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
-        gatewayObjects:
-          enabled: false
+          enableCfAuth: true
+          enableDiegoAuth: true
+          diegoCredentials: {{ .Values.secrets.diegoSSHCredentials }}
+          uaaSecret: {{ .Values.secrets.oauthClientsSecret }}
+          backends:
+            tls:
+              enabled: true
+          cc:
+            internalServiceHostname: cloud-controller.{{ .Values.systemNamespace }}.svc.cluster.local
+          certificateSecrets:
+            bbs: all-in-one-tls
+            loggregator: all-in-one-tls
+            backendsTLS: all-in-one-tls
+            uaaCA: all-in-one-tls
+            ccCA: all-in-one-tls
+          gateway:
+            enabled: false
 
   - name: tps-watcher
     namespace: {{ .Values.systemNamespace }}
@@ -559,22 +588,27 @@ releases:
       - cf-networking
     {{ end }}
     values:
-      - diegoSSHCredentials: ""
-        sshProxyHostKey: ""
-        routeEmitter:
+      - routeEmitter:
           enabled: true
-          certificateSecret: all-in-one-tls
+          localMode: true
+          nats:
+            tls:
+              enabled: true
+          internalRoutes:
+            enabled: {{ .Values.installOptionalComponents }}
+          tcp:
+            enabled: {{ .Values.installOptionalComponents }}
+            enableTls: true
           routingApi:
             enabled: {{ .Values.installOptionalComponents }}
-            certificateSecret: all-in-one-tls
-          oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
-          natsCertificateSecret: all-in-one-tls
-          loggregatorCertificateSecret: all-in-one-tls
-          bbsCertificateSecret: all-in-one-tls
-          locketCertificateSecret: all-in-one-tls
-          uaaCertificateSecret: all-in-one-tls
-          enableInternalEmitter: {{ .Values.installOptionalComponents }}
-          enableTcpEmitter: {{ .Values.installOptionalComponents }}
+          uaa:
+            clientSecret: {{ .Values.secrets.oauthClientsSecret }}
+          certificateSecrets:
+            bbs: all-in-one-tls
+            loggregator: all-in-one-tls
+            nats: all-in-one-tls
+            routingAPI: all-in-one-tls
+            uaaCA: all-in-one-tls
 
   - name: rep
     namespace: {{ .Values.systemNamespace }}
@@ -583,20 +617,24 @@ releases:
     needs:
       - diego
     set:
-      - name: rep.caCertificate
+      - name: rep.containers.proxy.trustedCaCertificates[0]
         file: {{ .Values.certsDir }}/ca.crt
     values:
       - rep:
           enabled: true
           workloadsNamespace: {{ .Values.workloadsNamespace }}
-          containerProxyVerifySubjectAltName:
-            - gorouter
-            - ssh-proxy
-            - cf-tcp-router
-          loggregator:
-            certificateSecret: all-in-one-tls
-          locket:
-            certificateSecret: all-in-one-tls
+          certificateSecrets:
+            loggregator: all-in-one-tls
+            locket: all-in-one-tls
+          containers:
+            trustedCaCertificates: trusted-system-certs
+            proxy:
+              requireAndVerifyClientCertificates: true
+              enableUnproxiedPortMappings: false
+              verifySubjectAltName:
+                - gorouter
+                - ssh-proxy
+                - cf-tcp-router
           stacks:
           {{- range $stackName, $stackConfig := .Values.stacks }}
             {{- if kindIs "map" $stackConfig }}
