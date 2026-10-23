@@ -33,7 +33,7 @@ charts:
     version: 107.0.39-1
   loggregatorAgent:
     url: cloudfoundry-k8s/loggregator-agent
-    version: 8.3.31
+    version: 8.3.32-1
   minio:
     url: bitnami/minio
     version: 17.0.21
