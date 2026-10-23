@@ -201,6 +201,7 @@ releases:
     values:
       - syslogBindingCache:
           enabled: true
+          aggregateDrains: "syslog://log-cache-syslog.{{ .Values.systemNamespace }}.svc.cluster.local:8082?include-metrics-deprecated=true"
           certificateSecrets:
             api: all-in-one-tls
             cache: all-in-one-tls
