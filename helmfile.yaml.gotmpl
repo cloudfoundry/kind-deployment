@@ -201,14 +201,25 @@ releases:
     values:
       - syslogBindingCache:
           enabled: true
-          certificateSecret: all-in-one-tls
+          certificateSecrets:
+            api: all-in-one-tls
+            cache: all-in-one-tls
+            loggregatorAgent: all-in-one-tls
+            metrics: all-in-one-tls
         forwarderAgent:
           enabled: true
-          certificateSecret: all-in-one-tls
+          certificateSecrets:
+            forwarder: all-in-one-tls
+            metrics: all-in-one-tls
         loggregatorAgent:
-          certificateSecret: all-in-one-tls
+          certificateSecrets:
+            loggregator: all-in-one-tls
+            metrics: all-in-one-tls
         syslogAgent:
-          certificateSecret: all-in-one-tls
+          certificateSecrets:
+            agent: all-in-one-tls
+            cache: all-in-one-tls
+            metrics: all-in-one-tls
 
   - name: gorouter
     namespace: {{ .Values.systemNamespace }}
