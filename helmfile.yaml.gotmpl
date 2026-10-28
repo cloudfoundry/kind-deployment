@@ -207,20 +207,26 @@ releases:
             cache: all-in-one-tls
             loggregatorAgent: all-in-one-tls
             metrics: all-in-one-tls
-        forwarderAgent:
+        agents:
           enabled: true
-          certificateSecrets:
-            forwarder: all-in-one-tls
-            metrics: all-in-one-tls
-        loggregatorAgent:
-          certificateSecrets:
-            loggregator: all-in-one-tls
-            metrics: all-in-one-tls
-        syslogAgent:
-          certificateSecrets:
-            agent: all-in-one-tls
-            cache: all-in-one-tls
-            metrics: all-in-one-tls
+          tolerations:
+            - key: cloudfoundry.org/cell
+              operator: Equal
+              value: "true"
+              effect: NoSchedule
+          forwarderAgent:
+            certificateSecrets:
+              forwarder: all-in-one-tls
+              metrics: all-in-one-tls
+          loggregatorAgent:
+            certificateSecrets:
+              loggregator: all-in-one-tls
+              metrics: all-in-one-tls
+          syslogAgent:
+            certificateSecrets:
+              agent: all-in-one-tls
+              cache: all-in-one-tls
+              metrics: all-in-one-tls
 
   - name: gorouter
     namespace: {{ .Values.systemNamespace }}
