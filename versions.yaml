@@ -15,7 +15,7 @@ charts:
     version: 3.33.0
   credhub:
     url: cloudfoundry-k8s/credhub
-    version: 2.15.27
+    version: 2.15.28
   diego:
     url: cloudfoundry-k8s/diego
     version: 2.151.1-5
@@ -42,7 +42,7 @@ charts:
     version: 2.12.4
   nfsVolume:
     url: cloudfoundry-k8s/nfs-volume
-    version: 7.74.0
+    version: 7.75.0
   policyAgent:
     url: cloudfoundry-k8s/policy-agent
     # renovate: dataSource=github-releases depName=cloudfoundry/k8s-policy-agent
@@ -62,31 +62,31 @@ buildpacks:
     tag: 2.0.1
   dotnet-core-buildpack:
     image: ghcr.io/cloudfoundry/k8s/dotnet-core-buildpack
-    tag: 2.4.52
+    tag: 2.4.53
   java-buildpack:
     image: ghcr.io/cloudfoundry/k8s/java-buildpack
     tag: 5.1.0
   go-buildpack:
     image: ghcr.io/cloudfoundry/k8s/go-buildpack
-    tag: 1.11.1
+    tag: 1.11.2
   nginx-buildpack:
     image: ghcr.io/cloudfoundry/k8s/nginx-buildpack
     tag: 1.2.40
   nodejs-buildpack:
     image: ghcr.io/cloudfoundry/k8s/nodejs-buildpack
-    tag: 1.9.5
+    tag: 1.9.7
   php-buildpack:
     image: ghcr.io/cloudfoundry/k8s/php-buildpack
-    tag: 5.1.2
+    tag: 5.1.5
   python-buildpack:
     image: ghcr.io/cloudfoundry/k8s/python-buildpack
-    tag: 1.9.6
+    tag: 1.9.8
   r-buildpack:
     image: ghcr.io/cloudfoundry/k8s/r-buildpack
     tag: 1.2.28
   ruby-buildpack:
     image: ghcr.io/cloudfoundry/k8s/ruby-buildpack
-    tag: 1.11.2
+    tag: 1.11.3
   staticfile-buildpack:
     image: ghcr.io/cloudfoundry/k8s/staticfile-buildpack
     tag: 1.6.40
@@ -94,7 +94,7 @@ stacks:
   default: cflinuxfs4
   cflinuxfs4:
     image: ghcr.io/cloudfoundry/k8s/cflinuxfs4
-    tag: 1.331.0
+    tag: 1.332.0
   cflinuxfs5:
     image: ghcr.io/cloudfoundry/k8s/cflinuxfs5
-    tag: 0.59.0
+    tag: 0.61.0
