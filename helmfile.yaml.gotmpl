@@ -235,10 +235,36 @@ releases:
     needs:
       - {{ .Values.systemNamespace }}/base
       - {{ .Values.systemNamespace }}/nats
+    {{ if .Values.installOptionalComponents }}
+      - {{ .Values.systemNamespace }}/tcp-routing
+    {{ end }}
     values:
       - gorouter:
           enabled: true
-          certificateSecret: all-in-one-tls
+          enableSSL: true
+          tracing:
+            enableZipkin: true
+          status:
+            password: {{ .Values.secrets.oauthClientsSecret | quote }}
+          routeServicesSecret: {{ .Values.secrets.oauthClientsSecret | quote }}
+          nats:
+            tlsEnabled: true
+          routingAPI:
+            enabled: {{ .Values.installOptionalComponents }}
+          uaa:
+            clients:
+              gorouter:
+                secret: {{ .Values.secrets.oauthClientsSecret | quote }}
+          certificateSecrets:
+            statusTLS: all-in-one-tls
+            serverTLS:
+              - all-in-one-tls
+            trustedCAs:
+              - all-in-one-tls
+            backendsTLS: all-in-one-tls
+            natsTLS: all-in-one-tls
+            uaaCA: all-in-one-tls
+            routingAPITLS: all-in-one-tls
         udpForwarder:
           certificateSecret: all-in-one-tls
 
@@ -253,19 +279,44 @@ releases:
       - uaa
       - postgresql
     values:
-      - routingApi:
+      - routingAPI:
           enabled: true
           sqldb:
-            password: {{ .Values.secrets.dbPassword }}
-            caCertificateSecret: all-in-one-tls
-            skipSSLVerify: false
-          certificateSecret: all-in-one-tls
-          locketCertificateSecret: all-in-one-tls
-          uaaCertificateSecret: all-in-one-tls
+            port: 5432
+            type: postgres
+            schema: routing_api
+            username: postgres
+            password: {{ .Values.secrets.dbPassword | quote }}
+          certificateSecrets:
+            mtlsServer: all-in-one-tls
+            locketTLS: all-in-one-tls
+            uaaCA: all-in-one-tls
+            databaseCA: all-in-one-tls
           systemDomain: {{ .Values.systemDomain }}
+          uaa:
+            tlsPort: 8443
+          routerGroups:
+            - name: default-tcp
+              reservable_ports: 32000-32019
+              type: tcp
         tcpRouter:
           enabled: true
-          oauthClientsSecret: {{ .Values.secrets.oauthClientsSecret }}
+          oauthSecret: {{ .Values.secrets.oauthClientsSecret | quote }}
+          uaa:
+            tlsPort: 8443
+          routingAPI:
+            port: 3001
+          backendTLS:
+            enabled: true
+          certificateSecrets:
+            routingAPITLS: all-in-one-tls
+            uaaCA: all-in-one-tls
+            backendTLS: all-in-one-tls
+            backendCA: all-in-one-tls
+            healthCheckTLS: all-in-one-tls
+        routeRegistrar:
+          certificateSecret: all-in-one-tls
+        udpForwarder:
           certificateSecret: all-in-one-tls
 
   - name: loggregator
