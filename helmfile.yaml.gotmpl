@@ -246,7 +246,7 @@ releases:
             enableZipkin: true
           status:
             password: {{ .Values.secrets.oauthClientsSecret | quote }}
-          routeServicesSecret: {{ .Values.secrets.oauthClientsSecret | quote }}
+          routeServicesSecret: route-services-dev-secret
           nats:
             tlsEnabled: true
           routingAPI:
