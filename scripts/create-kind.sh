@@ -74,6 +74,12 @@ fi
 
 kind create cluster --name "cfk8s" --config=$kind_config
 
+# masked sysfs blocks user namespaces, remove when https://github.com/kubernetes-sigs/kind/issues/3436 is fixed.
+for node in $(kind get nodes --name cfk8s); do
+  docker exec "$node" sh -c \
+    'mkdir -p /unmasked-sys && mount -t sysfs -o ro sysfs /unmasked-sys'
+done
+
 echo "Applying taints to workload nodes..."
 kubectl taint nodes -l cloudfoundry.org/cell=true cloudfoundry.org/cell=true:NoSchedule --overwrite || true
 
