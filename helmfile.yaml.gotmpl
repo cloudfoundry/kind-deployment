@@ -247,6 +247,8 @@ releases:
           status:
             password: {{ .Values.secrets.oauthClientsSecret | quote }}
           routeServicesSecret: route-services-dev-secret
+          routeServices:
+            egressBlocklist: []
           nats:
             tlsEnabled: true
           routingAPI:
