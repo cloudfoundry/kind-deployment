@@ -100,6 +100,7 @@ runs:
         fi
         make up
 
+        sed 's/^[^=]*=/::add-mask::/' temp/secrets.env
         cat temp/secrets.env >> "$GITHUB_ENV"
     - name: Login
       shell: bash
