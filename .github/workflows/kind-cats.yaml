@@ -78,6 +78,10 @@ jobs:
           cf create-service-broker nfsbroker nfsbroker nfsbroker http://nfsbroker:8080
           cf enable-service-access nfs
           cf marketplace
+      - name: Create an identity-aware domain
+        if: steps.check_changes.outputs.skip != 'true'
+        run: |
+          cf create-private-domain my-org apps.identity --enforce-route-policies
       - name: Create nfs share
         if: steps.check_changes.outputs.skip != 'true'
         run: |
