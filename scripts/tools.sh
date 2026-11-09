@@ -14,7 +14,7 @@ export KUBECTL_VERSION="1.36.2"
 # renovate: dataSource=github-releases depName=google/go-containerregistry
 export CRANE_VERSION="0.22.1"
 # renovate: dataSource=github-releases depName=mikefarah/yq
-export YQ_VERSION="4.54.2"
+export YQ_VERSION="4.54.3"
 
 export TOOLS_BIN_DIR="$(realpath $(dirname "${BASH_SOURCE[0]}"))/../bin"
 
