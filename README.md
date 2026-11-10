@@ -71,7 +71,7 @@ postgresql:
 
 ### OpenTelemetry Collector
 
-An OpenTelemetry Collector sidecar can be enabled in every forwarder-agent
+An OpenTelemetry Collector sidecar can be enabled in every `loggregator-agents`
 DaemonSet Pod to receive CF logs, metrics, and traces over mTLS. See
 [OpenTelemetry Collector](docs/otel-collector.md) for configuration and
 verification.

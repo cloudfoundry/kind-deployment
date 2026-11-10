@@ -1,7 +1,7 @@
 # OpenTelemetry Collector
 
 The optional OpenTelemetry Collector runs as a sidecar in every
-`forwarder-agent` DaemonSet Pod. Each forwarder sends CF logs, metrics, and
+`loggregator-agents` DaemonSet Pod. Each forwarder sends CF logs, metrics, and
 traces over mTLS to its colocated collector at `127.0.0.1:4317`.
 
 ## Enable the collector
@@ -31,12 +31,12 @@ with:
 
 ## Verify forwarding
 
-without an external endpoint, each collector uses its detailed debug exporter, 
-then inspect the collector sidecars:
+Without an external endpoint, each collector uses its detailed debug exporter.
+Inspect the collector sidecars:
 
 ```bash
 export KUBECONFIG="$PWD/temp/kubeconfig"
-kubectl -n cf-system logs daemonset/forwarder-agent -c otel-collector \
+kubectl -n cf-system logs daemonset/loggregator-agents -c otel-collector \
   --all-pods=true --prefix=true \
   | grep -E 'ResourceLogs?|ResourceMetrics'
 ```
@@ -44,7 +44,7 @@ kubectl -n cf-system logs daemonset/forwarder-agent -c otel-collector \
 Check the forwarders for TLS, retry, or connection failures:
 
 ```bash
-kubectl -n cf-system logs daemonset/forwarder-agent -c forwarder-agent \
+kubectl -n cf-system logs daemonset/loggregator-agents -c forwarder-agent \
   --all-pods=true --prefix=true \
   | grep -Ei '\[OTEL COLLECTOR CLIENT\].*(retry|error|fail|refused|unavailable)'
 ```

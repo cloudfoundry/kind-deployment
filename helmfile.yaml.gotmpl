@@ -45,6 +45,7 @@ repositories:
 {{- end }}
 
 {{- $cniRelease := printf "%s/%s" $cniReleaseNamespace .Values.cni }}
+{{- $otelExporterEndpoint := .Values.otelCollector.exporter.endpoint }}
 
 releases:
   {{- if .Values.localDeployment }}
@@ -230,9 +231,25 @@ releases:
           otelCollector:
             enabled: {{ .Values.otelCollector.enabled }}
             certificateSecret: all-in-one-tls
-            # TODO add new template instead
-            # exporter:
-            #   endpoint: {{ .Values.otelCollector.exporter.endpoint | quote }}
+            configs:
+              - exporters:
+                  {{- if $otelExporterEndpoint }}
+                  otlp:
+                    endpoint: {{ $otelExporterEndpoint | quote }}
+                    tls:
+                      insecure: true
+                  {{- else }}
+                  debug:
+                    verbosity: detailed
+                  {{- end }}
+                service:
+                  pipelines:
+                    logs:
+                      exporters: [{{ if $otelExporterEndpoint }}otlp{{ else }}debug{{ end }}]
+                    metrics:
+                      exporters: [{{ if $otelExporterEndpoint }}otlp{{ else }}debug{{ end }}]
+                    traces:
+                      exporters: [{{ if $otelExporterEndpoint }}otlp{{ else }}debug{{ end }}]
 
   - name: gorouter
     namespace: {{ .Values.systemNamespace }}
