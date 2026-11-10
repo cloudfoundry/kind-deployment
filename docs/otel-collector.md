@@ -35,10 +35,10 @@ Without an external endpoint, each collector uses its detailed debug exporter.
 Inspect the collector sidecars:
 
 ```bash
-export KUBECONFIG="$PWD/temp/kubeconfig"
+kubectl config use-context kind-cfk8s
 kubectl -n cf-system logs daemonset/loggregator-agents -c otel-collector \
   --all-pods=true --prefix=true \
-  | grep -E 'ResourceLogs?|ResourceMetrics'
+  | grep -E 'ResourceLogs?|ResourceMetrics|ResourceSpans'
 ```
 
 Check the forwarders for TLS, retry, or connection failures:
@@ -62,9 +62,13 @@ docker run --detach --name otel-collector-outside-kind \
   otel/opentelemetry-collector-k8s:latest \
   --config=/etc/otel/config.yaml
 
+docker logs otel-collector-outside-kind
+
 docker exec cfk8s-control-plane \
   sh -c "ip route | awk '/default/ {print \$3; exit}'"
 ```
+
+Confirm that the receiver logs report `Everything is ready` before redeploying.
 
 Set `otelCollector.exporter.endpoint` to the printed host address and port
 `4317` (here `172.18.0.1`):
@@ -85,3 +89,11 @@ docker logs -f otel-collector-outside-kind
 
 The external endpoint uses insecure transport and is intended only for local
 development.
+
+To stop this test, clear the endpoint (to return to debug export) or disable the
+sidecars with `otelCollector.enabled: false`, then rerun `make install` with the
+same values file. Remove the external receiver only after redeploying:
+
+```bash
+docker rm --force otel-collector-outside-kind
+```
