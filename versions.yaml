@@ -18,7 +18,7 @@ charts:
     version: 2.15.29
   diego:
     url: cloudfoundry-k8s/diego
-    version: 2.151.1-5
+    version: 2.152.0
   istioBase:
     url: istio/base
     version: 1.29.1
@@ -62,7 +62,7 @@ buildpacks:
     tag: 2.0.1
   dotnet-core-buildpack:
     image: ghcr.io/cloudfoundry/k8s/dotnet-core-buildpack
-    tag: 2.4.53
+    tag: 2.4.54
   java-buildpack:
     image: ghcr.io/cloudfoundry/k8s/java-buildpack
     tag: 5.1.1
@@ -86,10 +86,10 @@ buildpacks:
     tag: 1.2.28
   ruby-buildpack:
     image: ghcr.io/cloudfoundry/k8s/ruby-buildpack
-    tag: 1.11.3
+    tag: 1.11.4
   staticfile-buildpack:
     image: ghcr.io/cloudfoundry/k8s/staticfile-buildpack
-    tag: 1.6.40
+    tag: 1.6.41
 stacks:
   default: cflinuxfs4
   cflinuxfs4:
@@ -97,4 +97,4 @@ stacks:
     tag: 1.333.0
   cflinuxfs5:
     image: ghcr.io/cloudfoundry/k8s/cflinuxfs5
-    tag: 0.65.0
+    tag: 0.66.0
