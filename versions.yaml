@@ -52,7 +52,7 @@ charts:
     version: 16.7.27
   routing:
     url: cloudfoundry-k8s/routing
-    version: 0.399.1-1
+    version: 0.400.0
   uaa:
     url: cloudfoundry-k8s/uaa
     version: 79.12.0
@@ -62,22 +62,22 @@ buildpacks:
     tag: 2.0.1
   dotnet-core-buildpack:
     image: ghcr.io/cloudfoundry/k8s/dotnet-core-buildpack
-    tag: 2.4.54
+    tag: 2.4.55
   java-buildpack:
     image: ghcr.io/cloudfoundry/k8s/java-buildpack
-    tag: 5.1.2
+    tag: 5.1.4
   go-buildpack:
     image: ghcr.io/cloudfoundry/k8s/go-buildpack
     tag: 1.11.2
   nginx-buildpack:
     image: ghcr.io/cloudfoundry/k8s/nginx-buildpack
-    tag: 1.2.41
+    tag: 1.2.42
   nodejs-buildpack:
     image: ghcr.io/cloudfoundry/k8s/nodejs-buildpack
     tag: 1.9.8
   php-buildpack:
     image: ghcr.io/cloudfoundry/k8s/php-buildpack
-    tag: 5.1.5
+    tag: 5.1.6
   python-buildpack:
     image: ghcr.io/cloudfoundry/k8s/python-buildpack
     tag: 1.9.9
@@ -86,15 +86,15 @@ buildpacks:
     tag: 1.2.29
   ruby-buildpack:
     image: ghcr.io/cloudfoundry/k8s/ruby-buildpack
-    tag: 1.11.4
+    tag: 1.11.5
   staticfile-buildpack:
     image: ghcr.io/cloudfoundry/k8s/staticfile-buildpack
-    tag: 1.6.41
+    tag: 1.6.42
 stacks:
   default: cflinuxfs4
   cflinuxfs4:
     image: ghcr.io/cloudfoundry/k8s/cflinuxfs4
-    tag: 1.336.0
+    tag: 1.337.0
   cflinuxfs5:
     image: ghcr.io/cloudfoundry/k8s/cflinuxfs5
     tag: 0.74.0
