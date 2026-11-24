@@ -62,7 +62,7 @@ spec:
     - toEndpoints:
         - matchLabels:
             io.kubernetes.pod.namespace: {{ .Release.Namespace }}
-            app: credhub
+            app.kubernetes.io/name: credhub
       toPorts:
         - ports:
             - port: "8844"
@@ -81,7 +81,7 @@ spec:
     - toEndpoints:
         - matchLabels:
             io.kubernetes.pod.namespace: {{ .Release.Namespace }}
-            app: uaa
+            app.kubernetes.io/name: uaa
       toPorts:
         - ports:
             - port: "8443"

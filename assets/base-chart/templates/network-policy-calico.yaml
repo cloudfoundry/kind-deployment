@@ -64,7 +64,7 @@ spec:
       protocol: TCP
       destination:
         namespaceSelector: kubernetes.io/metadata.name == "{{ .Release.Namespace }}"
-        selector: app == "credhub"
+        selector: app.kubernetes.io/name == "credhub"
         ports:
           - 8844
 ---
@@ -81,7 +81,7 @@ spec:
       protocol: TCP
       destination:
         namespaceSelector: kubernetes.io/metadata.name == "{{ .Release.Namespace }}"
-        selector: app == "uaa"
+        selector: app.kubernetes.io/name == "uaa"
         ports:
           - 8443
 {{- end }}
