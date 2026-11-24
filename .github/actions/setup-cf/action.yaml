@@ -59,7 +59,8 @@ runs:
           --privileged \
           --pid host \
           -v /lib/modules:/lib/modules:ro \
-          alpine sh -c "sysctl -w fs.inotify.max_user_instances=512 && modprobe nfs && modprobe nfsd"
+          alpine sh -c "sysctl -w fs.inotify.max_user_instances=512 && modprobe nfs && modprobe nfsd && modprobe fuse"
+        test -c /dev/fuse
     - name: Install CF CLI
       shell: bash
       run: |
