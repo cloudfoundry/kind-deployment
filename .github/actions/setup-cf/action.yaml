@@ -61,6 +61,16 @@ runs:
           -v /lib/modules:/lib/modules:ro \
           alpine sh -c "sysctl -w fs.inotify.max_user_instances=512 && modprobe nfs && modprobe nfsd && modprobe fuse"
         test -c /dev/fuse
+    - name: Allow mapfs mounts in AppArmor
+      shell: bash
+      run: |
+        if [ -f /etc/apparmor.d/fusermount3 ]; then
+          printf '%s\n' \
+            'mount fstype=fuse.mapfs options=(rw,nosuid,nodev) -> /var/lib/rep/volumes/nfs/**/,' \
+            'umount /var/lib/rep/volumes/nfs/**/,' \
+            | sudo tee -a /etc/apparmor.d/local/fusermount3
+          sudo apparmor_parser -r /etc/apparmor.d/fusermount3
+        fi
     - name: Install CF CLI
       shell: bash
       run: |
