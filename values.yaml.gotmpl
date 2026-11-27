@@ -11,6 +11,10 @@ installOptionalComponents: {{ "INSTALL_OPTIONAL_COMPONENTS" | env | default "tru
 gateway:
   infrastructure: {}
 postgresql: {}
+otelCollector:
+  enabled: false
+  exporter:
+    endpoint: ""
 secrets:
   dbPassword: {{ requiredEnv "DB_PASSWORD" }}
   blobstorePassword: {{ requiredEnv "BLOBSTORE_PASSWORD" }}
