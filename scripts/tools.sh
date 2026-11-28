@@ -4,7 +4,7 @@ set -e
 set -o pipefail
 
 # renovate: dataSource=github-releases depName=helmfile/helmfile
-export HELMFILE_VERSION="1.8.5"
+export HELMFILE_VERSION="1.8.6"
 # renovate: dataSource=github-releases depName=helm/helm
 export HELM_VERSION="4.3.2"
 # renovate: dataSource=github-releases depName=kubernetes-sigs/kind
